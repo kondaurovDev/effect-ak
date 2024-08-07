@@ -1,0 +1,26 @@
+{
+  "update_id": 816258811,
+  "channel_post": {
+    "message_id": 7,
+    "author_signature": "Alexander Kondaurov",
+    "sender_chat": {
+      "id": -1002076232764,
+      "title": "Aws kondaurov",
+      "type": "channel"
+    },
+    "chat": {
+      "id": -1002076232764,
+      "title": "Aws kondaurov",
+      "type": "channel"
+    },
+    "date": 1699196541,
+    "text": "do it please @kondaurov_bot",
+    "entities": [
+      {
+        "offset": 13,
+        "length": 14,
+        "type": "mention"
+      }
+    ]
+  }
+}

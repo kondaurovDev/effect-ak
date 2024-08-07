@@ -1,0 +1,114 @@
+{
+  "object": "database",
+  "id": "0f822113-af78-4ada-8623-00bb324f3ca6",
+  "cover": null,
+  "icon": null,
+  "created_time": "2024-02-23T11:00:00.000Z",
+  "created_by": {
+    "object": "user",
+    "id": "677aff36-84a5-4374-ac22-c48d8793e386"
+  },
+  "last_edited_by": {
+    "object": "user",
+    "id": "677aff36-84a5-4374-ac22-c48d8793e386"
+  },
+  "last_edited_time": "2024-02-24T13:20:00.000Z",
+  "title": [
+    {
+      "type": "text",
+      "text": {
+        "content": "Участники",
+        "link": null
+      },
+      "annotations": {
+        "bold": false,
+        "italic": false,
+        "strikethrough": false,
+        "underline": false,
+        "code": false,
+        "color": "default"
+      },
+      "plain_text": "Участники",
+      "href": null
+    }
+  ],
+  "description": [],
+  "is_inline": true,
+  "properties": {
+    "Status": {
+      "id": "oIkh",
+      "name": "Status",
+      "type": "status",
+      "status": {
+        "options": [
+          {
+            "id": "c6c90bf4-c715-42a5-bb4c-ae5cdd60e437",
+            "name": "Not started",
+            "color": "default",
+            "description": null
+          },
+          {
+            "id": "ee09e59e-f447-475b-bab9-9d3db7657d25",
+            "name": "In progress",
+            "color": "blue",
+            "description": null
+          },
+          {
+            "id": "128bade6-7245-43d1-b5f0-3070e3429cb6",
+            "name": "Done",
+            "color": "green",
+            "description": null
+          }
+        ],
+        "groups": [
+          {
+            "id": "d19d2269-88a6-47d9-b847-970a942353e7",
+            "name": "To-do",
+            "color": "gray",
+            "option_ids": [
+              "c6c90bf4-c715-42a5-bb4c-ae5cdd60e437"
+            ]
+          },
+          {
+            "id": "4ae2952c-daf7-4968-88aa-1d3f8b7f7e9b",
+            "name": "In progress",
+            "color": "blue",
+            "option_ids": [
+              "ee09e59e-f447-475b-bab9-9d3db7657d25"
+            ]
+          },
+          {
+            "id": "53d8f062-8a54-47a9-ac7c-22fa4332eb57",
+            "name": "Complete",
+            "color": "green",
+            "option_ids": [
+              "128bade6-7245-43d1-b5f0-3070e3429cb6"
+            ]
+          }
+        ]
+      }
+    },
+    "Tags": {
+      "id": "%7DGsb",
+      "name": "Tags",
+      "type": "select",
+      "select": {
+        "options": []
+      }
+    },
+    "Name": {
+      "id": "title",
+      "name": "Name",
+      "type": "title",
+      "title": {}
+    }
+  },
+  "parent": {
+    "type": "page_id",
+    "page_id": "498bb647-ea44-4484-a0ec-f241b9ce5586"
+  },
+  "url": "https://www.notion.so/0f822113af784ada862300bb324f3ca6",
+  "public_url": null,
+  "archived": false,
+  "request_id": "424e0c0c-bd6b-4a12-9401-d8d6972e3e00"
+}

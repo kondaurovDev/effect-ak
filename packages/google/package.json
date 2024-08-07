@@ -1,0 +1,26 @@
+{
+  "name": "@efkit/google",
+  "version": "0.0.1",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "repository": {
+    "url": "https://github.com/kondaurovDev/efkit",
+    "directory": "packages/google"
+  },
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "scripts": {
+    "test": "vitest run",
+    "build": "npm run build-cjs && npm run build-esm",
+    "build-cjs": "tsup src/index.ts --dts",
+    "build-esm": "tsup src/index.ts --format esm --dts"
+  },
+  "dependencies": {
+    "google-auth-library": "^9.11.0",
+    "@efkit/shared": "^0.0.2"
+  }
+}

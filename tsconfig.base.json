@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "composite": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "lib": ["ESNext"],
+    "moduleResolution": "NodeNext", 
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+  },
+  "exclude": [
+    "packages/notion/*"
+  ]
+}

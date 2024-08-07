@@ -1,0 +1,26 @@
+{
+  "name": "@efkit/shared",
+  "version": "0.0.2",
+  "description": "reusable effects",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "repository": {
+    "url": "https://github.com/kondaurovDev/efkit",
+    "directory": "packages/shared"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [ "build" ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "effect": "^3.6.1",
+    "@effect/platform": "^0.61.4",
+    "@effect/schema": "^0.70.2"
+  }
+}

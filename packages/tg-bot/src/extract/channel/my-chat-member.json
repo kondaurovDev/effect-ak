@@ -1,0 +1,53 @@
+{
+  "update_id": 816258815,
+  "my_chat_member": {
+    "chat": {
+      "id": -1001994725279,
+      "title": "logs",
+      "type": "channel"
+    },
+    "from": {
+      "id": 270501423,
+      "is_bot": false,
+      "first_name": "Alexander",
+      "last_name": "Kondaurov",
+      "username": "kondaurov_aa",
+      "language_code": "en",
+      "is_premium": true
+    },
+    "date": 1699342433,
+    "old_chat_member": {
+      "user": {
+        "id": 6603026796,
+        "is_bot": true,
+        "first_name": "kondaurov_local_bot",
+        "username": "kondaurov_local_bot"
+      },
+      "status": "left"
+    },
+    "new_chat_member": {
+      "user": {
+        "id": 6603026796,
+        "is_bot": true,
+        "first_name": "kondaurov_local_bot",
+        "username": "kondaurov_local_bot"
+      },
+      "status": "asd",
+      "can_be_edited": false,
+      "can_manage_chat": true,
+      "can_change_info": true,
+      "can_post_messages": true,
+      "can_edit_messages": true,
+      "can_delete_messages": true,
+      "can_invite_users": true,
+      "can_restrict_members": true,
+      "can_promote_members": false,
+      "can_manage_video_chats": true,
+      "can_post_stories": true,
+      "can_edit_stories": true,
+      "can_delete_stories": true,
+      "is_anonymous": false,
+      "can_manage_voice_chats": true
+    }
+  }
+}

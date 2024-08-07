@@ -1,0 +1,25 @@
+{
+  "name": "@efkit/claude",
+  "version": "0.0.1",
+  "type": "module",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "repository": {
+    "url": "https://github.com/kondaurovDev/efkit",
+    "directory": "packages/claude"
+  },
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "vitest run",
+    "build": "npm run build-cjs && npm run build-esm",
+    "build-cjs": "tsup src/index.ts --dts",
+    "build-esm": "tsup src/index.ts --format esm --dts"
+  },
+  "dependencies": {
+    "@efkit/shared": "^0.0.2"
+  }
+}

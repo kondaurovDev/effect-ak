@@ -1,0 +1,41 @@
+  {
+    "update_id": 591973783,
+    "message": {
+      "message_id": 694,
+      "from": {
+        "id": 270501423,
+        "is_bot": false,
+        "first_name": "Alexander",
+        "last_name": "Kondaurov",
+        "username": "kondaurov_aa",
+        "language_code": "en",
+        "is_premium": true
+      },
+      "chat": {
+        "id": 270501423,
+        "first_name": "Alexander",
+        "last_name": "Kondaurov",
+        "username": "kondaurov_aa",
+        "type": "private"
+      },
+      "date": 1694341501,
+      "text": "/cmd1 @bot1 /superCmd cmd3",
+      "entities": [
+        {
+          "offset": 0,
+          "length": 5,
+          "type": "bot_command"
+        },
+        {
+          "offset": 6,
+          "length": 5,
+          "type": "mention"
+        },
+        {
+          "offset": 12,
+          "length": 9,
+          "type": "bot_command"
+        }
+      ]
+    }
+  }

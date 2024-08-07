@@ -1,0 +1,16 @@
+{
+  "name": "@efkit/notion",
+  "version": "0.0.1",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "repository": {
+    "url": "https://github.com/kondaurovDev/efkit",
+    "directory": "packages/notion"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@efkit/shared": "^0.0.2"
+  }
+}

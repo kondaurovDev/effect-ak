@@ -1,0 +1,26 @@
+{
+  "name": "@efkit/tg-bot",
+  "version": "0.0.1",
+  "description": "effects for telegram bot",
+  "license": "MIT",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "repository": {
+    "url": "https://github.com/kondaurovDev/efkit",
+    "directory": "packages/tg-bot"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "files": [],
+  "scripts": {
+    "build": "npm run build-cjs && npm run build-esm",
+    "build-cjs": "tsup src/index.ts --dts",
+    "build-esm": "tsup src/index.ts --format esm --dts"
+  },
+  "dependencies": {
+    "@efkit/shared": "^0.0.2"
+  }
+}
