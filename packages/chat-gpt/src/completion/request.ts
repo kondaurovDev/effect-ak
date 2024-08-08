@@ -1,7 +1,7 @@
 import { Schema as S } from "@effect/schema"
 import { Brand, pipe, Effect } from "effect";
 
-import * as FunctionTool from "../tools/function-tool"
+import * as FunctionTool from "../tools/function-tool.js"
 
 export type MessageContent =
   typeof MessageContent.Type

@@ -1,3 +1,3 @@
-export * from "./parameter"
-export * from "./service"
-export * as T from "./types"
+export * from "./parameter.js"
+export * from "./service.js"
+export * as T from "./types.js"

@@ -2,10 +2,9 @@ import { pipe, Effect } from "effect";
 import { Schema as S } from "@effect/schema";
 import * as Shared from "@efkit/shared";
 
-import * as ChatCompletion from "../completion";
-import { CompletionError } from "../completion/error";
-import { CompletionService } from "./service";
-import { ChatCompletionRequest } from "./request";
+import { CompletionError } from "../completion/error.js";
+import { CompletionService } from "./service.js";
+import { ChatCompletionRequest } from "./request.js";
 
 export type UserMessage = typeof UserMessage.Type
 export const UserMessage =
@@ -16,8 +15,8 @@ export const completeChat = (
 ) =>
   pipe(
     CompletionService,
-    Effect.andThen(completeChat =>
-      completeChat(request)
+    Effect.andThen(({ complete }) =>
+      complete(request)
     ),
     Effect.andThen(_ => _.firstChoice),
     Effect.andThen(_ =>
@@ -30,10 +29,10 @@ export const completeFunctionCall = <O>(
   resultSchema: S.Schema<O, O>,
 ) =>
   pipe(
-    ChatCompletion.CompletionService,
-    Effect.andThen((completeChat) =>
+    CompletionService,
+    Effect.andThen(({ complete }) =>
       pipe(
-        completeChat(request),
+        complete(request),
         Effect.andThen(_ => _.firstChoice),
         Effect.andThen(_ => _.functionArgumets),
         Effect.andThen(_ => pipe(

@@ -2,7 +2,7 @@
 import { Context, Layer, Effect } from "effect"
 import { SSM } from "@aws-sdk/client-ssm"
 
-import { AwsRegion } from "../config";
+import { AwsRegion } from "../config.js";
 
 export const Service =
   Context.GenericTag<SSM>("AWS.SSM")

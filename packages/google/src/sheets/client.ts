@@ -1,11 +1,9 @@
 import { Effect, Layer } from "effect";
 import { HttpClient, HttpClientRequest } from "@effect/platform";
 
-import { RestClientLayer, RestClient } from "../client";
-import { getServiceAccountAccessToken } from "../auth";
-import { SpreadsheetId } from ".";
-
-export * from "./values"
+import { RestClientLayer, RestClient } from "../client.js";
+import { getServiceAccountAccessToken } from "../auth/index.js";
+import * as T from "./types.js";
 
 export const SheetsClient =
   RestClient("Sheets")
@@ -20,7 +18,7 @@ export const SheetsClientLive =
   );
 
 export const getSpreadsheet = (
-  spreadsheetId: SpreadsheetId,
+  spreadsheetId: T.SpreadsheetId,
 ) =>
   Effect.Do.pipe(
     Effect.bind("client", () => SheetsClient),

@@ -1,7 +1,7 @@
 import { Schema as S, JSONSchema } from "@effect/schema";
 import { pipe, Effect } from "effect"
 
-import { ToolChoice } from "../completion/request"
+import { ToolChoice } from "../completion/request.js"
 
 export type ToolSchema =
   typeof ToolSchema.Type

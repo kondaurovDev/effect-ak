@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest"
 import { Effect } from "effect";
 
-import { getUpdateExpression } from "./update-expr";
-import * as D from "../types";
+import { getUpdateExpression } from "./update-expr.js";
+import * as D from "../types.js";
 
 describe("get update expression", () => {
 

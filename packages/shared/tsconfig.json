@@ -4,6 +4,7 @@
   "compilerOptions": {
     "types": ["node"],
     "outDir": "dist",
+    "declaration": true,
     "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
     "rootDir": "src"
   }

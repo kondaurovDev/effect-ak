@@ -1,8 +1,8 @@
 import { pipe, Effect } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { CompletionError } from "./error";
-import { Model } from "./request";
+import { CompletionError } from "./error.js";
+import { Model } from "./request.js";
 
 export type FinishReason = 
   typeof FinishReason.Type

@@ -1,4 +1,4 @@
-import * as D from "../types";
+import * as D from "../types.js";
 
 export const getProjectionAndAttributeNames = (attrs: D.AttrsToGet): {
   attributeNames: D.AttributeNames,

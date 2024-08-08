@@ -15,11 +15,14 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "test": "vitest run",
-    "build": "npm run build-cjs && npm run build-esm",
-    "build-cjs": "tsup src/index.ts --dts",
-    "build-esm": "tsup src/index.ts --format esm --dts"
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "effect": "^3.6.1",
+    "@effect/platform": "^0.61.4",
+    "@effect/schema": "^0.70.2"
   },
   "dependencies": {
-    "@efkit/shared": "^0.0.2"
+    "@efkit/shared": "workspace:^"
   }
 }

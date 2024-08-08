@@ -1,8 +1,7 @@
 import { Brand, Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema";
 
-import * as ChatCompletion from "../completion";
-import { CompletionError } from "../completion/error";
+import * as ChatCompletion from "../completion/index.js";
 
 export type ImageBytes = Uint8Array & Brand.Brand<"ImageBytes">;
 export const ImageBytes = Brand.nominal<ImageBytes>();
@@ -26,7 +25,7 @@ export const imagePrompt = (
 ) =>
   pipe(
     ChatCompletion.CompletionService,
-    Effect.andThen(completeChat =>
+    Effect.andThen(({ complete }) =>
       pipe(
         S.decode(ChatCompletion.ChatCompletionRequest)({
           model: "gpt-4o",
@@ -44,10 +43,10 @@ export const imagePrompt = (
           ]
         }).pipe(
           Effect.mapError(parseError =>
-            new CompletionError({ errorCode: "ClientError", parseError })
+            new ChatCompletion.CompletionError({ errorCode: "ClientError", parseError })
           )
         ),
-        Effect.andThen(completeChat),
+        Effect.andThen(complete),
         Effect.andThen(_ => _.firstChoice),
         Effect.andThen(_ => _.message.content),
       )

@@ -1,4 +1,4 @@
-export * as SSM from "./ssm"
-export * as S3 from "./s3"
-export * as DynamoDB from "./dynamodb"
-export * from "./config"
+export * as SSM from "./ssm/index.js"
+export * as S3 from "./s3/index.js"
+export * as DynamoDB from "./dynamodb/index.js"
+export * from "./config.js"

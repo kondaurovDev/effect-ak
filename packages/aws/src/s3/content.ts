@@ -1,8 +1,8 @@
 import { Effect, pipe } from "effect";
-import * as T from "./types";
+import * as T from "./types.js";
 
-import { Service } from "./service"
-import { tryAwsServiceMethod } from "../error";
+import { Service } from "./service.js"
+import { tryAwsServiceMethod } from "../error.js";
 import { parseJson } from "@efkit/shared";
 
 export const createFileWithContent = (

@@ -1,9 +1,10 @@
-import { describe, it, expect } from "bun:test"
-import { getJsonContent } from "./content"
-import { BucketKey, BucketName } from "./types"
-import { ServiceLive } from "./service"
+import { describe, it, expect } from "vitest"
 import { Effect, pipe } from "effect"
-import { AwsRegionLive } from "../config"
+
+import { getJsonContent } from "./content.js"
+import { BucketKey, BucketName } from "./types.js"
+import { ServiceLive } from "./service.js"
+import { AwsRegionLive } from "../config.js"
 
 describe("content", () => {
 

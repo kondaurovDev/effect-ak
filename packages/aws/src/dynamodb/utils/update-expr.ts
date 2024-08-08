@@ -1,8 +1,8 @@
 import { convertToAttr } from "@aws-sdk/util-dynamodb";
 import { Effect, pipe } from "effect";
 
-import * as D from "../types";
-import { DynamoDbError } from "../errors"
+import * as D from "../types.js";
+import { DynamoDbError } from "../errors.js"
 
 export const getUpdateExpression = (
   item: D.AnyItem

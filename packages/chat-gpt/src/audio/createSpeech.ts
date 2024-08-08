@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { FileSystem, HttpBody, HttpClientRequest } from "@effect/platform"
 
-import { RestClient as GptRestClient } from "../client"
+import { RestClient as GptRestClient } from "../client.js"
 
 type Voice = 
   "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"

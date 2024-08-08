@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import * as D from "./types";
-import { Service } from "./service"
-import { tryAwsServiceMethod } from "../error";
+import * as D from "./types.js";
+import { Service } from "./service.js"
+import { tryAwsServiceMethod } from "../error.js";
 
 export const createTable = (
   tableName: D.TableName,

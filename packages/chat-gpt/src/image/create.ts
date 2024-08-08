@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema"
 
-import { RestClient } from "../client";
+import { RestClient } from "../client.js";
 
 const Response = 
   S.Struct({

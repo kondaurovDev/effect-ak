@@ -1,6 +1,6 @@
 import { S3 } from "@aws-sdk/client-s3"
 import { Context, Layer, Effect } from "effect"
-import { AwsRegion } from "../config";
+import { AwsRegion } from "../config.js";
 
 export const Service = 
   Context.GenericTag<S3>("AWS.S3");

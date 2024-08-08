@@ -2,9 +2,6 @@
   "private": "true",
   "name": "efkit",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "test": "vitest run"
   },

@@ -3,8 +3,8 @@ import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 import { Action, ActionName, parseDateWithTime } from "@efkit/shared"
 
-import { RestClientLayer, RestClient } from "../client";
-import { getServiceAccountAccessToken } from "../auth";
+import { RestClientLayer, RestClient } from "../client.js";
+import { getServiceAccountAccessToken } from "../auth/index.js";
 
 const Client =
   RestClient("Calendar")

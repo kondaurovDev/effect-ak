@@ -2,11 +2,11 @@ import { Effect, pipe } from "effect";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import * as Sdk from "@aws-sdk/client-dynamodb";
 
-import * as D from "./types";
-import { getProjectionAndAttributeNames, getUpdateExpression } from "./utils";
-import { Service } from "./service"
-import { DynamoDbError } from "./errors";
-import { tryAwsServiceMethod } from "../error";
+import * as D from "./types.js";
+import { getProjectionAndAttributeNames, getUpdateExpression } from "./utils/index.js";
+import { Service } from "./service.js"
+import { DynamoDbError } from "./errors.js";
+import { tryAwsServiceMethod } from "../error.js";
 
 export const putItem = (
   tableName: D.TableName,

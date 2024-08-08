@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { SheetsClient, SheetsClientLive } from "./client";
-import { getServiceAccountAccessToken } from "../auth";
+import { SheetsClient, SheetsClientLive } from "./client.js";
+import { getServiceAccountAccessToken } from "../auth/index.js";
 
 //https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
 

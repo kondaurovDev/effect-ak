@@ -1,8 +1,8 @@
-
 import { HttpClientRequest } from "@effect/platform";
-import { RestClient, RestClientLayer } from "../client"
 import { Effect } from "effect";
-import { getServiceAccountAccessToken } from "../auth";
+
+import { RestClient, RestClientLayer } from "../client.js"
+import { getServiceAccountAccessToken } from "../auth/index.js";
 
 const Client = 
   RestClient("Spreadsheet");

@@ -1,12 +1,12 @@
-export * as ChatCompletion from "./completion"
-export * as Vision from "./vision/vision"
-export * as FunctionTool from "./tools/function-tool"
-export * from "./audio/transcribe"
-export * from "./audio/createSpeech"
-export * from "./image/create"
+export * as ChatCompletion from "./completion/index.js"
+export * as Vision from "./vision/vision.js"
+export * as FunctionTool from "./tools/function-tool.js"
+export * from "./audio/transcribe.js"
+export * from "./audio/createSpeech.js"
+export * from "./image/create.js"
 
 export { 
   RestClientLive as GtpRestClientLive, 
   RestClient as GptRestClient,
   GptTokenLayerFromEnv
-} from "./client"
+} from "./client.js"
