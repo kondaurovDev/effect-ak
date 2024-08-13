@@ -14,7 +14,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "devDependencies": {
     "effect": "^3.6.1",
@@ -23,6 +24,6 @@
   },
   "dependencies": {
     "google-auth-library": "^9.11.0",
-    "@efkit/shared": "workspace:^"
+    "@efkit/shared": "0.0.2"
   }
 }

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { Schema as S, } from "@effect/schema"
 import { Effect, Logger, pipe } from "effect";
 
-import { Message, MessageContent } from "./request.js"
+import { Message, MessageContent } from "../src/completion"
 
 describe("request", () => {
 

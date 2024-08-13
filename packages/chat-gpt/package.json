@@ -13,8 +13,12 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "vitest run",
+    "pack-tar": "pnpm pack --pack-destination ../../dist",
     "build": "tsc"
   },
   "devDependencies": {
@@ -23,6 +27,6 @@
     "@effect/schema": "^0.70.2"
   },
   "dependencies": {
-    "@efkit/shared": "workspace:^"
+    "@efkit/shared": "0.0.2"
   }
 }

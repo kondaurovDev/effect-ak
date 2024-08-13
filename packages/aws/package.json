@@ -15,6 +15,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "pack-tar": "pnpm pack --pack-destination ../../dist",
     "build": "tsc"
   },
   "devDependencies": {
@@ -27,6 +28,6 @@
     "@aws-sdk/util-dynamodb": "^3.623.0",
     "@aws-sdk/client-ssm": "^3.623.0",
     "@aws-sdk/client-s3": "^3.623.0",
-    "@efkit/shared": "workspace:^"
+    "@efkit/shared": "0.0.2"
   }
 }

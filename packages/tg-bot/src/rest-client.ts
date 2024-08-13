@@ -1,8 +1,9 @@
 import { HttpBody, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Layer, pipe, Effect, Context, Match } from "effect";
 import { Schema as S } from "@effect/schema"
-import { ContractError, TgApiError } from "./error";
-import { BotTokenValue, BotToken } from "./token";
+
+import { ContractError, TgApiError } from "./error.js";
+import { BotTokenValue, BotToken } from "./token.js";
 
 export type TgResponse =
   typeof TgResponse.Type;
@@ -21,7 +22,7 @@ export type RestClientError =
   TgApiError
 
 export type MethodResult<A> =
-  Effect.Effect<A, RestClientError, BotTokenValue>
+  Effect.Effect<A, RestClientError, BotToken>
 
 export type RestClient = {
   sendApiRequest: <O>(

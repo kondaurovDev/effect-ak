@@ -1,9 +1,10 @@
-import * as M from "./models/method";
-import * as D from "./models/domain";
-import { MessageUpdate } from "./update-events/message"
-import { MethodResult, RestClient, RestClientLive } from "./rest-client";
 import { Context, Effect, Layer, pipe } from "effect";
-import { TgBotError } from "./error";
+
+import * as M from "./models/method.js";
+import * as D from "./models/domain.js";
+import { MessageUpdate } from "./update-events/message.js"
+import { MethodResult, RestClient, RestClientLive } from "./rest-client.js";
+import { TgBotError } from "./error.js";
 
 export type TgBotApiClient = {
   getMe(): MethodResult<D.User>

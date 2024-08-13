@@ -1,2 +1,2 @@
-export * from "./message"
-export * from "./update-event"
+export * from "./message.js"
+export * from "./update-event.js"

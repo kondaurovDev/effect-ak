@@ -14,9 +14,12 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": [ "dist" ],
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "peerDependencies": {
     "effect": "^3.6.1",

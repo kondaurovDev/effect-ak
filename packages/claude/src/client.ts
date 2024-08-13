@@ -40,7 +40,7 @@ export const RestClientLayer =
           HttpClient.mapRequest(
             HttpClientRequest.setHeaders({
               "anthropic-version": "2023-06-01",
-              "x-api-key": token
+              "x-api-key": token.value
             })
           ),
           HttpClient.mapRequest(

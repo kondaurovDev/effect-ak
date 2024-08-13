@@ -7,9 +7,19 @@
     "module": "NodeNext",
     "lib": ["ESNext"],
     "moduleResolution": "NodeNext", 
+    "moduleDetection": "force",
     "baseUrl": ".",
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
+    "incremental": true,
+    "paths": {
+      "@efkit/shared": ["./packages/shared/src/index.js"],
+      "@efkit/aws": ["./packages/aws/src/index.js"],
+      "@efkit/tg-bot": ["./packages/tg-bot/src/index.js"],
+      "@efkit/chat-gtp": ["./packages/chat-gpt/src/index.js"],
+      "@efkit/google": ["./packages/google/src/index.js"],
+      "@efkit/claude": ["./packages/claude/src/index.js"],
+    }
   },
   "exclude": [
     "packages/notion/*"

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [],
+  "references": [
+    { "path": "packages/shared/tsconfig.src.json" },
+    { "path": "packages/chat-gpt/tsconfig.src.json" },
+    { "path": "packages/claude/tsconfig.src.json" },
+    { "path": "packages/google/tsconfig.src.json" },
+    { "path": "packages/aws/tsconfig.src.json" },
+    { "path": "packages/tg-bot/tsconfig.src.json" }
+  ]
+}

@@ -1,6 +1,7 @@
 import { Schema as S } from "@effect/schema"
-import { OriginalTgUpdateEvent } from "../update-events";
-import { ChatId, CommandScope, InlineKeyboardButton } from "./domain";
+
+import { OriginalTgUpdateEvent } from "../update-events/index.js";
+import { ChatId, CommandScope, InlineKeyboardButton } from "./domain.js";
 
 const ReplyParameters = 
   S.Struct({

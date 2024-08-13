@@ -1,8 +1,8 @@
 import { Schema as S } from "@effect/schema";
 import { Effect } from "effect";
 
-import { MessageUpdate, getMessageUserName } from "./message"
-import { UnknownTgUpdate } from "../error";
+import { MessageUpdate, getMessageUserName } from "./message.js"
+import { UnknownTgUpdate } from "../error.js";
 
 export type OriginalTgUpdateEvent =
   typeof OriginalTgUpdateEvent.Type;

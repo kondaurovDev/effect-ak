@@ -1,29 +1,8 @@
-import { Layer, pipe, Effect, Context, Brand, Config } from "effect";
+import { Layer, pipe, Effect, Context } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
 import * as Shared from "@efkit/shared";
-
-export type GptTokenValue =
-  string & Brand.Brand<"GPT.GptTokenValue">
-
-export const GptTokenValue =
-  Brand.nominal<GptTokenValue>();
-
-export const GptToken =
-  Context.GenericTag<GptTokenValue>("GPT.GptToken");
-
-export const GptTokenLayerFromEnv = 
-  Layer.effect(
-    GptToken,
-    pipe(
-      Config.string("OPENAI_TOKEN"),
-      Effect.andThen(value =>
-        GptToken.of(
-          GptTokenValue(value)
-        )
-      )
-    )
-  )
+import { GptToken } from "./token.js";
 
 export type ValidJsonError =
   HttpClientError.HttpClientError | Shared.JsonError | ParseResult.ParseError
@@ -46,20 +25,14 @@ export const RestClientLayer =
   Layer.effect(
     RestClient,
     Effect.Do.pipe(
-      Effect.bind("httpClient", () =>
-        HttpClient.HttpClient
-      ),
-      Effect.bind("gptToken", () =>
-        GptToken
-      ),
-      Effect.let("baseUrl", () =>
-        "https://api.openai.com"
-      ),
+      Effect.bind("httpClient", () => HttpClient.HttpClient),
+      Effect.bind("gptToken", () => GptToken),
+      Effect.let("baseUrl", () => "https://api.openai.com"),
       Effect.let("gptClient", ({ httpClient, baseUrl, gptToken }) =>
         httpClient.pipe(
           HttpClient.mapRequest(
             HttpClientRequest.setHeader(
-              "Authorization", `Bearer ${gptToken}`
+              "Authorization", `Bearer ${gptToken.value}`
             )
           ),
           HttpClient.mapRequest(

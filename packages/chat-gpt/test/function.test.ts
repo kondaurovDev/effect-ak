@@ -5,7 +5,7 @@ import { Schema as S } from "@effect/schema"
 
 import { completeFunctionCall } from "../src/completion/complete";
 import { ChatCompletionRequest, CompletionServiceLive } from "../src/completion";
-import { GptTokenLayerFromEnv } from "../src";
+import { GptTokenFromEnvLive } from "../src";
 
 describe("function call", () => {
 
@@ -42,7 +42,7 @@ describe("function call", () => {
         Effect.provide(LogLevelConfigFromEnvLive),
         Effect.provide(Logger.pretty),
         Effect.provide(CompletionServiceLive),
-        Effect.provide(GptTokenLayerFromEnv),
+        Effect.provide(GptTokenFromEnvLive),
         Effect.runPromise
       );
 

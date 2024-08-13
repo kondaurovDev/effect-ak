@@ -2,8 +2,8 @@ import { Brand, Config, Effect, pipe, Data } from "effect";
 import { HttpClient, FileSystem, HttpClientRequest } from "@effect/platform";
 import { MiscError, hashText } from "@efkit/shared";
 
-import { baseUrl } from "./rest-client";
-import { BotToken } from "./token"
+import { baseUrl } from "./rest-client.js";
+import { BotToken } from "./token.js"
 
 export class DownloadFileError 
   extends Data.TaggedError("Tg.DownloadFileError")<{
@@ -43,7 +43,7 @@ export const downloadFile = (
     ),
     Effect.bind("tmpDir", () => tmpDir),
     Effect.bind("hashedToken", ({ botToken }) => 
-      hashText(botToken)
+      hashText(botToken.token)
     ),
     Effect.let("downloadTo", ({ tmpDir, hashedToken }) => 
       `${tmpDir}/${hashedToken}:${remoteFilePath.replaceAll("/", "-")}${fileExtension ?? ""}`

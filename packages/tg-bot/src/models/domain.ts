@@ -1,5 +1,6 @@
 import { Schema as S } from "@effect/schema"
-import { MessageUpdate } from "../update-events/message";
+
+import { MessageUpdate } from "../update-events/message.js";
 
 type Infer<T> = S.Schema.Type<T>
 

@@ -4,8 +4,7 @@ import { LogLevelConfigFromEnvLive} from "@efkit/shared"
 
 import { ChatCompletionRequest, CompletionServiceLive } from "../src/completion";
 import { completeChat } from "../src/completion/complete";
-import { GptTokenLayerFromEnv } from "../src";
-
+import { GptTokenFromEnvLive } from "../src";
 
 describe("chat completion test suite", () => {
 
@@ -22,7 +21,7 @@ describe("chat completion test suite", () => {
         })),
         Effect.provide(LogLevelConfigFromEnvLive),
         Effect.provide(CompletionServiceLive),
-        Effect.provide(GptTokenLayerFromEnv),
+        Effect.provide(GptTokenFromEnvLive),
         Effect.runPromise
       );
 

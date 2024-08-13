@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest"
 import { Effect } from "effect";
 
-import { getUpdateExpression } from "./update-expr.js";
-import * as D from "../types.js";
+import { getUpdateExpression } from "../src/dynamodb/utils/update-expr.js";
+import { DynamoDB } from "../src/index.js";
 
 describe("get update expression", () => {
 
   it("case 1", () => {
 
-    const item = D.AnyItem({
+    const item = DynamoDB.T.AnyItem({
       textMsg: `test msg`,
       someState: {
         prop1: "blr",
@@ -36,7 +36,7 @@ describe("get update expression", () => {
     ])
 
     expect(actual.attributeNames).toEqual(
-      D.AttributeNames({
+      DynamoDB.T.AttributeNames({
         "#P1": "textMsg",
         "#P2": "someState",
         "#P2P1": "prop1",
@@ -49,7 +49,7 @@ describe("get update expression", () => {
     );
 
     expect(actual.attributeValues).toEqual(
-      D.AttributeValues({
+      DynamoDB.T.AttributeValues({
         ":P1": { S: "test msg" },
         ":P2P1": { S: "blr" },
         ":P2P2P1": { S: "another" },
@@ -61,7 +61,7 @@ describe("get update expression", () => {
 
   it("nested update", () => {
 
-    const item = D.AnyItem({
+    const item = DynamoDB.T.AnyItem({
       baz: {
         bar: {
           foo: 1
@@ -77,14 +77,14 @@ describe("get update expression", () => {
       ]);
 
     expect(actual.attributeNames)
-      .toEqual(D.AttributeNames({
+      .toEqual(DynamoDB.T.AttributeNames({
         "#P1": "baz",
         "#P1P1": "bar",
         "#P1P1P1": "foo",
       }));
 
     expect(actual.attributeValues)
-      .toEqual(D.AttributeValues({
+      .toEqual(DynamoDB.T.AttributeValues({
         ":P1P1P1": { N: "1" }
       }))
 
@@ -92,7 +92,7 @@ describe("get update expression", () => {
 
   it("simple case", () => {
 
-    const item = D.AnyItem({
+    const item = DynamoDB.T.AnyItem({
       myProp: 1,
       boolProp: true,
       complex: { foo: "bar", baz: 1 },
@@ -113,7 +113,7 @@ describe("get update expression", () => {
       ]);
 
     expect(actual.attributeNames)
-      .toEqual(D.AttributeNames({
+      .toEqual(DynamoDB.T.AttributeNames({
         "#P1": "myProp",
         "#P2": "boolProp",
         "#P3": "complex",
@@ -125,7 +125,7 @@ describe("get update expression", () => {
       }));
 
     expect(actual.attributeValues)
-      .toEqual(D.AttributeValues({
+      .toEqual(DynamoDB.T.AttributeValues({
         ":P1": { N: "1" },
         ":P2": { BOOL: true },
         ":P3P1": { S: "bar" },
@@ -138,7 +138,7 @@ describe("get update expression", () => {
 
   it("empty property shouldn't be in AttributeNames", () => {
 
-    const item = D.AnyItem({
+    const item = DynamoDB.T.AnyItem({
       foo: 1,
       bar: {
         faa: 2
@@ -154,7 +154,7 @@ describe("get update expression", () => {
     ]);
 
     expect(actual.attributeNames)
-      .toEqual(D.AttributeNames({
+      .toEqual(DynamoDB.T.AttributeNames({
         "#P1": "foo",
         "#P2": "bar",
         "#P2P1": "faa"

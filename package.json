@@ -3,12 +3,17 @@
   "name": "efkit",
   "type": "module",
   "scripts": {
-    "test": "vitest run"
+    "clean": "node scripts/clean.mjs",
+    "test": "vitest run",
+    "build": "tsc -b tsconfig.src.json",
+    "pack-all": "pnpm -r run pack-tar --pack-destination ../../dist",
+    "show-tar": "tar xfO dist/efkit-claude-0.0.1.tgz package/dist/index.js"
   },
   "devDependencies": {
     "@effect/platform-node": "0.56.4",
     "@types/bun": "latest",
     "@types/node": "20.14.8",
+    "glob": "^11.0.0",
     "typescript": "^5.5.4",
     "vitest": "^2.0.5"
   }

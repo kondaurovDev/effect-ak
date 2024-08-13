@@ -1,11 +1,13 @@
-import { Brand, Context } from "effect";
+import { Context } from "effect";
 import { Schema as S } from "@effect/schema"
 
-export type BotTokenValue =
-  string & Brand.Brand<"TgBot.BotTokenValue">
-
 export const BotTokenValue =
-  S.NonEmptyString.pipe(S.brand("TgBotToken"))
+  S.NonEmptyString.pipe(S.brand("TgBot.BotTokenValue"))
 
-export const BotToken =
-  Context.GenericTag<BotTokenValue>("TgBot.BotToken");
+export class BotToken extends
+  Context.Tag("TgBot.BotToken")<
+    BotToken,
+    {
+      token: typeof BotTokenValue.Type
+    }
+  >() {}

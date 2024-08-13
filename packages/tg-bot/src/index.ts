@@ -1,11 +1,11 @@
-export * from "./update-events"
-export * as Method from "./models/method"
+export * from "./update-events/index.js"
+export * as Method from "./models/method.js"
 export { 
   RestClientLive as TgRestClientLive,
   RestClient as TgRestClient,
-} from "./rest-client"
+} from "./rest-client.js"
 
-export * from "./download-file"
-export * from "./client"
-export * from "./token"
-export * from "./error"
+export * from "./download-file.js"
+export * from "./client.js"
+export * from "./token.js"
+export * from "./error.js"

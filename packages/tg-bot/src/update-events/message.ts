@@ -1,7 +1,7 @@
 import { Schema as S } from "@effect/schema";
 import { pipe } from "effect";
 
-import * as D from "../models/domain";
+import * as D from "../models/domain.js";
 
 export const getMessageUserName = (
   message: Pick<MessageUpdate, "from">
