@@ -24,6 +24,6 @@
   },
   "dependencies": {
     "google-auth-library": "^9.11.0",
-    "@efkit/shared": "0.0.2"
+    "@efkit/shared": "workspace:^"
   }
 }

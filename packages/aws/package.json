@@ -21,13 +21,16 @@
   "devDependencies": {
     "effect": "^3.6.1",
     "@effect/platform": "^0.61.4",
-    "@effect/schema": "^0.70.2"
+    "@effect/schema": "^0.70.2",
+    "@efkit/shared": "workspace:^"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.623.0",
     "@aws-sdk/util-dynamodb": "^3.623.0",
     "@aws-sdk/client-ssm": "^3.623.0",
-    "@aws-sdk/client-s3": "^3.623.0",
-    "@efkit/shared": "0.0.2"
+    "@aws-sdk/client-s3": "^3.623.0"
+  },
+  "peerDependencies": {
+    "@efkit/shared": "workspace:^"
   }
 }

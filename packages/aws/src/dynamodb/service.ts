@@ -1,6 +1,6 @@
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { Context, Effect, Layer } from "effect";
-import { AwsRegion } from "../config.js";
+import { AwsRegion } from "@efkit/shared";
 
 export const Service =
   Context.GenericTag<DynamoDB>("AWS.ApiGateway")
@@ -13,7 +13,7 @@ export const ServiceLive =
       Effect.bind("client", ({ region }) =>
         Effect.try(() =>
           new DynamoDB({
-            region: region.regionName
+            region: region.value
           })
         )
       ),
