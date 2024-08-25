@@ -3,7 +3,7 @@ import { Schema } from "@effect/schema";
 import { parseJson, toJsonString } from "@efkit/shared";
 
 import * as T from "./types.js";
-import {Service} from "./service.js";
+import { Service, ServiceLive } from "./service.js";
 import { tryAwsServiceMethod } from "../error.js";
 
 export const getParameter = (
@@ -54,7 +54,8 @@ export const getJsonParamValue = (
 
 export const putParameter = (
   paramName: T.ParameterName,
-  paramValue: T.ParameterValue
+  paramValue: T.ParameterValue,
+  keyId: string | undefined = undefined
 ) =>
   Effect.Do.pipe(
     Effect.bind("ssmSDK", () => Service),
@@ -65,8 +66,9 @@ export const putParameter = (
           ssmSDK.putParameter({
             Name: paramName,
             Value: paramValue,
-            Type: "String",
-            Overwrite: true
+            Type: keyId ? "SecureString" : "String",
+            Overwrite: true,
+            ...(keyId ? { KeyId: keyId } : {})
           })
       )
     )
@@ -74,11 +76,13 @@ export const putParameter = (
 
 export const putJsonParameter = (
   paramName: T.ParameterName,
-  value: unknown
+  value: unknown,
+  keyId: string | undefined = undefined
 ) =>
   pipe(
     toJsonString(value),
     Effect.andThen(param => 
-      putParameter(paramName, T.ParameterValue(param))
-    )
+      putParameter(paramName, T.ParameterValue(param), keyId)
+    ),
+    Effect.provide(ServiceLive)
   );

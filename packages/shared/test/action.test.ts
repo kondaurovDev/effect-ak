@@ -8,7 +8,7 @@ const action =
   Action(
     ActionName("testAction"),
     S.Literal("throwBadRequest", "throwInternalError", "check", "check2"),
-    S.Struct({ message: S.NonEmptyString }),
+    S.Struct({ message: S.NonEmptyString }).annotations({ title: "body"}),
     input => {
 
       if (input === "throwInternalError") {

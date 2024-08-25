@@ -14,10 +14,10 @@ export const AuthResponse =
     token_type: S.Literal("Bearer")
   });
 
-type ClientCredentialsSchema = 
+export type ClientCredentialsSchema = 
   typeof ClientCredentialsSchema.Type
 
-const ClientCredentialsSchema = 
+export const ClientCredentialsSchema = 
   S.Struct({
     clientId: S.NonEmptyString,
     clientSecret: S.NonEmptyString

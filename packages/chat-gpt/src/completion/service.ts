@@ -37,7 +37,7 @@ export const CompletionServiceLayer =
               Effect.logDebug("response", response)
             ),
             Effect.andThen(response =>
-              S.validate(ChatCompletionResponse)(response)
+              S.decodeUnknown(ChatCompletionResponse)(response)
             )
           )
       ),

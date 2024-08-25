@@ -1,19 +1,19 @@
 // https://developers.google.com/identity/protocols/oauth2/service-account
 
 import { Effect, pipe, Context } from "effect";
-import { Schema as S } from "@effect/schema"
 import { JWT } from "google-auth-library";
+import { Schema as S } from "@effect/schema"
 
-const ServiceAccountCredentialsSchema = 
+export const ServiceAccountCredentialsSchema =
   S.Struct({
     client_email: S.NonEmptyString,
     private_key: S.NonEmptyString
-  }).pipe(
-    S.brand("ServiceAccountCredentials")
-  )
+  })
 
-const ServiceAccountCredentials =
-  Context.GenericTag<typeof ServiceAccountCredentialsSchema.Type>("ServiceAccountCredentials");
+export class ServiceAccountCredentials
+  extends Context.Tag("ServiceAccountCredentials")<
+    ServiceAccountCredentials, typeof ServiceAccountCredentialsSchema.Type
+  >() { };
 
 export const getServiceAccountAccessToken =
   pipe(

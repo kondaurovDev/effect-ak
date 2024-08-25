@@ -42,8 +42,8 @@ export const imagePrompt = (
             }
           ]
         }).pipe(
-          Effect.mapError(parseError =>
-            new ChatCompletion.CompletionError({ errorCode: "ClientError", parseError })
+          Effect.mapError(error =>
+            new ChatCompletion.CompletionError({ errorCode: "ClientError", cause: error })
           )
         ),
         Effect.andThen(complete),

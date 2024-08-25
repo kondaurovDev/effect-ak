@@ -1,13 +1,9 @@
-import { Schema as S, ParseResult } from "@effect/schema";
 import { Config, Context, Effect, Layer, pipe } from "effect";
-
-export const GptTokenValue =
-  S.NonEmptyString.pipe(S.brand("GPT.TokenValue"))
 
 export class GptToken extends
   Context.Tag("GPT.GptToken")<
     GptToken, {
-      value: typeof GptTokenValue.Type
+      value: string
     }
   >() {};
 
@@ -18,7 +14,7 @@ export const GptTokenFromEnvLive =
       Config.string("OPENAI_TOKEN"),
       Effect.andThen(token =>
         GptToken.of({
-          value: GptTokenValue.make(token)
+          value: token
         })
       )
     )

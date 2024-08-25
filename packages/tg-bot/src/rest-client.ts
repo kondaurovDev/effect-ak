@@ -85,7 +85,7 @@ export const RestClientLive =
               client(
                 request
                   .pipe(
-                    HttpClientRequest.prependUrl(`${baseUrl}/bot${token}`)
+                    HttpClientRequest.prependUrl(`${baseUrl}/bot${token.token}`)
                   )
               )
             ),
@@ -104,7 +104,7 @@ export const RestClientLive =
             ),
             Effect.let("request", ({ botToken }) =>
               HttpClientRequest.post(
-                `${baseUrl}/bot${botToken}${methodName}`, {
+                `${baseUrl}/bot${botToken.token}${methodName}`, {
                   body: 
                     Object.keys(body).length != 0
                       ? HttpBody.formData(

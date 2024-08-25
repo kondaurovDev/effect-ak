@@ -22,9 +22,10 @@
     "dist"
   ],
   "devDependencies": {
-    "effect": "^3.6.1",
-    "@effect/platform": "^0.61.4",
-    "@effect/schema": "^0.70.2",
+    "effect": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "@effect/platform": "catalog:",
+    "@effect/schema": "catalog:",
     "@efkit/shared": "workspace:^"
   },
   "peerDependencies": {

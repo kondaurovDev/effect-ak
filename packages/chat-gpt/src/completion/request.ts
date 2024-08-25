@@ -75,15 +75,26 @@ export const ToolChoice =
     }),
   );
 
+const ResponseFormat = 
+  S.Union(
+    S.Struct({
+      type: S.Literal("text", "json_object")
+    }),
+    S.Struct({
+      type: S.Literal("json_schema"),
+      json_schema: S.Struct({
+        name: S.NonEmptyString,
+        description: S.NonEmptyString,
+        schema: S.Unknown,
+        strict: S.Boolean
+      })
+    })
+  )
+
 export class ChatCompletionRequest
   extends S.Class<ChatCompletionRequest>("ChatCompletionRequest")({
     messages: S.Array(RequestMessageSchema),
-    response_format: 
-      S.optional(
-        S.Struct({
-          type: S.Literal("text", "json_object")
-        })
-      ),
+    response_format: S.optional(ResponseFormat),
     model: Model,
     user: S.optional(S.String),
     max_tokens: S.optional(S.Number),
@@ -94,6 +105,7 @@ export class ChatCompletionRequest
   }) {
 
     static createFunctionCall<F>(
+      schemaName: string,
       functionSchema: S.Schema<F>,
       model: Model,
       systemMessages: string[],
@@ -101,13 +113,49 @@ export class ChatCompletionRequest
     ) {
 
       return pipe(
-        FunctionTool.getTool(functionSchema),
+        FunctionTool.getTool(schemaName, functionSchema),
         Effect.andThen(tool =>
           ChatCompletionRequest.make({
             model: model,
             max_tokens: 100,
             tools: [ tool ],
             tool_choice: FunctionTool.getToolChoice(tool.function.name),
+            messages: [
+              { role: "system", content: [
+                ...(systemMessages ? systemMessages.map(msg => 
+                  ({ type: "text", text: msg } as MessageContent)
+                ) : [])
+              ] },
+              { role: "user", content: userMessage }
+            ]
+          })
+        )
+      ) 
+    }
+
+    static createStructuredRequest<F>(
+      schemaName: string,
+      functionSchema: S.Schema<F>,
+      model: Model,
+      systemMessages: string[],
+      userMessage: string,
+    ) {
+
+      return pipe(
+        FunctionTool.getTool(schemaName, functionSchema),
+        Effect.andThen(({ function: fn }) =>
+          ChatCompletionRequest.make({
+            model: model,
+            max_tokens: 100,
+            response_format: {
+              type: "json_schema",
+              json_schema: {
+                name: fn.name,
+                description: fn.description,
+                schema: fn.parameters,
+                strict: false 
+              }
+            },
             messages: [
               { role: "system", content: [
                 ...(systemMessages ? systemMessages.map(msg => 

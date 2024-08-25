@@ -2,6 +2,7 @@ import { ParseResult } from "@effect/schema";
 import { Data } from "effect";
 
 const errors = {
+  NoContent: "Expected to have message with non empty content",
   WrongFinishReason: "Expected other finish reason",
   MissingToolCall: "The response doesn't contain a tool call",
   MissingChoices: "The response doesn't contain choices",
@@ -13,7 +14,7 @@ const errors = {
 
 export class CompletionError extends Data.TaggedError("CompletionError")<{
   errorCode: keyof typeof errors,
-  parseError?: ParseResult.ParseError
+  cause?: ParseResult.ParseError
 }> {
 
   get message() {

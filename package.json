@@ -11,8 +11,6 @@
     "show-tar2": "tar xfO dist/efkit-aws-0.0.1.tgz package/package.json"
   },
   "devDependencies": {
-    "@effect/platform-node": "0.56.4",
-    "@types/bun": "latest",
     "@types/node": "20.14.8",
     "glob": "^11.0.0",
     "typescript": "^5.5.4",

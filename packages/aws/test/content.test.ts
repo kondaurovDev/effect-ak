@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest"
-import { Effect, pipe } from "effect"
+import { Effect, Logger, LogLevel, pipe } from "effect"
+import { AwsRegionLive } from "@efkit/shared"
 
 import { getJsonContent } from "../src/s3/content.js"
 import { BucketKey, BucketName } from "../src/s3/types.js"
 import { ServiceLive } from "../src/s3/service.js"
-import { AwsRegionLive } from "../src/config.js"
 
 describe("content", () => {
 
@@ -18,6 +18,7 @@ describe("content", () => {
         ),
         Effect.provide(ServiceLive),
         Effect.provide(AwsRegionLive("eu-west-1")),
+        Logger.withMinimumLogLevel(LogLevel.Debug),
         Effect.runPromise
       );
 

@@ -1,5 +1,5 @@
 import { Schema as S, JSONSchema } from "@effect/schema";
-import { pipe, Effect } from "effect"
+import { Effect } from "effect"
 
 import { ToolChoice } from "../completion/request.js"
 
@@ -28,6 +28,7 @@ export const FunctionToolSchema =
   })
 
 export const getTool = <F>(
+  schemaName: string,
   functionSchema: S.Schema<F>
 ): Effect.Effect<ToolSchema, unknown> =>
   Effect.Do.pipe(
@@ -40,16 +41,18 @@ export const getTool = <F>(
       Effect.all({
         name: Effect.fromNullable(jsonSchema.title),
         description: Effect.fromNullable(jsonSchema.description),
-        schema: Effect.fromNullable(jsonSchema)
       })
     ),
-    Effect.andThen(({ parts }) => {
+    Effect.catchTag("NoSuchElementException", () => 
+      Effect.fail(`title, description must be defined for schema '${schemaName}'`)
+    ),
+    Effect.andThen(({ parts, jsonSchema }) => {
       return {
         type: "function",
         function: {
           name: parts.name,
           description: parts.description,
-          parameters: parts.schema
+          parameters: jsonSchema
         }
       }
     })

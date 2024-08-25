@@ -1,2 +1,8 @@
 packages:
   - 'packages/*'
+
+catalog:
+  effect: ^3.6.5
+  "@effect/platform": ^0.62.2
+  "@effect/platform-node": ^0.57.2
+  "@effect/schema": ^0.71.1

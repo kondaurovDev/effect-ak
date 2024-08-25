@@ -26,7 +26,7 @@ export const completeChat = (
 
 export const completeFunctionCall = <O>(
   request: ChatCompletionRequest,
-  resultSchema: S.Schema<O, O>,
+  resultSchema: S.Schema<O>,
 ) =>
   pipe(
     CompletionService,
@@ -45,3 +45,28 @@ export const completeFunctionCall = <O>(
       )
     )
   )
+
+export const completeStructuredRequest = <O>(
+  request: ChatCompletionRequest,
+  resultSchema: S.Schema<O>,
+) =>
+  pipe(
+    CompletionService,
+    Effect.andThen(({ complete }) =>
+      pipe(
+        complete(request),
+        Effect.andThen(_ => _.firstChoice),
+        Effect.andThen(_ => _.message.content),
+        Effect.filterOrFail(_ => _ != null, () => new CompletionError({ errorCode: "NoContent" })),
+        Effect.andThen(_ =>
+          pipe(
+            Shared.parseJson(_),
+            Effect.mapError(() =>
+              new CompletionError({ errorCode: "FunctionCallError" })
+            )
+          )),
+        Effect.andThen(S.validate(resultSchema))
+      )
+    )
+  )
+

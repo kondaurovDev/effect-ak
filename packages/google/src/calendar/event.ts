@@ -63,6 +63,8 @@ export const ListCalendars =
     Effect.provide(ClientLive)
   );
 
+type CreateEventSchema = typeof CreateEventSchema.Type
+
 export const CreateEventSchema =
   S.Struct({
     calendarId: S.NonEmptyString,
@@ -79,41 +81,36 @@ export const CreateEventSchema =
   })
 
 // https://developers.google.com/calendar/api/v3/reference/events/insert
-export const createEvent =
-  Action(
-    ActionName("Create calendar event"),
-    CreateEventSchema,
-    CreateEventSchema,
-    input =>
-      Effect.Do.pipe(
-        Effect.bind("client", () => Client),
-        Effect.bind("accessToken", () => getServiceAccountAccessToken),
-        Effect.bind("startDate", () => parseDateWithTime(input.start.dateTime)),
-        Effect.bind("endDate", () => parseDateWithTime(input.end.dateTime)),
-        Effect.bind("event", ({ startDate, endDate }) =>
-          HttpBody.json({
-            end: {
-              dateTime: endDate.toISOString()
-            },
-            start: {
-              dateTime: startDate.toISOString()
-            },
-            description: input.description,
-            summary: input.summary
-          })
-        ),
-        Effect.andThen(({ client, event, accessToken }) =>
-          client(
-            HttpClientRequest.post(
-              `/calendars/${input.calendarId}/events`, {
-              body: event,
-              headers: {
-                "Authorization": `Bearer ${accessToken}`
-              }
-            })
-          )
-        ),
-        Effect.andThen(input),
-        Effect.provide(ClientLive)  
+export const createEvent = (
+  request: CreateEventSchema
+) =>
+  Effect.Do.pipe(
+    Effect.bind("client", () => Client),
+    Effect.bind("accessToken", () => getServiceAccountAccessToken),
+    Effect.bind("startDate", () => parseDateWithTime(request.start.dateTime)),
+    Effect.bind("endDate", () => parseDateWithTime(request.end.dateTime)),
+    Effect.bind("event", ({ startDate, endDate }) =>
+      HttpBody.json({
+        end: {
+          dateTime: endDate.toISOString()
+        },
+        start: {
+          dateTime: startDate.toISOString()
+        },
+        description: request.description,
+        summary: request.summary
+      })
+    ),
+    Effect.andThen(({ client, event, accessToken }) =>
+      client(
+        HttpClientRequest.post(
+          `/calendars/${request.calendarId}/events`, {
+          body: event,
+          headers: {
+            "Authorization": `Bearer ${accessToken}`
+          }
+        })
       )
+    ),
+    Effect.provide(ClientLive)  
   )

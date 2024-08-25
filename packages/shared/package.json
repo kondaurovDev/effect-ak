@@ -17,13 +17,16 @@
   "files": [
     "dist"
   ],
+  "devDependencies": {
+    "@effect/platform-node": "catalog:"
+  },
   "scripts": {
     "build": "tsc",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "peerDependencies": {
-    "effect": "^3.6.1",
-    "@effect/platform": "^0.61.4",
-    "@effect/schema": "^0.70.2"
+    "effect": "catalog:",
+    "@effect/platform": "catalog:",
+    "@effect/schema": "catalog:"
   }
 }
