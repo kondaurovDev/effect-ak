@@ -34,8 +34,8 @@ export const getParameterValue = (
     Effect.andThen(_ =>
       Effect.fromNullable(_.Value)
     ),
-    Effect.tap(raw =>
-      Effect.logDebug("param value", raw)
+    Effect.tap(
+      Effect.logDebug(`retrived param value for '${paramName}'`)
     )
   );
 

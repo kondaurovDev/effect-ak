@@ -3,38 +3,46 @@ import { randomBytes, scrypt, timingSafeEqual } from "crypto"
 import { Effect } from "effect";
 import { promisify } from "util";
 
-const scryptAsync = promisify(scrypt);
-
 export type HashedPassword = typeof HashedPassword.Type; 
 export const HashedPassword = 
   S.TemplateLiteral(S.String, ".", S.String).pipe(S.brand("HashedPassword"))
 
 const hashPasswordWithSalt = (
-  password: string, salt: string,
+  password: string, salt: Buffer,
 ) =>
-  Effect.tryPromise(() =>
-    scryptAsync(password, salt, 64) as Promise<Buffer>
+  Effect.async<Buffer, Error>((resume) =>
+    scrypt(password, salt.toString("hex"), 64, (error, data) => {
+      if (error) {
+        resume(Effect.fail(error))
+      } else {
+        resume(Effect.succeed(data))
+      }
+    })
+  ).pipe(
+    Effect.andThen(result => 
+      HashedPassword.make(`${result.toString("base64")}.${salt.toString("base64")}`)
+    )
   )
 
 export const hashPassword = (
   password: string
 ) =>
-  hashPasswordWithSalt(password, randomBytes(16).toString("hex"))
+  hashPasswordWithSalt(password, randomBytes(16))
 
-export const isPasswordValid = async (
+export const isPasswordValid = (
   storedHashedPassword: HashedPassword,
   plainPassword: string
 ) => 
   Effect.Do.pipe(
     Effect.let("parts", () => storedHashedPassword.split(".")),
     Effect.let("hashedPasswordBuffer", ({ parts }) => 
-      Buffer.from(parts[0], "hex")
+      Buffer.from(parts[0], "base64")
     ),
     Effect.bind("plainPasswordBuffer", ({ parts }) => 
-      hashPasswordWithSalt(plainPassword, parts[1])
+      hashPasswordWithSalt(plainPassword, Buffer.from(parts[1], "base64"))
     ),
     Effect.andThen(({ hashedPasswordBuffer, plainPasswordBuffer}) => 
-      timingSafeEqual(hashedPasswordBuffer, plainPasswordBuffer)
+      timingSafeEqual(hashedPasswordBuffer, Buffer.from(plainPasswordBuffer, "base64"))
     ),
     Effect.mapError(error =>
       new Error("Can't validate password", { cause: error })
