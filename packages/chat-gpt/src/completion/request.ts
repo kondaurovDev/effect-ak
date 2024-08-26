@@ -150,7 +150,7 @@ export class ChatCompletionRequest
             response_format: {
               type: "json_schema",
               json_schema: {
-                name: fn.name,
+                name: fn.name.replaceAll(" ", "_"),
                 description: fn.description,
                 schema: fn.parameters,
                 strict: false 
