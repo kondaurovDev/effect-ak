@@ -3,7 +3,7 @@ import { Layer, pipe, Effect, Context, Match } from "effect";
 import { Schema as S } from "@effect/schema"
 
 import { ContractError, TgApiError } from "./error.js";
-import { BotTokenValue, BotToken } from "./token.js";
+import { TgBotTokenValue, TgBotToken } from "./token.js";
 
 export type TgResponse =
   typeof TgResponse.Type;
@@ -22,7 +22,7 @@ export type RestClientError =
   TgApiError
 
 export type MethodResult<A> =
-  Effect.Effect<A, RestClientError, BotToken>
+  Effect.Effect<A, RestClientError, TgBotTokenValue>
 
 export type RestClient = {
   sendApiRequest: <O>(
@@ -80,12 +80,12 @@ export const RestClientLive =
           resultSchema: S.Schema<O>
         ) =>
           pipe(
-            BotToken,
+            TgBotToken,
             Effect.andThen(token =>
               client(
                 request
                   .pipe(
-                    HttpClientRequest.prependUrl(`${baseUrl}/bot${token.token}`)
+                    HttpClientRequest.prependUrl(`${baseUrl}/bot${token}`)
                   )
               )
             ),
@@ -99,12 +99,10 @@ export const RestClientLive =
           resultSchema: S.Schema<O>
         ) =>
           Effect.Do.pipe(
-            Effect.bind("botToken", () => 
-              BotToken
-            ),
+            Effect.bind("botToken", () => TgBotToken),
             Effect.let("request", ({ botToken }) =>
               HttpClientRequest.post(
-                `${baseUrl}/bot${botToken.token}${methodName}`, {
+                `${baseUrl}/bot${botToken}${methodName}`, {
                   body: 
                     Object.keys(body).length != 0
                       ? HttpBody.formData(

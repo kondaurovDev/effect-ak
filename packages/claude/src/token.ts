@@ -1,25 +1,18 @@
-import { Layer, pipe, Effect, Context, Config } from "effect";
-import { Schema as S } from "@effect/schema";
+import { Layer, pipe, Effect, Context, Config, Brand } from "effect";
 
-export const ClaudeTokenValue =
-  S.NonEmptyString.pipe(S.brand("Claude.TokenValue"))
+export type ClaudeTokenValue = string & Brand.Brand<"ClaudeTokenValue">
+export const ClaudeTokenValue = Brand.nominal<ClaudeTokenValue>()
 
-export class ClaudeToken extends
-  Context.Tag("Claude.Token")<
-    ClaudeToken, {
-      value: typeof ClaudeTokenValue.Type
-    }
-  >() { }
+export const ClaudeToken = 
+  Context.GenericTag<ClaudeTokenValue>("Claude.Token");
 
 export const ClaudeTokenLayerFromEnv =
   Layer.effect(
     ClaudeToken,
     pipe(
       Config.string("CLAUDE_TOKEN"),
-      Effect.andThen(value =>
-        ClaudeToken.of({
-          value: ClaudeTokenValue.make(value)
-        })
+      Effect.andThen(token =>
+        ClaudeToken.of(ClaudeTokenValue(token))
       )
     )
   )

@@ -1,11 +1,9 @@
-import { Config, Context, Effect, Layer, pipe } from "effect";
+import { Brand, Config, Context, Effect, Layer, pipe } from "effect";
 
-export class GptToken extends
-  Context.Tag("GPT.GptToken")<
-    GptToken, {
-      value: string
-    }
-  >() {};
+export type GptTokenValue = string & Brand.Brand<"GptTokenValue">
+export const GptTokenValue = Brand.nominal<GptTokenValue>()
+
+export const GptToken = Context.GenericTag<GptTokenValue>("OpenAi.Token");
 
 export const GptTokenFromEnvLive =
   Layer.effect(
@@ -13,9 +11,7 @@ export const GptTokenFromEnvLive =
     pipe(
       Config.string("OPENAI_TOKEN"),
       Effect.andThen(token =>
-        GptToken.of({
-          value: token
-        })
+        GptToken.of(GptTokenValue(token))
       )
     )
   )

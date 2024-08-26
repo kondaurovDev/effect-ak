@@ -5,11 +5,12 @@ import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { ChatCompletionRequest } from "./request.js"
 import { ChatCompletionResponse } from "./response.js"
 import { RestClient, RestClientLive, ValidJsonError } from "../client.js"
+import { GptTokenValue } from "../token.js";
 
 export class CompletionService extends
   Context.Tag("ChatGPT.CompletionService")<
     CompletionService, {
-      complete: (request: ChatCompletionRequest) => Effect.Effect<ChatCompletionResponse, HttpBody.HttpBodyError | ValidJsonError >
+      complete: (request: ChatCompletionRequest) => Effect.Effect<ChatCompletionResponse, HttpBody.HttpBodyError | ValidJsonError, GptTokenValue >
     }
   >() {};
 

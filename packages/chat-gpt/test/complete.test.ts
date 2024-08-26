@@ -10,9 +10,8 @@ import { GptTokenFromEnvLive } from "../src/token";
 const live = 
   Layer.mergeAll(
     LogLevelConfigFromEnvLive,
-    CompletionServiceLive
-  ).pipe(
-    Layer.provide(GptTokenFromEnvLive)
+    CompletionServiceLive,
+    GptTokenFromEnvLive
   )
 
 const currencySchema = 
