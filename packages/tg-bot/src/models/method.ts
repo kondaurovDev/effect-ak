@@ -1,6 +1,6 @@
 import { Schema as S } from "@effect/schema"
 
-import { OriginalTgUpdateEvent } from "../update-events/index.js";
+import { TgUpdateEvent } from "../update-events/index.js";
 import { ChatId, CommandScope, InlineKeyboardButton } from "./domain.js";
 
 const ReplyParameters = 
@@ -106,7 +106,7 @@ export const SetChatAction =
   });
 
 const AllowedUpdates =
-  S.keyof(OriginalTgUpdateEvent.pipe(S.omit("update_id")))
+  S.keyof(S.Struct(TgUpdateEvent.fields).pipe(S.omit("update_id")))
 
 export type SetWebhook = 
   typeof SetWebhook.Type

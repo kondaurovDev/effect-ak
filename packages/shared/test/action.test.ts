@@ -1,14 +1,21 @@
 import { describe, it, expect } from "vitest"
-import { Effect } from "effect";
+import { Effect, Logger } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { Action, ActionName } from "../src/action"
+import { Action, ActionName } from "../src/action";
+
+class MySchema extends S.Class<MySchema>("MySchema")(
+  {
+    message: S.NonEmptyString
+  }, {
+    title: "body" 
+  }) {}
 
 const action =
   Action(
     ActionName("testAction"),
     S.Literal("throwBadRequest", "throwInternalError", "check", "check2"),
-    S.Struct({ message: S.NonEmptyString }).annotations({ title: "body"}),
+    MySchema,
     input => {
 
       if (input === "throwInternalError") {
@@ -20,10 +27,10 @@ const action =
       }
 
       if (input === "check2") {
-        return { message: input }
+        return new MySchema({ message: input })
       }
 
-      return Effect.succeed({ message: input });
+      return Effect.succeed(new MySchema({ message: input }));
     }
   );
 
@@ -76,6 +83,7 @@ describe("action test suite", () => {
       await action.actionWithInput
         .pipe(
           Effect.provide(action.createInput("check")),
+          Effect.provide(Logger.pretty),
           Effect.runPromise
         );
 

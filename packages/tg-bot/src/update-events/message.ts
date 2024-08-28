@@ -7,7 +7,7 @@ export const getMessageUserName = (
   message: Pick<MessageUpdate, "from">
 ) =>
   pipe(
-    message.from.username ?? message.from.first_name,
+    message.from?.username ?? message.from?.first_name ?? "anonym",
     name => name.toLocaleLowerCase()
   )
 
@@ -33,7 +33,7 @@ const messageFields = {
   photo: S.optional(PhotoArray),
   caption: S.optional(S.String),
   voice: S.optional(Voice),
-  from: S.suspend(() => D.User),
+  from: S.optional(D.User),
   message_thread_id: S.optional(S.Number),
   chat: S.Struct({
     id: S.Number,

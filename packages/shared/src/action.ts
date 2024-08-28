@@ -7,14 +7,14 @@ export const ActionName = Brand.nominal<ActionName>();
 export type ActionResult<O = unknown, E = unknown, R = never> = 
   Effect.Effect<O, E, R> | Promise<O> | O
 
-export interface ActionInput<T = unknown> {
+export type ActionInput<T = unknown> = {
   readonly input: T
 }
 
 export type Action<I = unknown, O = unknown, E = unknown, R = never> = {
   inputTag: Context.Tag<ActionInput<I>, ActionInput<I>>,
-  inputSchema: S.Schema<I, I>,
-  outputSchema: S.Schema<O, O>,
+  inputSchema: S.Schema<I>,
+  outputSchema: S.Schema<O>,
   action: (_: I) => ActionResult<O, E, R>,
   createInput: (_: I) => Layer.Layer<ActionInput<I>>,
   actionWithInput: Effect.Effect<O, ActionError, ActionInput<I> | R>
