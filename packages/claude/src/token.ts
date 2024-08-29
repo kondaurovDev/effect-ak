@@ -1,6 +1,6 @@
-import { Layer, pipe, Effect, Context, Config, Brand } from "effect";
+import { Layer, pipe, Effect, Context, Config, Brand, Redacted } from "effect";
 
-export type ClaudeTokenValue = string & Brand.Brand<"ClaudeTokenValue">
+export type ClaudeTokenValue = Redacted.Redacted<string> & Brand.Brand<"ClaudeTokenValue">
 export const ClaudeTokenValue = Brand.nominal<ClaudeTokenValue>()
 
 export const ClaudeToken = 
@@ -12,7 +12,7 @@ export const ClaudeTokenLayerFromEnv =
     pipe(
       Config.string("CLAUDE_TOKEN"),
       Effect.andThen(token =>
-        ClaudeToken.of(ClaudeTokenValue(token))
+        ClaudeToken.of(ClaudeTokenValue(Redacted.make(token)))
       )
     )
   )

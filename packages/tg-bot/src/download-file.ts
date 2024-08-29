@@ -1,4 +1,4 @@
-import { Brand, Config, Effect, pipe, Data } from "effect";
+import { Brand, Config, Effect, pipe, Data, Redacted } from "effect";
 import { HttpClient, FileSystem, HttpClientRequest } from "@effect/platform";
 import { MiscError, hashText } from "@efkit/shared";
 
@@ -41,7 +41,7 @@ export const downloadFile = (
     Effect.bind("botToken", () => TgBotToken),
     Effect.bind("tmpDir", () => tmpDir),
     Effect.bind("hashedToken", ({ botToken }) => 
-      hashText(botToken)
+      hashText(Redacted.value(botToken))
     ),
     Effect.let("downloadTo", ({ tmpDir, hashedToken }) => 
       `${tmpDir}/${hashedToken}:${remoteFilePath.replaceAll("/", "-")}${fileExtension ?? ""}`
@@ -64,7 +64,7 @@ export const downloadFile = (
             HttpClient.HttpClient,
             Effect.andThen(client =>
               client(
-                HttpClientRequest.get(`${baseUrl}/file/bot${botToken}/${remoteFilePath}`)
+                HttpClientRequest.get(`${baseUrl}/file/bot${Redacted.value(botToken)}/${remoteFilePath}`)
               ).pipe(
                 Effect.mapError(error =>
                   new MiscError({

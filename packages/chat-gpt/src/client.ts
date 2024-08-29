@@ -1,4 +1,4 @@
-import { Layer, pipe, Effect, Context } from "effect";
+import { Layer, pipe, Effect, Context, Redacted } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
 import * as Shared from "@efkit/shared";
@@ -47,7 +47,7 @@ export const RestClientLayer =
               GptToken,
               Effect.andThen(token =>
                 restClient(
-                  HttpClientRequest.setHeader("Authorization", `Bearer ${token}`)(request)
+                  HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)(request)
                 )
               ),
               Effect.scoped,
@@ -63,7 +63,7 @@ export const RestClientLayer =
               GptToken,
               Effect.andThen(token =>
                 restClient(
-                  HttpClientRequest.setHeader("Authorization", `Bearer ${token}`)(request)
+                  HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)(request)
                 )
               ),
               Effect.andThen(_ =>

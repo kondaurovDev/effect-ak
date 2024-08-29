@@ -1,4 +1,4 @@
-import { Layer, pipe, Effect, Context } from "effect";
+import { Layer, pipe, Effect, Context, Redacted } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
 import * as Shared from "@efkit/shared";
@@ -51,7 +51,7 @@ export const RestClientLayer =
             pipe(
               ClaudeToken,
               Effect.andThen(token =>
-                client(HttpClientRequest.setHeader("x-api-key", token)(request))
+                client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
               ),
               Effect.scoped,
             )
@@ -63,7 +63,7 @@ export const RestClientLayer =
             pipe(
               ClaudeToken,
               Effect.andThen(token =>
-                client(HttpClientRequest.setHeader("x-api-key", token)(request))
+                client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
               ),
               Effect.andThen(_ =>
                 Buffer.from(_).toString()

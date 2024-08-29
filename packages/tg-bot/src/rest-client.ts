@@ -1,5 +1,5 @@
 import { HttpBody, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
-import { Layer, pipe, Effect, Context, Match } from "effect";
+import { Layer, pipe, Effect, Context, Match, Redacted } from "effect";
 import { Schema as S } from "@effect/schema"
 
 import { ContractError, TgApiError } from "./error.js";
@@ -51,7 +51,10 @@ export const RestClientLive =
       Effect.let("client", ({ httpClient }) =>
         httpClient.pipe(
           HttpClient.tapRequest(request =>
-            Effect.logDebug(`request to telegram bot api`, request.toJSON())
+            Effect.logDebug(`request to telegram bot api`, {
+              path: request.urlParams.at(-1),
+              body: request.body.toJSON()
+            })
           ),
           HttpClient.tap(response => 
             pipe(
@@ -85,7 +88,7 @@ export const RestClientLive =
               client(
                 request
                   .pipe(
-                    HttpClientRequest.prependUrl(`${baseUrl}/bot${token}`)
+                    HttpClientRequest.prependUrl(`${baseUrl}/bot${Redacted.value(token)}`)
                   )
               )
             ),
@@ -102,7 +105,7 @@ export const RestClientLive =
             Effect.bind("botToken", () => TgBotToken),
             Effect.let("request", ({ botToken }) =>
               HttpClientRequest.post(
-                `${baseUrl}/bot${botToken}${methodName}`, {
+                `${baseUrl}/bot${Redacted.value(botToken)}${methodName}`, {
                   body: 
                     Object.keys(body).length != 0
                       ? HttpBody.formData(

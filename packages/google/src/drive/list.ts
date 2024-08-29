@@ -2,7 +2,7 @@ import { HttpClientRequest } from "@effect/platform";
 import { Effect } from "effect";
 
 import { RestClient, RestClientLayer } from "../client.js"
-import { getServiceAccountAccessToken } from "../auth/index.js";
+import { AccessToken } from "../auth/common.js";
 
 const Client = 
   RestClient("Spreadsheet");
@@ -17,7 +17,7 @@ const ClientLive =
 export const GetSpreadsheetsList =
   Effect.Do.pipe(
     Effect.bind("client", () => Client),
-    Effect.bind("accessToken", () => getServiceAccountAccessToken),
+    Effect.bind("accessToken", () => AccessToken),
     Effect.andThen(({ client, accessToken }) =>
       client(
         HttpClientRequest.get("files", {

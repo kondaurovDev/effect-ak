@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
 import { SheetsClient, SheetsClientLive } from "./client.js";
-import { getServiceAccountAccessToken } from "../auth/index.js";
+import { AccessToken } from "../auth/common.js";
 
 //https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
 
@@ -13,7 +13,7 @@ export const appendRow = (
 ) =>
   Effect.Do.pipe(
     Effect.bind("client", () => SheetsClient),
-    Effect.bind("accessToken", () => getServiceAccountAccessToken),
+    Effect.bind("accessToken", () => AccessToken),
     Effect.andThen(({ client, accessToken }) => 
       client(
         HttpClientRequest.post(

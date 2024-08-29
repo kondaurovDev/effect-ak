@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
-import { Action, ActionName, parseDateWithTime } from "@efkit/shared"
+import { parseDateWithTime } from "@efkit/shared"
 
 import { RestClientLayer, RestClient } from "../client.js";
-import { getServiceAccountAccessToken } from "../auth/index.js";
+import { AccessToken } from "../auth/common.js";
 
 const Client =
   RestClient("Calendar")
@@ -21,7 +21,7 @@ export const InsertCalendar = (
 ) =>
   Effect.Do.pipe(
     Effect.bind("client", () => Client),
-    Effect.bind("accessToken", () => getServiceAccountAccessToken),
+    Effect.bind("accessToken", () => AccessToken),
     Effect.bind("body", () =>
       HttpBody.json({
         id: calendarId
@@ -45,10 +45,8 @@ export const InsertCalendar = (
 
 export const ListCalendars =
   Effect.Do.pipe(
-    Effect.bind("client", () => 
-      Client
-    ),
-    Effect.bind("accessToken", () => getServiceAccountAccessToken),
+    Effect.bind("client", () => Client),
+    Effect.bind("accessToken", () => AccessToken),
     Effect.andThen(({ client, accessToken }) =>
       client(
         HttpClientRequest.get(
@@ -86,7 +84,7 @@ export const createEvent = (
 ) =>
   Effect.Do.pipe(
     Effect.bind("client", () => Client),
-    Effect.bind("accessToken", () => getServiceAccountAccessToken),
+    Effect.bind("accessToken", () => AccessToken),
     Effect.bind("startDate", () => parseDateWithTime(request.start.dateTime)),
     Effect.bind("endDate", () => parseDateWithTime(request.end.dateTime)),
     Effect.bind("event", ({ startDate, endDate }) =>

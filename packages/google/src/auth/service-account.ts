@@ -1,27 +1,27 @@
 // https://developers.google.com/identity/protocols/oauth2/service-account
 
-import { Effect, pipe, Context } from "effect";
+import { Effect, pipe, Context, Redacted } from "effect";
 import { JWT } from "google-auth-library";
 import { Schema as S } from "@effect/schema"
 
-export const ServiceAccountCredentialsSchema =
+export const CredentialsSchema =
   S.Struct({
     client_email: S.NonEmptyString,
-    private_key: S.NonEmptyString
+    private_key: S.Redacted(S.NonEmptyString)
   })
 
-export class ServiceAccountCredentials
+export class AccountCredentials
   extends Context.Tag("ServiceAccountCredentials")<
-    ServiceAccountCredentials, typeof ServiceAccountCredentialsSchema.Type
+    AccountCredentials, typeof CredentialsSchema.Type
   >() { };
 
 export const getServiceAccountAccessToken =
   pipe(
-    ServiceAccountCredentials,
+    AccountCredentials,
     Effect.andThen((cred) => {
       const token = new JWT({
         email: cred.client_email,
-        key: cred.private_key,
+        key: Redacted.value(cred.private_key),
         scopes: [
           "https://www.googleapis.com/auth/calendar.events",
           "https://www.googleapis.com/auth/calendar",

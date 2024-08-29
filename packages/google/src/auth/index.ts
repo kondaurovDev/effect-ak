@@ -1,3 +1,4 @@
-export * from "./oauth.js"
+export * as OAuth from "./oauth.js"
 // export * from "./token-cache"
-export * from "./service-account.js"
+export * as ServiceAccount from "./service-account.js"
+export * from "./common.js"
