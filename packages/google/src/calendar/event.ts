@@ -3,63 +3,8 @@ import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 import { parseDateWithTime } from "@efkit/shared"
 
-import { RestClientLayer, RestClient } from "../client.js";
-import { AccessToken } from "../auth/common.js";
-
-const Client =
-  RestClient("Calendar")
-
-const ClientLive =
-  RestClientLayer(
-    Client,
-    "www.googleapis.com",
-    "/calendar/v3"
-  );
-
-export const InsertCalendar = (
-  calendarId: string
-) =>
-  Effect.Do.pipe(
-    Effect.bind("client", () => Client),
-    Effect.bind("accessToken", () => AccessToken),
-    Effect.bind("body", () =>
-      HttpBody.json({
-        id: calendarId
-      })
-    ),
-    Effect.andThen(({ client, accessToken, body }) =>
-      client(
-        HttpClientRequest.post(
-          "/users/me/calendarList", {
-            headers: {
-              "Authorization": `Bearer ${accessToken}`
-            },
-            body
-          })
-      )
-    ),
-    Effect.scoped,
-    Effect.provide(ClientLive)
-  );
-
-
-export const ListCalendars =
-  Effect.Do.pipe(
-    Effect.bind("client", () => Client),
-    Effect.bind("accessToken", () => AccessToken),
-    Effect.andThen(({ client, accessToken }) =>
-      client(
-        HttpClientRequest.get(
-          "/users/me/calendarList", {
-            headers: {
-              "Authorization": `Bearer ${accessToken}`
-            }
-          })
-      )
-    ),
-    Effect.scoped,
-    Effect.provide(ClientLive)
-  );
+import { RestClient } from "../client.js";
+import { prefix } from "./common.js";
 
 type CreateEventSchema = typeof CreateEventSchema.Type
 
@@ -67,11 +12,11 @@ export const CreateEventSchema =
   S.Struct({
     calendarId: S.NonEmptyString,
     summary: S.NonEmptyString,
-    start: S.Struct({ 
+    start: S.Struct({
       dateTime: S.String,
       timeZone: S.String
     }),
-    end: S.Struct({ 
+    end: S.Struct({
       dateTime: S.String,
       timeZone: S.String
     }),
@@ -83,8 +28,7 @@ export const createEvent = (
   request: CreateEventSchema
 ) =>
   Effect.Do.pipe(
-    Effect.bind("client", () => Client),
-    Effect.bind("accessToken", () => AccessToken),
+    Effect.bind("client", () => RestClient),
     Effect.bind("startDate", () => parseDateWithTime(request.start.dateTime)),
     Effect.bind("endDate", () => parseDateWithTime(request.end.dateTime)),
     Effect.bind("event", ({ startDate, endDate }) =>
@@ -99,16 +43,13 @@ export const createEvent = (
         summary: request.summary
       })
     ),
-    Effect.andThen(({ client, event, accessToken }) =>
-      client(
+    Effect.andThen(({ client, event }) =>
+      client.execute(
+        "apis",
         HttpClientRequest.post(
-          `/calendars/${request.calendarId}/events`, {
-          body: event,
-          headers: {
-            "Authorization": `Bearer ${accessToken}`
-          }
+          `${prefix}/calendars/${request.calendarId}/events`, {
+          body: event
         })
       )
-    ),
-    Effect.provide(ClientLive)  
+    )
   )

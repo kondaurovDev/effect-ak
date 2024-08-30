@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { SheetsClient, SheetsClientLive } from "./client.js";
-import { AccessToken } from "../auth/common.js";
+import { RestClient } from "../client.js";
+import { prefix } from "./common.js";
 
 //https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
 
@@ -12,12 +12,12 @@ export const appendRow = (
   rowValues: string[]
 ) =>
   Effect.Do.pipe(
-    Effect.bind("client", () => SheetsClient),
-    Effect.bind("accessToken", () => AccessToken),
-    Effect.andThen(({ client, accessToken }) => 
-      client(
+    Effect.bind("client", () => RestClient),
+    Effect.andThen(({ client }) => 
+      client.execute(
+        "sheets",
         HttpClientRequest.post(
-          `/${spreadsheetId}/values/${range}:append`, {
+          `${prefix}/${spreadsheetId}/values/${range}:append`, {
             urlParams: {
               valueInputOption: "USER_ENTERED"
             },
@@ -27,13 +27,9 @@ export const appendRow = (
               values: [
                 rowValues
               ]
-            }),
-            headers: {
-              "Authorization": `Bearer ${accessToken}`
-            }
+            })
           }
         )
       )
-    ),
-    Effect.provide(SheetsClientLive)
+    )
   )

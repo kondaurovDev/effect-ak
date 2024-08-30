@@ -11,7 +11,7 @@ export type ActionInput<T = unknown> = {
   readonly input: T
 }
 
-export type Action<I = unknown, O = unknown, E = unknown, R = never> = {
+export type Action<I, O, E, R> = {
   inputTag: Context.Tag<ActionInput<I>, ActionInput<I>>,
   inputSchema: S.Schema<I>,
   outputSchema: S.Schema<O>,
@@ -20,7 +20,7 @@ export type Action<I = unknown, O = unknown, E = unknown, R = never> = {
   actionWithInput: Effect.Effect<O, ActionError, ActionInput<I> | R>
 }
 
-export const Action = <I = unknown, O = unknown, E = unknown, R = never>(
+export const Action = <I, O, E, R>(
   name: ActionName,
   inputSchema: S.Schema<I>,
   outputSchema: S.Schema<O>,
