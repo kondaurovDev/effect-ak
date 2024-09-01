@@ -15,5 +15,6 @@ export const GetSpreadsheetsList =
           }
         })
       )
-    )
+    ),
+    Effect.provide(RestClient.live)
   )

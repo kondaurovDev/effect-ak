@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { FileSystem, HttpBody, HttpClientRequest } from "@effect/platform"
 
-import { RestClient as GptRestClient } from "../client.js"
+import { RestClient } from "../client.js"
 
 type Voice = 
   "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"
@@ -18,7 +18,7 @@ export const createSpeech = (
   speed = 1
 ) =>
   Effect.Do.pipe(
-    Effect.bind("client", () => GptRestClient),
+    Effect.bind("client", () => RestClient),
     Effect.bind("body", () =>
       HttpBody.json({
         model,
@@ -40,7 +40,8 @@ export const createSpeech = (
     Effect.bind("fs", () => FileSystem.FileSystem),
     Effect.andThen(({ fs, fileBytes }) =>
       fs.writeFile(fileName, new Uint8Array(fileBytes))
-    )
+    ),
+    Effect.provide(RestClient.live)
   )
 
 

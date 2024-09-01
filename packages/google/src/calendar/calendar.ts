@@ -22,7 +22,8 @@ export const InsertCalendar = (
           body
         })
       )
-    )
+    ),
+    Effect.provide(RestClient.live)
   );
 
   export const ListCalendars =
@@ -36,5 +37,6 @@ export const InsertCalendar = (
         })
       )
     ),
+    Effect.provide(RestClient.live),
     Effect.scoped
   );

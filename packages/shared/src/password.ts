@@ -1,11 +1,10 @@
 import { Schema as S } from "@effect/schema";
 import { randomBytes, scrypt, timingSafeEqual } from "crypto"
 import { Effect } from "effect";
-import { promisify } from "util";
 
 export type HashedPassword = typeof HashedPassword.Type; 
 export const HashedPassword = 
-  S.TemplateLiteral(S.String, ".", S.String).pipe(S.brand("HashedPassword"))
+  S.TemplateLiteral(S.String, S.Literal("."), S.String).pipe(S.brand("HashedPassword"))
 
 const hashPasswordWithSalt = (
   password: string, salt: Buffer,

@@ -13,9 +13,7 @@ export const ServiceLive =
       Effect.bind("region", () => AwsRegion),
       Effect.bind("client", ({ region }) =>
         Effect.try(() =>
-          new SSM({
-            region: region.value
-          })
+          new SSM({ region: region })
         )
       ),
       Effect.andThen(({ client }) =>

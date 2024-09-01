@@ -15,5 +15,6 @@ export const getSpreadsheet = (
         "sheets",
         HttpClientRequest.get(`${prefix}/${spreadsheetId}`)
       )
-    )
+    ),
+    Effect.provide(RestClient.live)
   );

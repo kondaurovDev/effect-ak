@@ -14,16 +14,16 @@ export const AuthResponse =
     token_type: S.Literal("Bearer")
   });
 
-export class ClientCredentialsValue
-  extends S.Class<ClientCredentialsValue>("ClientCredentials")({
+export class GoogleOAuthClientCredentialsContainer
+  extends S.Class<GoogleOAuthClientCredentialsContainer>("Google.ClientCredentials")({
     clientId: S.NonEmptyString,
-    clientSecret: S.NonEmptyString,
+    clientSecret: S.Redacted(S.NonEmptyString),
     scopes: S.NonEmptyArray(S.NonEmptyString),
     redirectUri: S.NonEmptyString
   }) { }
 
-export const ClientCredentials =
-  Context.GenericTag<ClientCredentialsValue>("Google.OAuthCredentials");
+export class GoogleOAuthClientCredentials 
+  extends Context.Tag("Google.OAuthCredentials")<GoogleOAuthClientCredentials, GoogleOAuthClientCredentialsContainer>() {};
 
 export class AuthUrlError extends Data.TaggedError("Google.AuthUrlError")<{
   message: string
@@ -33,7 +33,7 @@ export class AuthUrlError extends Data.TaggedError("Google.AuthUrlError")<{
 // scopes https://developers.google.com/identity/protocols/oauth2/scopes
 export const getAuthUrl =
   Effect.Do.pipe(
-    Effect.bind("credentials", () => ClientCredentials),
+    Effect.bind("credentials", () => GoogleOAuthClientCredentials),
     Effect.let("params", ({ credentials }) => (
       new URLSearchParams({
         client_id: credentials.clientId.toString(),
@@ -53,7 +53,7 @@ export const refreshAccessToken = (
   refreshToken: string
 ) =>
   Effect.Do.pipe(
-    Effect.bind("clientCredentials", () => ClientCredentials),
+    Effect.bind("clientCredentials", () => GoogleOAuthClientCredentials),
     Effect.bind("httpClient", () => HttpClient.HttpClient),
     Effect.let("formData", ({ clientCredentials }) => {
       const result = new FormData();
@@ -83,7 +83,8 @@ export const refreshAccessToken = (
         )
       )
     ),
-    Effect.scoped
+    Effect.scoped,
+    Effect.provide(HttpClient.layer)
   )
 
 // exchange
@@ -93,7 +94,7 @@ export const exchangeCode = (
   code: string
 ) =>
   Effect.Do.pipe(
-    Effect.bind("credentials", () => ClientCredentials),
+    Effect.bind("credentials", () => GoogleOAuthClientCredentials),
     Effect.bind("httpClient", () => HttpClient.HttpClient),
     Effect.let("formData", ({ credentials }) => {
       const result = new FormData();
@@ -116,6 +117,7 @@ export const exchangeCode = (
         Effect.andThen(HttpClientResponse.schemaBodyJson(AuthResponse))
       )
     ),
-    Effect.scoped
+    Effect.scoped,
+    Effect.provide(HttpClient.layer)
   )
 

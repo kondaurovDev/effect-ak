@@ -12,9 +12,7 @@ export const ServiceLive =
       Effect.bind("region", () => AwsRegion),
       Effect.bind("client", ({ region }) =>
         Effect.try(() =>
-          new S3({
-            region: region.value
-          })
+          new S3({ region })
         )
       ),
       Effect.andThen(({ client }) =>

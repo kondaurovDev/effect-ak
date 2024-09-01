@@ -21,7 +21,7 @@
     "@effect/platform-node": "catalog:"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b tsconfig.src.json",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "peerDependencies": {

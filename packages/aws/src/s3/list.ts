@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 
 import * as T from "./types.js";
-import { Service } from "./service.js"
+import { Service, ServiceLive } from "./service.js"
 import { tryAwsServiceMethod } from "../error.js";
 
 export const listFiles = (
@@ -11,11 +11,11 @@ export const listFiles = (
 ) =>
   pipe(
     Service,
-    Effect.andThen(s3SDK =>
+    Effect.andThen(s3Sdk =>
       tryAwsServiceMethod(
         "list object",
         () =>
-          s3SDK.listObjectsV2({
+          s3Sdk.listObjectsV2({
             Bucket: bucketName,
             ...(delimiter && {
               Delimiter: delimiter
@@ -25,5 +25,6 @@ export const listFiles = (
             })
           })
       )
-    )
+    ),
+    Effect.provide(ServiceLive)
   );

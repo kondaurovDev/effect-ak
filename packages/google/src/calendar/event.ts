@@ -51,5 +51,6 @@ export const createEvent = (
           body: event
         })
       )
-    )
+    ),
+    Effect.provide(RestClient.live)
   )

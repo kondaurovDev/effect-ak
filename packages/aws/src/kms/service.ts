@@ -11,11 +11,7 @@ export const ServiceLive =
     Effect.Do.pipe(
       Effect.bind("region", () => AwsRegion),
       Effect.bind("client", ({ region }) =>
-        Effect.try(() =>
-          new KMS({
-            region: region.value
-          })
-        )
+        Effect.try(() => new KMS({ region }))
       ),
       Effect.andThen(({ client }) =>
         client

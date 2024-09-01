@@ -31,5 +31,6 @@ export const appendRow = (
           }
         )
       )
-    )
+    ),
+    Effect.provide(RestClient.live)
   )

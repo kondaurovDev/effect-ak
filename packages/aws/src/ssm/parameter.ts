@@ -23,7 +23,8 @@ export const getParameter = (
     )),
     Effect.andThen(({ parameter }) =>
       Effect.fromNullable(parameter.Parameter)
-    )
+    ),
+    Effect.provide(ServiceLive)
   )
 
 export const getParameterValue = (
@@ -71,7 +72,8 @@ export const putParameter = (
             ...(keyId ? { KeyId: keyId } : {})
           })
       )
-    )
+    ),
+    Effect.provide(ServiceLive)
   )
 
 export const putJsonParameter = (

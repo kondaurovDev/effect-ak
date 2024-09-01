@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { tryAwsServiceMethod } from "../error.js";
-import { Service } from "./service.js";
+import { Service, ServiceLive } from "./service.js";
 
 export const encryptSecret = (
   secret: string,
@@ -24,7 +24,8 @@ export const encryptSecret = (
     ),
     Effect.andThen(result =>
       Buffer.from(result).toString("base64")
-    )
+    ),
+    Effect.provide(ServiceLive)
   )
 
 export const decryptSecret = (
@@ -48,6 +49,7 @@ export const decryptSecret = (
     ),
     Effect.andThen(result =>
       Buffer.from(result).toString("utf-8")
-    )
+    ),
+    Effect.provide(ServiceLive)
   )
 

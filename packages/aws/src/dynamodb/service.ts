@@ -12,9 +12,7 @@ export const ServiceLive =
       Effect.bind("region", () => AwsRegion),
       Effect.bind("client", ({ region }) =>
         Effect.try(() =>
-          new DynamoDB({
-            region: region.value
-          })
+          new DynamoDB({ region })
         )
       ),
       Effect.andThen(({ client }) =>

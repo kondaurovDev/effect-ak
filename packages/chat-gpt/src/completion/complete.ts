@@ -3,7 +3,7 @@ import { Schema as S } from "@effect/schema";
 import * as Shared from "@efkit/shared";
 
 import { CompletionError } from "../completion/error.js";
-import { CompletionService } from "./service.js";
+import { Completion } from "./service.js";
 import { ChatCompletionRequest } from "./request.js";
 
 export type UserMessage = typeof UserMessage.Type
@@ -14,14 +14,15 @@ export const completeChat = (
   request: ChatCompletionRequest
 ) =>
   pipe(
-    CompletionService,
+    Completion,
     Effect.andThen(({ complete }) =>
       complete(request)
     ),
     Effect.andThen(_ => _.firstChoice),
     Effect.andThen(_ =>
       Effect.fromNullable(_.message.content)
-    )
+    ),
+    Effect.provide(Completion.live)
   );
 
 export const completeFunctionCall = <O>(
@@ -29,7 +30,7 @@ export const completeFunctionCall = <O>(
   resultSchema: S.Schema<O>,
 ) =>
   pipe(
-    CompletionService,
+    Completion,
     Effect.andThen(({ complete }) =>
       pipe(
         complete(request),
@@ -43,7 +44,8 @@ export const completeFunctionCall = <O>(
         )),
         Effect.andThen(S.validate(resultSchema))
       )
-    )
+    ),
+    Effect.provide(Completion.live)
   )
 
 export const completeStructuredRequest = <O>(
@@ -51,7 +53,7 @@ export const completeStructuredRequest = <O>(
   resultSchema: S.Schema<O>,
 ) =>
   pipe(
-    CompletionService,
+    Completion,
     Effect.andThen(({ complete }) =>
       pipe(
         complete(request),
@@ -67,6 +69,7 @@ export const completeStructuredRequest = <O>(
           )),
         Effect.andThen(S.validate(resultSchema))
       )
-    )
+    ),
+    Effect.provide(Completion.live)
   )
 

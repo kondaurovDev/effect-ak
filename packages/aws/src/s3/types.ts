@@ -1,5 +1,5 @@
 import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
-import {Brand} from "effect";
+import { Brand } from "effect";
 
 export type BucketName = string & Brand.Brand<"BucketName">;
 export const BucketName = Brand.nominal<BucketName>();

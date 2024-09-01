@@ -4,6 +4,7 @@ import { parseJson } from "@efkit/shared";
 import * as T from "./types.js";
 import { Service } from "./service.js"
 import { tryAwsServiceMethod } from "../error.js";
+import { S3 } from "@efkit/aws";
 
 export const createFileWithContent = (
   bucketName: T.BucketName,
@@ -22,7 +23,8 @@ export const createFileWithContent = (
             Body: content
           })
       )
-    )
+    ),
+    Effect.provide(S3.ServiceLive)
   )
 
 export const getFileContent = (
@@ -62,7 +64,8 @@ export const getFileContent = (
           new global.File([ bytes], fileName)
         )
       )
-    )
+    ),
+    Effect.provide(S3.ServiceLive)
   )
 
 export const getJsonContent = (

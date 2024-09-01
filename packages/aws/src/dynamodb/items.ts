@@ -4,7 +4,7 @@ import * as Sdk from "@aws-sdk/client-dynamodb";
 
 import * as D from "./types.js";
 import { getProjectionAndAttributeNames, getUpdateExpression } from "./utils/index.js";
-import { Service } from "./service.js"
+import { Service, ServiceLive } from "./service.js"
 import { DynamoDbError } from "./errors.js";
 import { tryAwsServiceMethod } from "../error.js";
 
@@ -26,7 +26,8 @@ export const putItem = (
             Item: marshalledItem
           })
       )
-    )
+    ),
+    Effect.provide(ServiceLive)
   )
 
 export const getOne = (
@@ -60,7 +61,8 @@ export const getOne = (
     Effect.andThen(({ Item }) => {
       if (!Item) return new DynamoDbError({ message: `item not found in ${tableName}` });
       return Effect.try(() => unmarshall(Item))
-    })
+    }),
+    Effect.provide(ServiceLive)
   )
 
 export const updateOne = (
@@ -93,5 +95,6 @@ export const updateOne = (
         () =>
           dynamoSDK.updateItem(request as Sdk.UpdateItemCommandInput)
       )
-    )
+    ),
+    Effect.provide(ServiceLive)
   )

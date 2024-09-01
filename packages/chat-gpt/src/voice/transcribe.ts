@@ -3,7 +3,7 @@ import { HttpBody, HttpClientRequest } from "@effect/platform"
 import { Schema as S } from "@effect/schema";
 import { File } from "buffer"
 
-import { RestClient as GptRestClient } from "../client.js"
+import { RestClient } from "../client.js"
 
 // supported: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm
 
@@ -22,7 +22,7 @@ export const transcribeAudio = (
       formData.append("file", file, file.name);
       return HttpBody.formData(formData);
     }), 
-    Effect.bind("client", () => GptRestClient),
+    Effect.bind("client", () => RestClient),
     Effect.andThen(({ client, formData }) =>
       pipe(
         client(
@@ -36,5 +36,6 @@ export const transcribeAudio = (
           S.validate(S.Struct({ text: S.String }))
         )
       )
-    )
+    ),
+    Effect.provide(RestClient.live)
   );

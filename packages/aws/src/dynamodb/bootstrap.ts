@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import * as D from "./types.js";
-import { Service } from "./service.js"
+import { Service, ServiceLive } from "./service.js"
 import { tryAwsServiceMethod } from "../error.js";
 
 export const createTable = (
@@ -23,5 +23,6 @@ export const createTable = (
             KeySchema: key
           })
       )
-    )
+    ),
+    Effect.provide(ServiceLive)
   );

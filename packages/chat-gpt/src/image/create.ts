@@ -47,5 +47,6 @@ export const createImage = (
     ),
     Effect.andThen(_ =>
       Effect.fromNullable(_.data.at(0)?.b64_json)
-    )
+    ),
+    Effect.provide(RestClient.live)
   )

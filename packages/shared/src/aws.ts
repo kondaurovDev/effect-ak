@@ -1,23 +1,20 @@
 import { Context, Layer } from "effect"
-import { Schema as S } from "@effect/schema"
+import { Schema as S } from "@effect/schema";
 
-export type AwsRegionValue = typeof AwsRegionValue.Type
-export const AwsRegionValue = S.NonEmptyString.annotations({ title: "AWS region" })
+export type AwsRegionSchema = typeof AwsRegionSchema.Type
+
+export const AwsRegionSchema =
+  S.TemplateLiteral(S.String, S.Literal("-"), S.String, S.Literal("-"), S.Number)
 
 export class AwsRegion extends
-  Context.Tag("AwsRegion")<
-    AwsRegion,
-    {
-      value: AwsRegionValue
-    }
-  >() {}
+  Context.Tag("AwsRegion")<AwsRegion, AwsRegionSchema>() {
 
-export const AwsRegionLive = (
-  region: AwsRegionValue
-) =>
-  Layer.succeed(
-    AwsRegion,
-    AwsRegion.of({
-      value: region
-    })
-  )
+    static createLayer(region: AwsRegionSchema) {
+      return Layer.succeed(
+        AwsRegion,
+        AwsRegion.of(region)
+      )
+    }
+
+  }
+

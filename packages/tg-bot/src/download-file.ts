@@ -7,7 +7,7 @@ import { TgBotToken } from "./token.js"
 
 export class DownloadFileError 
   extends Data.TaggedError("Tg.DownloadFileError")<{
-    error: MiscError
+    cause: MiscError
   }> {}
 
 export type RemoteFilePath = 
@@ -113,7 +113,7 @@ export const downloadFile = (
         new File([ bytes ], fileName)
     ),
     Effect.mapError(error =>
-      new DownloadFileError({ error })
+      new DownloadFileError({ cause: error })
     ),
     Effect.provide(HttpClient.layer)
   )
