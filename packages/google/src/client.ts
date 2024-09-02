@@ -27,7 +27,8 @@ export type BaseUrlDomain = keyof typeof baseUrlMap;
 const baseUrlMap = {
   apis: "www.googleapis.com",
   sheets: "sheets.googleapis.com",
-  people: "people.googleapis.com"
+  people: "people.googleapis.com",
+  tasks: "tasks.googleapis.com"
 } as const;
 
 export class RestClient
