@@ -10,12 +10,12 @@ export const getParameter = (
   paramName: T.ParameterName
 ) =>
   Effect.Do.pipe(
-    Effect.bind("ssmSDK", () => Service),
-    Effect.bind("parameter", (({ ssmSDK }) => 
+    Effect.bind("ssmSdk", () => Service),
+    Effect.bind("parameter", (({ ssmSdk }) => 
       tryAwsServiceMethod(
         `getting parameter ${paramName}`, 
         () =>
-          ssmSDK.getParameter({
+          ssmSdk.getParameter({
             Name: paramName,
             WithDecryption: true
           })

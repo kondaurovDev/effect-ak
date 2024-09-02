@@ -20,81 +20,79 @@ export type RestClientService = (
 }
 
 export class RestClient extends
-  Context.Tag("Claude.RestClient")<RestClient, RestClientService>() {
+  Context.Tag("Claude.RestClient")<RestClient, RestClientService>() { };
 
-    static readonly live =
-      Layer.effect(
-        RestClient,
-        Effect.Do.pipe(
-          Effect.bind("httpClient", () =>
-            HttpClient.HttpClient
+export const RestClientLive =
+  Layer.effect(
+    RestClient,
+    Effect.Do.pipe(
+      Effect.bind("httpClient", () =>
+        HttpClient.HttpClient
+      ),
+      Effect.let("baseUrl", () => "https://api.anthropic.com/"),
+      Effect.let("client", ({ httpClient, baseUrl }) =>
+        httpClient.pipe(
+          HttpClient.mapRequest(
+            HttpClientRequest.setHeaders({
+              "anthropic-version": "2023-06-01"
+            })
           ),
-          Effect.let("baseUrl", () => "https://api.anthropic.com/"),
-          Effect.let("client", ({ httpClient, baseUrl }) =>
-            httpClient.pipe(
-              HttpClient.mapRequest(
-                HttpClientRequest.setHeaders({
-                  "anthropic-version": "2023-06-01"
-                })
+          HttpClient.mapRequest(
+            HttpClientRequest.prependUrl(baseUrl)
+          ),
+          HttpClient.transformResponse(
+            HttpClientResponse.arrayBuffer
+          ),
+        ),
+      ),
+      Effect.let("getBuffer", ({ client }) =>
+        (request: HttpClientRequest.HttpClientRequest) =>
+          Effect.suspend(() =>
+            pipe(
+              ClaudeToken,
+              Effect.andThen(token =>
+                client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
               ),
-              HttpClient.mapRequest(
-                HttpClientRequest.prependUrl(baseUrl)
-              ),
-              HttpClient.transformResponse(
-                HttpClientResponse.arrayBuffer
-              ),
-            ),
-          ),
-          Effect.let("getBuffer", ({ client }) =>
-            (request: HttpClientRequest.HttpClientRequest) =>
-              Effect.suspend(() =>
-                pipe(
-                  ClaudeToken,
-                  Effect.andThen(token =>
-                    client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
-                  ),
-                  Effect.scoped,
-                )
-              )
-          ),
-          Effect.let("getJson", ({ client }) =>
-            (request: HttpClientRequest.HttpClientRequest) =>
-              Effect.suspend(() =>
-                pipe(
-                  ClaudeToken,
-                  Effect.andThen(token =>
-                    client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
-                  ),
-                  Effect.andThen(_ =>
-                    Buffer.from(_).toString()
-                  ),
-                  Effect.andThen(
-                    Shared.parseJson
-                  ),
-                  Effect.scoped,
-                ),
-              )
-          ),
-          Effect.andThen(({ getBuffer, getJson }) =>
-            RestClient.of(
-              request => ({
-                buffer: getBuffer(request),
-                json: getJson(request),
-                validJson: schema =>
-                  pipe(
-                    getJson(request),
-                    Effect.andThen(json =>
-                      S.validate(schema)(json)
-                    )
-                  )
-              })
+              Effect.scoped,
             )
           )
+      ),
+      Effect.let("getJson", ({ client }) =>
+        (request: HttpClientRequest.HttpClientRequest) =>
+          Effect.suspend(() =>
+            pipe(
+              ClaudeToken,
+              Effect.andThen(token =>
+                client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
+              ),
+              Effect.andThen(_ =>
+                Buffer.from(_).toString()
+              ),
+              Effect.andThen(
+                Shared.parseJson
+              ),
+              Effect.scoped,
+            ),
+          )
+      ),
+      Effect.andThen(({ getBuffer, getJson }) =>
+        RestClient.of(
+          request => ({
+            buffer: getBuffer(request),
+            json: getJson(request),
+            validJson: schema =>
+              pipe(
+                getJson(request),
+                Effect.andThen(json =>
+                  S.validate(schema)(json)
+                )
+              )
+          })
         )
-      ).pipe(
-        Layer.provide(HttpClient.layer)
       )
-
-  };
+    )
+  ).pipe(
+    Layer.provide(HttpClient.layer)
+  )
 
 

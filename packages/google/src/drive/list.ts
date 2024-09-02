@@ -1,7 +1,7 @@
 import { HttpClientRequest } from "@effect/platform";
 import { Effect } from "effect";
 
-import { RestClient } from "../client.js"
+import { RestClient, RestClientLive } from "../client.js"
 
 export const GetSpreadsheetsList =
   Effect.Do.pipe(
@@ -16,5 +16,5 @@ export const GetSpreadsheetsList =
         })
       )
     ),
-    Effect.provide(RestClient.live)
+    Effect.provide(RestClientLive)
   )

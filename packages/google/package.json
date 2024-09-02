@@ -6,6 +6,9 @@
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "url": "https://github.com/kondaurovDev/efkit",
     "directory": "packages/google"
@@ -22,9 +25,6 @@
     "@effect/platform-node": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/schema": "catalog:"
-  },
-  "dependencies": {
-    "google-auth-library": "^9.11.0"
   },
   "peerDependencies": {
     "@efkit/shared": "workspace:^"

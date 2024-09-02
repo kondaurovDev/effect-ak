@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema"
 
-import { RestClient } from "../client.js";
+import { RestClient, RestClientLive } from "../client.js";
 
 const Response = 
   S.Struct({
@@ -48,5 +48,5 @@ export const createImage = (
     Effect.andThen(_ =>
       Effect.fromNullable(_.data.at(0)?.b64_json)
     ),
-    Effect.provide(RestClient.live)
+    Effect.provide(RestClientLive)
   )

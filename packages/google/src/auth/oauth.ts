@@ -1,6 +1,8 @@
-import { HttpClient, HttpBody, HttpClientRequest, HttpClientResponse } from "@effect/platform";
-import { Effect, Data, Context, pipe } from "effect";
+import { HttpBody } from "@effect/platform";
+import { Effect, Data, Context, pipe, Redacted } from "effect";
 import { Schema as S } from "@effect/schema"
+
+import { RestClient, RestClientLive } from "../client.js";
 
 export type AuthResponse =
   typeof AuthResponse.Type
@@ -48,43 +50,28 @@ export const getAuthUrl =
     )
   )
 
-//https://oauth2.googleapis.com/token
+// https://developers.google.com/identity/protocols/oauth2/web-server#offline
 export const refreshAccessToken = (
   refreshToken: string
 ) =>
   Effect.Do.pipe(
     Effect.bind("clientCredentials", () => GoogleOAuthClientCredentials),
-    Effect.bind("httpClient", () => HttpClient.HttpClient),
+    Effect.bind("restClient", () => RestClient),
     Effect.let("formData", ({ clientCredentials }) => {
       const result = new FormData();
       result.append("client_id", clientCredentials.clientId);
-      result.append("client_secret", clientCredentials.clientSecret);
+      result.append("client_secret", Redacted.value(clientCredentials.clientSecret));
       result.append("refresh_token", refreshToken);
       result.append("grant_type", "refresh_token");
       return HttpBody.formData(result)
     }),
-    Effect.andThen(({ httpClient, formData }) =>
+    Effect.andThen(({ restClient, formData }) =>
       pipe(
-        httpClient(
-          HttpClientRequest.post(
-            "https://oauth2.googleapis.com/token", {
-            body: formData
-          }
-          )
-        ),
-        Effect.andThen(response =>
-          pipe(
-            response.json,
-            Effect.tap(resp => Effect.logDebug("auth response", resp, response.status)),
-            Effect.andThen(
-              S.validate(AuthResponse)
-            )
-          )
-        )
+        restClient.token(formData),
+        Effect.andThen(S.decodeUnknown(AuthResponse))
       )
     ),
-    Effect.scoped,
-    Effect.provide(HttpClient.layer)
+    Effect.provide(RestClientLive)
   )
 
 // exchange
@@ -95,29 +82,24 @@ export const exchangeCode = (
 ) =>
   Effect.Do.pipe(
     Effect.bind("credentials", () => GoogleOAuthClientCredentials),
-    Effect.bind("httpClient", () => HttpClient.HttpClient),
+    Effect.bind("restClient", () => RestClient),
     Effect.let("formData", ({ credentials }) => {
       const result = new FormData();
       result.append("client_id", credentials.clientId);
-      result.append("client_secret", credentials.clientSecret);
+      result.append("client_secret", Redacted.value(credentials.clientSecret));
       result.append("code", code);
       result.append("grant_type", "authorization_code");
       result.append("redirect_uri", credentials.redirectUri);
       return HttpBody.formData(result)
     }),
-    Effect.andThen(({ httpClient, formData }) =>
-      httpClient(
-        HttpClientRequest.post(
-          "https://oauth2.googleapis.com/token", {
-          body: formData
-        }
+    Effect.andThen(({ restClient, formData }) =>
+      pipe(
+        restClient.token(formData),
+        Effect.andThen(result => S.decodeUnknown(AuthResponse)(result)),
+        Effect.tap(result =>
+          Effect.logDebug("Code has been exchanged", result.token_type)
         )
-      ).pipe(
-        Effect.tap(resp => Effect.andThen(resp.json, Effect.logDebug)),
-        Effect.andThen(HttpClientResponse.schemaBodyJson(AuthResponse))
       )
     ),
-    Effect.scoped,
-    Effect.provide(HttpClient.layer)
+    Effect.provide(RestClientLive)
   )
-

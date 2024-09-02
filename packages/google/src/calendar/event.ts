@@ -3,7 +3,7 @@ import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 import { parseDateWithTime } from "@efkit/shared"
 
-import { RestClient } from "../client.js";
+import { RestClient, RestClientLive } from "../client.js";
 import { prefix } from "./common.js";
 
 type CreateEventSchema = typeof CreateEventSchema.Type
@@ -52,5 +52,5 @@ export const createEvent = (
         })
       )
     ),
-    Effect.provide(RestClient.live)
+    Effect.provide(RestClientLive)
   )

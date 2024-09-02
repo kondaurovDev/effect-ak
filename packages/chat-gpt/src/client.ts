@@ -19,9 +19,9 @@ export type RestClientService = (
 }
 
 export class RestClient
-  extends Context.Tag("Gpt.RestClient")<RestClient, RestClientService>() {
+  extends Context.Tag("Gpt.RestClient")<RestClient, RestClientService>() {};
 
-  static readonly live =
+  export const RestClientLive =
     Layer.effect(
       RestClient,
       Effect.Do.pipe(
@@ -95,4 +95,3 @@ export class RestClient
     ).pipe(
       Layer.provide(HttpClient.layer)
     )
-};

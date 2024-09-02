@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Schema as S } from "@effect/schema"
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { RestClient } from "../client.js";
+import { RestClient, RestClientLive } from "../client.js";
 import { MessageResponse } from "./response.js";
 import { CreateMessageRequest } from "./request.js";
 
@@ -24,5 +24,6 @@ export const complete = (
     ),
     Effect.andThen(({ result }) =>
       S.decodeUnknown(MessageResponse)(result)
-    )
+    ),
+    Effect.provide(RestClientLive)
   )

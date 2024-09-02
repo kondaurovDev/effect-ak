@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { HttpClientRequest } from "@effect/platform";
 
-import { RestClient } from "../client.js";
+import { RestClient, RestClientLive } from "../client.js";
 import * as T from "./types.js";
 import { prefix } from "./common.js";
 
@@ -16,5 +16,5 @@ export const getSpreadsheet = (
         HttpClientRequest.get(`${prefix}/${spreadsheetId}`)
       )
     ),
-    Effect.provide(RestClient.live)
+    Effect.provide(RestClientLive)
   );

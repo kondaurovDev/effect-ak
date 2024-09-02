@@ -2,7 +2,7 @@ packages:
   - 'packages/*'
 
 catalog:
-  effect: ^3.6.5
-  "@effect/platform": ^0.62.2
-  "@effect/platform-node": ^0.57.2
-  "@effect/schema": ^0.71.1
+  effect: ^3.7.0
+  "@effect/platform": ^0.63.0
+  "@effect/platform-node": ^0.58.0
+  "@effect/schema": ^0.72.0

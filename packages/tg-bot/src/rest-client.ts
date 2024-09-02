@@ -39,99 +39,97 @@ export type RestClientService = {
 export const baseUrl = "https://api.telegram.org";
 
 export class RestClient
-  extends Context.Tag("TgBot.RestClient")<RestClient, RestClientService>() {
+  extends Context.Tag("TgBot.RestClient")<RestClient, RestClientService>() { };
 
-  static readonly live =
-    Layer.effect(
-      RestClient,
-      Effect.Do.pipe(
-        Effect.bind("httpClient", () =>
-          HttpClient.HttpClient
-        ),
-        Effect.let("client", ({ httpClient }) =>
-          httpClient.pipe(
-            HttpClient.tapRequest(request =>
-              Effect.logDebug(`request to telegram bot api`, {
-                path: request.urlParams.at(-1),
-                body: request.body.toJSON()
-              })
-            ),
-            HttpClient.tap(response =>
-              pipe(
-                response.json,
-                Effect.andThen(body =>
-                  Effect.logDebug("telegram body response", body)
-                )
+export const RestClientLive =
+  Layer.effect(
+    RestClient,
+    Effect.Do.pipe(
+      Effect.bind("httpClient", () =>
+        HttpClient.HttpClient
+      ),
+      Effect.let("client", ({ httpClient }) =>
+        httpClient.pipe(
+          HttpClient.tapRequest(request =>
+            Effect.logDebug(`request to telegram bot api`, {
+              path: request.urlParams.at(-1),
+              body: request.body.toJSON()
+            })
+          ),
+          HttpClient.tap(response =>
+            pipe(
+              response.json,
+              Effect.andThen(body =>
+                Effect.logDebug("telegram body response", body)
+              )
+            )
+          ),
+          HttpClient.mapEffectScoped(
+            HttpClientResponse.schemaBodyJson(TgResponse)
+          ),
+          HttpClient.catchTag("ParseError", parseError =>
+            Effect.fail(new ContractError({ parseError, type: "api" }))
+          ),
+          HttpClient.filterOrFail(
+            response => response.ok,
+            response => new TgApiError({ response })
+          ),
+          HttpClient.map(_ => _.result)
+        )
+      ),
+      Effect.let("sendApiRequest", ({ client }) =>
+        <O>(
+          request: HttpClientRequest.HttpClientRequest,
+          resultSchema: S.Schema<O>
+        ) =>
+          pipe(
+            TgBotToken,
+            Effect.andThen(token =>
+              client(
+                request
+                  .pipe(
+                    HttpClientRequest.prependUrl(`${baseUrl}/bot${Redacted.value(token)}`)
+                  )
               )
             ),
-            HttpClient.mapEffectScoped(
-              HttpClientResponse.schemaBodyJson(TgResponse)
-            ),
-            HttpClient.catchTag("ParseError", parseError =>
-              Effect.fail(new ContractError({ parseError, type: "api" }))
-            ),
-            HttpClient.filterOrFail(
-              response => response.ok,
-              response => new TgApiError({ response })
-            ),
-            HttpClient.map(_ => _.result)
+            Effect.andThen(_ => validateResponse(resultSchema, _))
           )
-        ),
-        Effect.let("sendApiRequest", ({ client }) =>
-          <O>(
-            request: HttpClientRequest.HttpClientRequest,
-            resultSchema: S.Schema<O>
-          ) =>
-            pipe(
-              TgBotToken,
-              Effect.andThen(token =>
-                client(
-                  request
-                    .pipe(
-                      HttpClientRequest.prependUrl(`${baseUrl}/bot${Redacted.value(token)}`)
+      ),
+      Effect.let("sendApiPostRequest", ({ client }) =>
+        <O>(
+          methodName: `/${string}`,
+          body: Record<string, unknown>,
+          resultSchema: S.Schema<O>
+        ) =>
+          Effect.Do.pipe(
+            Effect.bind("botToken", () => TgBotToken),
+            Effect.let("request", ({ botToken }) =>
+              HttpClientRequest.post(
+                `${baseUrl}/bot${Redacted.value(botToken)}${methodName}`, {
+                body:
+                  Object.keys(body).length != 0
+                    ? HttpBody.formData(
+                      getFormData(methodName, body)
                     )
-                )
-              ),
-              Effect.andThen(_ => validateResponse(resultSchema, _))
-            )
-        ),
-        Effect.let("sendApiPostRequest", ({ client }) =>
-          <O>(
-            methodName: `/${string}`,
-            body: Record<string, unknown>,
-            resultSchema: S.Schema<O>
-          ) =>
-            Effect.Do.pipe(
-              Effect.bind("botToken", () => TgBotToken),
-              Effect.let("request", ({ botToken }) =>
-                HttpClientRequest.post(
-                  `${baseUrl}/bot${Redacted.value(botToken)}${methodName}`, {
-                  body:
-                    Object.keys(body).length != 0
-                      ? HttpBody.formData(
-                        getFormData(methodName, body)
-                      )
-                      : undefined
-                }
-                )
-              ),
-              Effect.andThen(({ request }) =>
-                client(request),
-              ),
-              Effect.andThen(_ => validateResponse(resultSchema, _))
-            )
-        ),
-        Effect.andThen(({ sendApiRequest, sendApiPostRequest }) =>
-          RestClient.of({
-            sendApiPostRequest, sendApiRequest
-          })
-        )
+                    : undefined
+              }
+              )
+            ),
+            Effect.andThen(({ request }) =>
+              client(request),
+            ),
+            Effect.andThen(_ => validateResponse(resultSchema, _))
+          )
+      ),
+      Effect.andThen(({ sendApiRequest, sendApiPostRequest }) =>
+        RestClient.of({
+          sendApiPostRequest, sendApiRequest
+        })
       )
-    ).pipe(
-      Layer.provide(HttpClient.layer)
     )
-
-};
+  ).pipe(
+    Layer.provide(HttpClient.layer)
+  )
 
 const getFormData = (
   methodName: `/${string}`,

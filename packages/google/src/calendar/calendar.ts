@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { RestClient } from "../client.js";
+import { RestClient, RestClientLive } from "../client.js";
 import { prefix } from "./common.js";
 
-export const InsertCalendar = (
+export const insertCalendar = (
   calendarId: string
 ) =>
   Effect.Do.pipe(
@@ -23,10 +23,10 @@ export const InsertCalendar = (
         })
       )
     ),
-    Effect.provide(RestClient.live)
+    Effect.provide(RestClientLive)
   );
 
-  export const ListCalendars =
+export const listCalendars =
   Effect.Do.pipe(
     Effect.bind("client", () => RestClient),
     Effect.andThen(({ client }) =>
@@ -37,6 +37,6 @@ export const InsertCalendar = (
         })
       )
     ),
-    Effect.provide(RestClient.live),
+    Effect.provide(RestClientLive),
     Effect.scoped
   );

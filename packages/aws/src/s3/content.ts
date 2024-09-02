@@ -13,11 +13,11 @@ export const createFileWithContent = (
 ) =>
   pipe(
     Service,
-    Effect.andThen(s3SDK =>
+    Effect.andThen(s3Sdk =>
       tryAwsServiceMethod(
         `put object to ${bucketName}:${key}`,
         () =>
-          s3SDK.putObject({
+          s3Sdk.putObject({
             Bucket: bucketName,
             Key: key,
             Body: content

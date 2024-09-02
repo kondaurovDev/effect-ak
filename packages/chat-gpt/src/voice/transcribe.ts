@@ -3,7 +3,7 @@ import { HttpBody, HttpClientRequest } from "@effect/platform"
 import { Schema as S } from "@effect/schema";
 import { File } from "buffer"
 
-import { RestClient } from "../client.js"
+import { RestClient, RestClientLive } from "../client.js"
 
 // supported: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm
 
@@ -37,5 +37,5 @@ export const transcribeAudio = (
         )
       )
     ),
-    Effect.provide(RestClient.live)
+    Effect.provide(RestClientLive)
   );

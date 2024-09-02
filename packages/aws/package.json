@@ -11,6 +11,9 @@
     "url": "https://github.com/kondaurovDev/efkit",
     "directory": "packages/claude"
   },
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

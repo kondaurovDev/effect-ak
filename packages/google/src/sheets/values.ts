@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { RestClient } from "../client.js";
+import { RestClient, RestClientLive } from "../client.js";
 import { prefix } from "./common.js";
 
 //https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
@@ -32,5 +32,5 @@ export const appendRow = (
         )
       )
     ),
-    Effect.provide(RestClient.live)
+    Effect.provide(RestClientLive)
   )
