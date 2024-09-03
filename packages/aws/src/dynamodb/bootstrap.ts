@@ -6,7 +6,6 @@ import { tryAwsServiceMethod } from "../error.js";
 
 export const createTable = (
   tableName: D.TableName,
-  billingMode: D.BillingMode,
   attributes: D.AttributeDefinition[],
   key: D.KeySchema[]
 ) =>
@@ -18,7 +17,7 @@ export const createTable = (
         () =>
           dynamoSDK.createTable({
             TableName: tableName,
-            BillingMode: billingMode,
+            BillingMode: "PAY_PER_REQUEST",
             AttributeDefinitions: attributes,
             KeySchema: key
           })

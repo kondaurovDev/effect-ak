@@ -1,21 +1,20 @@
 import { Effect, pipe } from "effect";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import * as Sdk from "@aws-sdk/client-dynamodb";
+import type * as Sdk from "@aws-sdk/client-dynamodb";
 
 import * as D from "./types.js";
 import { getProjectionAndAttributeNames, getUpdateExpression } from "./utils/index.js";
 import { Service, ServiceLive } from "./service.js"
 import { DynamoDbError } from "./errors.js";
 import { tryAwsServiceMethod } from "../error.js";
+import { marshallItem, unmarshallItem } from "./marshall.js";
 
 export const putItem = (
   tableName: D.TableName,
   item: D.AnyItem
 ) =>
-  Effect.Do.pipe(
-    Effect.bind("marshalledItem", () =>
-      Effect.try(() => marshall(item)),
-    ),
+  pipe(
+    Effect.Do,
+    Effect.bind("marshalledItem", () => marshallItem(item)),
     Effect.bind("dynamoSDK", () => Service),
     Effect.andThen(({ dynamoSDK, marshalledItem }) =>
       tryAwsServiceMethod(
@@ -35,7 +34,8 @@ export const getOne = (
   key: D.Key,
   attrsToGet: D.AttrsToGet
 ) =>
-  Effect.Do.pipe(
+  pipe(
+    Effect.Do,
     Effect.let("request", () => ({
       TableName: tableName,
     } as Partial<Sdk.GetItemCommandInput>)),
@@ -46,7 +46,7 @@ export const getOne = (
     }),
     Effect.tap(({ request }) =>
       pipe(
-        Effect.try(() => marshall(key)),
+        marshallItem(key),
         Effect.tap(v => { request.Key = v; })
       ),
     ),
@@ -60,7 +60,7 @@ export const getOne = (
     ),
     Effect.andThen(({ Item }) => {
       if (!Item) return new DynamoDbError({ message: `item not found in ${tableName}` });
-      return Effect.try(() => unmarshall(Item))
+      return unmarshallItem(Item)
     }),
     Effect.provide(ServiceLive)
   )
@@ -71,14 +71,13 @@ export const updateOne = (
   update: D.AnyItem,
   returnValue?: D.ReturnValue,
 ) =>
-  Effect.Do.pipe(
+  pipe(
+    Effect.Do,
     Effect.let("request", () => ({
       TableName: tableName,
       ReturnValues: returnValue ?? "NONE"
     }) as Partial<Sdk.UpdateItemCommandInput>),
-    Effect.bind("marshalledKey", () => 
-      Effect.try(() => marshall(key))
-    ),
+    Effect.bind("marshalledKey", () => marshallItem(key)),
     Effect.bind("updateExpression", () =>
       getUpdateExpression(update)
     ),

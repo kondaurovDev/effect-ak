@@ -6,18 +6,24 @@ import * as FunctionTool from "../tools/function-tool.js"
 export type MessageContent =
   typeof MessageContent.Type
 
+export const ImageMessageContent =
+  S.Struct({
+    type: S.Literal("image_url"),
+    image_url: S.Struct({
+      url: S.String
+    })
+  })
+
+export const TextMessageContent =
+  S.Struct({
+    type: S.Literal("text"),
+    text: S.String
+  })
+
 export const MessageContent = 
   S.Union(
-    S.Struct({
-      type: S.Literal("image_url"),
-      image_url: S.Struct({
-        url: S.String
-      })
-    }),
-    S.Struct({
-      type: S.Literal("text"),
-      text: S.String
-    }),
+    ImageMessageContent,
+    TextMessageContent
   );
 
 const Content =
@@ -33,7 +39,7 @@ export type RequestMessage =
   typeof RequestMessageSchema.Type & Brand.Brand<"RequestMessage">;
 export const RequestMessage = Brand.nominal<RequestMessage>();
 
-const RequestMessageSchema =
+export const RequestMessageSchema =
   S.Union(
     S.Struct({
       role: S.Literal("tool"),
