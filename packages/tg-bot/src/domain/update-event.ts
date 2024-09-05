@@ -1,8 +1,8 @@
 import { Schema as S } from "@effect/schema";
 import { Effect } from "effect";
 
-import { MessageUpdate, getMessageUserName } from "./message.js"
-import { UnknownTgUpdate } from "../error.js";
+import { MessageUpdate, getMessageUserName } from "./message-update.js"
+import { UnknownTgUpdate } from "../domain/index.js";
 
 export class TgUpdateEvent 
   extends S.Class<TgUpdateEvent>("TgUpdateEvent")({
@@ -34,4 +34,3 @@ export class TgUpdateEvent
     }
 
   }
-

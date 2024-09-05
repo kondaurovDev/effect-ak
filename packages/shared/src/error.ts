@@ -1,6 +1,6 @@
 import { Data } from "effect"
 
-export class MiscError 
-  extends Data.TaggedError("MiscError")<{
+export class SharedError 
+  extends Data.TaggedError("SharedError")<{
     message: string
   }> {}

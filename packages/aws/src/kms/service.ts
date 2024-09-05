@@ -1,6 +1,7 @@
 import { Context, Layer, Effect } from "effect"
 import { KMS } from "@aws-sdk/client-kms"
-import { AwsRegion } from "@efkit/shared";
+
+import { AwsRegion } from "../region.js";
 
 export const Service =
   Context.GenericTag<KMS>("AWS.KMS")

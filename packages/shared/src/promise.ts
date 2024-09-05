@@ -1,6 +1,5 @@
 import {Effect, pipe, Data } from "effect";
 import {Schema as S} from "@effect/schema";
-import { ParseError } from "@effect/schema/ParseResult";
 
 export class PromiseError<E> extends Data.TaggedError("PromiseError")<{
   actionName: string,
@@ -9,8 +8,7 @@ export class PromiseError<E> extends Data.TaggedError("PromiseError")<{
 
 export class PromiseSchemaError extends Data.TaggedError("PromiseSchemaError")<{
   actionName: string,
-  message: string,
-  cause: ParseError
+  cause: Error
 }> {}
 
 export const trySafePromise = <O, E>(
@@ -29,7 +27,7 @@ export const trySafePromise = <O, E>(
         ),
         Effect.matchEffect({
           onSuccess: error => new PromiseError({ actionName, cause: error }),
-          onFailure: error => new PromiseSchemaError({ actionName, cause: error, message: error.message })
+          onFailure: error => new PromiseSchemaError({ actionName, cause: exception })
         })
       )
     )

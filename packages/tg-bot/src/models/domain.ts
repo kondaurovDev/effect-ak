@@ -1,18 +1,17 @@
 import { Schema as S } from "@effect/schema"
-
-import { MessageUpdate } from "../update-events/message.js";
+import { MessageUpdate } from "../domain/index.js";
 
 type Infer<T> = S.Schema.Type<T>
 
-export type ChatId = 
+export type ChatId =
   typeof ChatId;
 
 export const ChatId = S.Union(S.Number, S.String);
 
-export type User = 
+export type User =
   typeof User.Type;
 
-export const User = 
+export const User =
   S.Struct({
     id: S.Number,
     first_name: S.NonEmptyString,
@@ -22,10 +21,16 @@ export const User =
     identifier: "TgUser"
   });
 
-export type WebhookInfo = 
+export const BotCommand =
+  S.Struct({
+    command: S.NonEmptyString,
+    description: S.NonEmptyString
+  })
+
+export type WebhookInfo =
   typeof WebhookInfo.Type;
-  
-export const WebhookInfo = 
+
+export const WebhookInfo =
   S.Struct({
     url: S.String,
     pending_update_count: S.Number,
@@ -47,14 +52,22 @@ export const SetBotNameResult = S.Boolean
   });
 
 export type SetBotCommandsResult = Infer<typeof SetBotCommandsResult>;
-export const SetBotCommandsResult = 
+export const SetBotCommandsResult =
   S.Boolean
     .annotations({
       identifier: "SetMyCommandsResult"
     });
 
+export type GetBotCommandsResult = Infer<typeof GetBotCommandsResult>;
+export const GetBotCommandsResult =
+  S.Array(BotCommand)
+    .annotations({
+      identifier: "GetMyCommandsResult"
+    });
+
+
 export type UpdateMessageReplyMarkupResult = Infer<typeof UpdateMessageReplyMarkupResult>;
-export const UpdateMessageReplyMarkupResult = 
+export const UpdateMessageReplyMarkupResult =
   S.Union(
     S.Boolean,
     S.suspend(() => MessageUpdate)
@@ -63,14 +76,14 @@ export const UpdateMessageReplyMarkupResult =
   });
 
 export type SetChatActionResult = Infer<typeof SetChatActionResult>;
-export const SetChatActionResult = 
+export const SetChatActionResult =
   S.Boolean
     .annotations({
       identifier: "SendChatActionResult"
     });
 
 export type FileInfo = Infer<typeof FileInfo>;
-export const FileInfo = 
+export const FileInfo =
   S.Struct({
     file_id: S.String,
     file_unique_id: S.String,
@@ -81,18 +94,19 @@ export const FileInfo =
   });
 
 export type Chat = Infer<typeof Chat>;
-export const Chat = S.Struct({
-  id: S.Number,
-  type: S.Literal("private", "group", "supergroup", "channel"),
-  title: S.optional(S.String)
-}).annotations({
-  identifier: "Chat"
-});
+export const Chat =
+  S.Struct({
+    id: S.Number,
+    type: S.Literal("private", "group", "supergroup", "channel"),
+    title: S.optional(S.String)
+  }).annotations({
+    identifier: "Chat"
+  });
 
 export const CommandScope =
   S.Union(
     S.Struct({
-      type: 
+      type:
         S.Literal(
           "all_private_chats", "default", "all_group_chats",
           "all_chat_administrators"
@@ -123,21 +137,21 @@ export const InlineKeyboardButton =
       callback_data: S.String,
       switch_inline_query: S.String,
       switch_inline_query_current_chat: S.String,
-      switch_inline_query_chosen_chat: 
+      switch_inline_query_chosen_chat:
         S.suspend(() => SwitchInlineQueryChosenChat)
     })
   ).annotations({
     identifier: "InlineKeyboardButton"
   })
 
-const WebApp = 
+const WebApp =
   S.Struct({
     url: S.String
   }).annotations({
     identifier: "WebApp"
   })
 
-const SwitchInlineQueryChosenChat = 
+const SwitchInlineQueryChosenChat =
   S.Struct({
     query: S.optional(S.String),
     allow_user_chats: S.optional(S.Boolean),
@@ -147,4 +161,3 @@ const SwitchInlineQueryChosenChat =
   }).annotations({
     identifier: "SwitchInlineQueryChosenChat"
   })
-  

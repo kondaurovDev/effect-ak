@@ -7,6 +7,12 @@ export const TableName = Brand.nominal<TableName>();
 export type AttributeDefinition = Sdk.AttributeDefinition & Brand.Brand<"AttributeDefinition">;
 export const AttributeDefinition = Brand.nominal<AttributeDefinition>();
 
+export type UpdateItemInput = Sdk.UpdateItemInput & Brand.Brand<"UpdateItemInput">;
+export const UpdateItemInput = Brand.nominal<UpdateItemInput>();
+
+export type GetItemInput = Sdk.GetItemInput & Brand.Brand<"GetItemInput">;
+export const GetItemInput = Brand.nominal<GetItemInput>();
+
 export type KeySchema = Sdk.KeySchemaElement & Brand.Brand<"KeySchema">;
 export const KeySchema = Brand.nominal<KeySchema>();
 

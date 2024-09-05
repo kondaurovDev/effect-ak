@@ -1,6 +1,7 @@
 import { S3 } from "@aws-sdk/client-s3"
 import { Context, Layer, Effect } from "effect"
-import { AwsRegion } from "@efkit/shared";
+
+import { AwsRegion } from "../region.js";
 
 export const Service = 
   Context.GenericTag<S3>("AWS.S3");

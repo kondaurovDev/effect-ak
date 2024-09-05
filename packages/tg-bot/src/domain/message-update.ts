@@ -28,7 +28,8 @@ const Voice =
   })
 
 const messageFields = {
-  message_id: S.Number,
+  message_id: S.Number, // Unix time
+  date: S.Number,
   text: S.optional(S.NonEmptyString),
   photo: S.optional(PhotoArray),
   caption: S.optional(S.String),

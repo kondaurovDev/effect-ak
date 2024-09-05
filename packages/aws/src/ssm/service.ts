@@ -1,7 +1,8 @@
 
 import { Context, Layer, Effect } from "effect"
 import { SSM } from "@aws-sdk/client-ssm"
-import { AwsRegion } from "@efkit/shared";
+
+import { AwsRegion } from "../region.js";
 
 export const Service =
   Context.GenericTag<SSM>("AWS.SSM")

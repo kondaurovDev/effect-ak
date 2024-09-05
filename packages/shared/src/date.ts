@@ -1,6 +1,6 @@
 import { Cache, Duration, Effect, pipe } from "effect"
 
-import { MiscError } from "./error.js"
+import { SharedError } from "./error.js"
 
 const dateTimeFormatter = (
   timezone: string
@@ -47,15 +47,15 @@ export const parseDateWithTime = (
     ),
     Effect.mapError(error => {
       if (error._tag == "NoSuchElementException") {
-        return new MiscError({
+        return new SharedError({
           message: `Input '${input}' isn't a date string`
         })
       } else if (error._tag == "UnknownException") {
-        return new MiscError({
+        return new SharedError({
           message: `Input '${input}' can't be transformed to a date`
         })
       } else {
-        return new MiscError({
+        return new SharedError({
           message: `Input '${input}'. Unknown exception`
         })
       }
@@ -81,7 +81,7 @@ const getGMTOffsetByTimezone = (
       ),
     ),
     Effect.catchAll(errors =>
-      new MiscError({ message: `getting gmt by timezone ${timezone}: ${errors.message}` })
+      new SharedError({ message: `getting gmt by timezone ${timezone}: ${errors.message}` })
     ),
     Effect.andThen(result => result.value)
   )

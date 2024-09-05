@@ -1,9 +1,13 @@
 import * as D from "../types.js";
 
-export const getProjectionAndAttributeNames = (attrs: D.AttrsToGet): {
+type Result = {
   attributeNames: D.AttributeNames,
   projectionExpression: D.ProjectionExpression
-} => {
+}
+
+export const getProjectionAndAttributeNames = (
+  attrs: D.AttrsToGet
+): Result => {
 
   const expr: string[] = [];
 

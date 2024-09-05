@@ -48,7 +48,7 @@ export const Action = <I, O, E, R>(
           pipe(
             S.validate(inputSchema)(getInput(actionInput)),
             Effect.mapError(parseError => 
-              new ActionError({ error: { type: "RequestStructureError", parseError } })
+              new ActionError({ cause: parseError })
             )
           )
         ),
@@ -77,14 +77,15 @@ export const Action = <I, O, E, R>(
               Effect.logWarning(error)
             ),
             Effect.mapError((executionError) =>
-              new ActionError({ error: { type: "ExecutionError", executionError } })
+              new ActionError({ cause: executionError })
             )
           )
         ),
         Effect.andThen(({ actionResult }) =>
-          S.validate(outputSchema)(actionResult).pipe(
-            Effect.mapError(parseError => 
-              new ActionError({ error: { type: "ResponseStructureError", parseError } })
+          pipe(
+            S.validate(outputSchema)(actionResult),
+            Effect.catchTag("ParseError", parseError => 
+              new ActionError({ cause: parseError })
             )
           )
         )
@@ -93,30 +94,24 @@ export const Action = <I, O, E, R>(
 };
 
 export class ActionError extends Data.TaggedError("ActionError")<{
-  error: {
-    type: "RequestStructureError" | "ResponseStructureError",
-    parseError: ParseResult.ParseError,
-  } | {
-    type: "ExecutionError",
-    executionError: unknown
-  }
+  cause: unknown
 }> {
 
-  get message() {
-    return pipe(
-      Match.value(this.error),
-      Match.when(
-        { type: "ExecutionError" }, 
-        error => {
-          const errorDetails = 
-            error.executionError instanceof Error ? error.executionError.message : error.executionError;
-          return `Execution error (${errorDetails})`
-        }
-      ),
-      Match.orElse(error =>
-        `${error.type}: ${error.parseError.message}`
-      )
-    )
-  }
+  // get message() {
+  //   return pipe(
+  //     Match.value(this.error),
+  //     Match.when(
+  //       { type: "ExecutionError" }, 
+  //       error => {
+  //         const errorDetails = 
+  //           error.executionError instanceof Error ? error.executionError.message : error.executionError;
+  //         return `Execution error (${errorDetails})`
+  //       }
+  //     ),
+  //     Match.orElse(error =>
+  //       `${error.type}: ${error.parseError.message}`
+  //     )
+  //   )
+  // }
 
 }

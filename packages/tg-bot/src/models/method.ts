@@ -1,7 +1,7 @@
 import { Schema as S } from "@effect/schema"
 
-import { TgUpdateEvent } from "../update-events/index.js";
-import { ChatId, CommandScope, InlineKeyboardButton } from "./domain.js";
+import { TgUpdateEvent } from "../domain/index.js";
+import { ChatId, CommandScope, InlineKeyboardButton, BotCommand } from "./domain.js";
 
 const ReplyParameters = 
   S.Struct({
@@ -123,13 +123,15 @@ export type SetBotCommands =
   typeof SetBotCommands.Type
 export const SetBotCommands = 
   S.Struct({
-    commands: 
-      S.Array(
-        S.Struct({
-        command: S.NonEmptyString,
-        description: S.NonEmptyString
-      })
-    ),
+    commands: S.Array(BotCommand),
     scope: CommandScope,
     language_code: S.optional(S.String)
+  });
+
+export type GetBotCommands = 
+  typeof GetBotCommands.Type
+export const GetBotCommands = 
+  S.Struct({
+    scope: S.optional(CommandScope),
+    language_code: S.optional(S.NonEmptyString)
   });

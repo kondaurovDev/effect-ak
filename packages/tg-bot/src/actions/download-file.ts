@@ -1,13 +1,13 @@
 import { Brand, Config, Effect, pipe, Data, Redacted } from "effect";
 import { HttpClient, FileSystem, HttpClientRequest } from "@effect/platform";
-import { MiscError, hashText } from "@efkit/shared";
+import { hashText, SharedError } from "@efkit/shared";
 
-import { baseUrl } from "./rest-client.js";
-import { TgBotToken } from "./token.js"
+import { baseUrl } from "../rest-client.js";
+import { TgBotError, TgBotToken } from "../domain/index.js"
 
 export class DownloadFileError 
   extends Data.TaggedError("Tg.DownloadFileError")<{
-    cause: MiscError
+    cause: TgBotError | SharedError
   }> {}
 
 export type RemoteFilePath = 
@@ -27,7 +27,7 @@ const tmpDir =
     Config.string("TMP_DIR"),
     Config.withDefault("/tmp"),
     Effect.mapError(error =>
-      new MiscError({
+      new TgBotError({
         message: `Can't get tmp_dir: ${error._op}`
       })
     )
@@ -51,7 +51,7 @@ export const downloadFile = (
       pipe(
         fs.exists(downloadTo),
         Effect.mapError((error) => 
-          new MiscError({
+          new TgBotError({
             message: `Can't download file to filesystem: ${error.message}`
           })
         )
@@ -67,7 +67,7 @@ export const downloadFile = (
                 HttpClientRequest.get(`${baseUrl}/file/bot${Redacted.value(botToken)}/${remoteFilePath}`)
               ).pipe(
                 Effect.mapError(error =>
-                  new MiscError({
+                  new TgBotError({
                     message: `Can't download file from telegram: ${error.message}`
                   })
                 )
@@ -77,7 +77,7 @@ export const downloadFile = (
               pipe(
                 _.arrayBuffer,
                 Effect.mapError(error => 
-                  new MiscError({
+                  new TgBotError({
                     message: `Can't read http body: ${error.message}`
                   })
                 )
@@ -87,7 +87,7 @@ export const downloadFile = (
               pipe(
                 fs.writeFile(downloadTo, new Uint8Array(_)),
                 Effect.mapError((error) => 
-                  new MiscError({
+                  new TgBotError({
                     message: `Can't check cached file: ${error.message}`
                   })
                 )
@@ -102,7 +102,7 @@ export const downloadFile = (
       pipe(
         fs.readFile(downloadTo),
         Effect.mapError((error) => 
-          new MiscError({
+          new TgBotError({
             message: `Can't read downloaded file: ${error.message}`
           })
         )
@@ -114,6 +114,5 @@ export const downloadFile = (
     ),
     Effect.mapError(error =>
       new DownloadFileError({ cause: error })
-    ),
-    Effect.provide(HttpClient.layer)
+    )
   )

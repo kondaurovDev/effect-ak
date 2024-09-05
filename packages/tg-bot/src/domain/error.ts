@@ -2,7 +2,7 @@ import { Data } from "effect";
 import { ParseResult } from "@effect/schema";
 import { HttpBody } from "@effect/platform";
 
-import { TgResponse } from "./rest-client.js";
+import { TgResponse } from "../rest-client.js";
 
 export class TgApiError extends Data.TaggedError("TgApiError")<{
   response: TgResponse

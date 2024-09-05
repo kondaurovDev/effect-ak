@@ -1,6 +1,7 @@
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { Context, Effect, Layer } from "effect";
-import { AwsRegion } from "@efkit/shared";
+
+import { AwsRegion } from "../region.js";
 
 export const Service =
   Context.GenericTag<DynamoDB>("AWS.ApiGateway")

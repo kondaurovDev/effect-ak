@@ -1,4 +1,4 @@
-import { Effect, pipe } from "effect";
+import { Effect, Match, pipe } from "effect";
 import type * as Sdk from "@aws-sdk/client-dynamodb";
 
 import * as D from "./types.js";
@@ -14,7 +14,7 @@ export const putItem = (
 ) =>
   pipe(
     Effect.Do,
-    Effect.bind("marshalledItem", () => marshallItem(item)),
+    Effect.bind("marshalledItem", () => marshallItem(item, tableName)),
     Effect.bind("dynamoSDK", () => Service),
     Effect.andThen(({ dynamoSDK, marshalledItem }) =>
       tryAwsServiceMethod(
@@ -32,35 +32,44 @@ export const putItem = (
 export const getOne = (
   tableName: D.TableName,
   key: D.Key,
-  attrsToGet: D.AttrsToGet
+  attrsToGet: D.AttrsToGet | undefined
 ) =>
   pipe(
     Effect.Do,
-    Effect.let("request", () => ({
-      TableName: tableName,
-    } as Partial<Sdk.GetItemCommandInput>)),
-    Effect.tap(({ request }) => {
-      const projection = getProjectionAndAttributeNames(attrsToGet);
-      request.ExpressionAttributeNames = projection.attributeNames;
-      request.ProjectionExpression = projection.projectionExpression;
-    }),
-    Effect.tap(({ request }) =>
+    Effect.bind("key", () => marshallItem(key, tableName)),
+    Effect.let("request", ({ key }) =>
       pipe(
-        marshallItem(key),
-        Effect.tap(v => { request.Key = v; })
-      ),
+        Match.value(attrsToGet),
+        Match.when(Match.defined, (attrs) =>
+          pipe(
+            getProjectionAndAttributeNames(attrs),
+            projection =>
+              D.GetItemInput({
+                TableName: tableName,
+                Key: key,
+                ExpressionAttributeNames: projection.attributeNames,
+                ProjectionExpression: projection.projectionExpression
+              })
+          )
+        ),
+        Match.orElse(() =>
+          D.GetItemInput({
+            TableName: tableName,
+            Key: key
+          })
+        )
+      )
     ),
     Effect.bind("dynamoSDK", () => Service),
     Effect.andThen(({ dynamoSDK, request }) =>
       tryAwsServiceMethod(
-        `get item from ${tableName}`, 
-        () => 
-          dynamoSDK.getItem(request as Sdk.GetItemCommandInput)
+        `get item from ${tableName}`,
+        () => dynamoSDK.getItem(request)
       )
     ),
     Effect.andThen(({ Item }) => {
       if (!Item) return new DynamoDbError({ message: `item not found in ${tableName}` });
-      return unmarshallItem(Item)
+      return unmarshallItem(Item, tableName)
     }),
     Effect.provide(ServiceLive)
   )
@@ -73,20 +82,18 @@ export const updateOne = (
 ) =>
   pipe(
     Effect.Do,
-    Effect.let("request", () => ({
-      TableName: tableName,
-      ReturnValues: returnValue ?? "NONE"
-    }) as Partial<Sdk.UpdateItemCommandInput>),
-    Effect.bind("marshalledKey", () => marshallItem(key)),
-    Effect.bind("updateExpression", () =>
-      getUpdateExpression(update)
+    Effect.bind("marshalledKey", () => marshallItem(key, tableName)),
+    Effect.bind("updateExpression", () => getUpdateExpression(update)),
+    Effect.let("request", ({ marshalledKey, updateExpression }) =>
+      D.UpdateItemInput({
+        TableName: tableName,
+        ReturnValues: returnValue ?? "NONE",
+        Key: marshalledKey,
+        UpdateExpression: `SET ${updateExpression.expressionParts.join(",")}`,
+        ExpressionAttributeNames: updateExpression.attributeNames,
+        ExpressionAttributeValues: updateExpression.attributeValues
+      })
     ),
-    Effect.tap(({ marshalledKey, updateExpression, request }) => {
-      request.Key = marshalledKey;
-      request.UpdateExpression = `SET ${updateExpression.expressionParts.join(",")}`;
-      request.ExpressionAttributeNames = updateExpression.attributeNames;
-      request.ExpressionAttributeValues = updateExpression.attributeValues;
-    }),
     Effect.bind("dynamoSDK", () => Service),
     Effect.andThen(({ dynamoSDK, request }) =>
       tryAwsServiceMethod(

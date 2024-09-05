@@ -1,9 +1,8 @@
 import { HttpBody, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
-import { Layer, pipe, Effect, Context, Match, Redacted } from "effect";
+import { Layer, pipe, Effect, Context, Match, Redacted, Console } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { ContractError, TgApiError } from "./error.js";
-import { TgBotToken } from "./token.js";
+import { TgBotToken, ContractError, TgApiError } from "./domain/index.js";
 
 export type TgResponse =
   typeof TgResponse.Type;
@@ -44,7 +43,9 @@ export class RestClient
 export const RestClientLive =
   Layer.effect(
     RestClient,
-    Effect.Do.pipe(
+    pipe(
+      Effect.Do,
+      Effect.tap(Effect.logDebug("Creating Layer with TgRestClient")),
       Effect.bind("httpClient", () =>
         HttpClient.HttpClient
       ),
@@ -52,7 +53,7 @@ export const RestClientLive =
         httpClient.pipe(
           HttpClient.tapRequest(request =>
             Effect.logDebug(`request to telegram bot api`, {
-              path: request.urlParams.at(-1),
+              botAction: request.url.split("/").at(-1),
               body: request.body.toJSON()
             })
           ),
@@ -101,19 +102,20 @@ export const RestClientLive =
           body: Record<string, unknown>,
           resultSchema: S.Schema<O>
         ) =>
-          Effect.Do.pipe(
+          pipe(
+            Effect.Do,
+            Effect.tap(Console.log(`executing method '${methodName}'`)),
             Effect.bind("botToken", () => TgBotToken),
-            Effect.let("request", ({ botToken }) =>
+            Effect.let("body", () =>
+              Object.keys(body).length != 0
+                ? HttpBody.formData(getFormData(methodName, body))
+                : undefined
+            ),
+            Effect.let("request", ({ botToken, body }) =>
               HttpClientRequest.post(
                 `${baseUrl}/bot${Redacted.value(botToken)}${methodName}`, {
-                body:
-                  Object.keys(body).length != 0
-                    ? HttpBody.formData(
-                      getFormData(methodName, body)
-                    )
-                    : undefined
-              }
-              )
+                body
+              })
             ),
             Effect.andThen(({ request }) =>
               client(request),

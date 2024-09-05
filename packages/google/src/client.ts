@@ -89,7 +89,6 @@ export const RestClientLive =
               )
             )
         })
-      ),
-      Effect.provide(HttpClient.layer)
+      )
     )
   )
