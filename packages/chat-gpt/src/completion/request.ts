@@ -159,7 +159,7 @@ export class ChatCompletionRequest
                 name: fn.name.replaceAll(" ", "_"),
                 description: fn.description,
                 schema: fn.parameters,
-                strict: false 
+                strict: true 
               }
             },
             messages: [

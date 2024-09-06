@@ -3,32 +3,32 @@ import { pipe, Effect, Logger, Layer } from "effect"
 import { LogLevelConfigFromEnvLive} from "@efkit/shared"
 import { Schema as S } from "@effect/schema"
 
-import { ChatCompletionRequest, CompletionServiceLive } from "../src/completion";
+import { ChatCompletionRequest, CompletionLive } from "../src/completion";
 import { completeChat, completeFunctionCall, completeStructuredRequest } from "../src/completion/complete";
-import { GptTokenFromEnvLive } from "../src/token";
+import { GptToken } from "../src/token";
 
 const live = 
   Layer.mergeAll(
     LogLevelConfigFromEnvLive,
-    CompletionServiceLive,
-    GptTokenFromEnvLive
+    CompletionLive,
+    GptToken.createLayerFromConfig()
   )
 
 const currencySchema = 
   S.Struct({
-    currFrom: S.NonEmptyString.annotations({ title: "from which currency"}),
-    currTo: S.NonEmptyString.annotations({ title: "to which currency"}),
-    amount: S.Positive.annotations({ title: "amount of money to convert from"})
+    currFrom: S.String.annotations({ title: "from which currency"}),
+    currTo: S.String.annotations({ title: "to which currency"}),
+    amount: S.Number.annotations({ title: "amount of money to convert from"})
   }).annotations({
     title: "convertCurrency",
     description: "convert currency from one to another",
-    examples: [
-      {
-        amount: 5000,
-        currFrom: "EUR",
-        currTo: "AMD"
-      }
-    ]
+    // examples: [
+    //   {
+    //     amount: 5000,
+    //     currFrom: "EUR",
+    //     currTo: "AMD"
+    //   }
+    // ]
   })
 
 
