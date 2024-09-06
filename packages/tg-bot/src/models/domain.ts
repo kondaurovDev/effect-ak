@@ -1,34 +1,16 @@
 import { Schema as S } from "@effect/schema"
-import { MessageUpdate } from "../domain/index.js";
 
-type Infer<T> = S.Schema.Type<T>
+import { MessageUpdate } from "../domain/message-update.js";
 
-export type ChatId =
-  typeof ChatId;
+export const ChatId = 
+  S.Union(S.Number, S.String);
 
-export const ChatId = S.Union(S.Number, S.String);
-
-export type User =
-  typeof User.Type;
-
-export const User =
-  S.Struct({
-    id: S.Number,
-    first_name: S.NonEmptyString,
-    username: S.optional(S.NonEmptyString),
-    is_bot: S.Boolean
-  }).annotations({
-    identifier: "TgUser"
-  });
 
 export const BotCommand =
   S.Struct({
     command: S.NonEmptyString,
     description: S.NonEmptyString
   })
-
-export type WebhookInfo =
-  typeof WebhookInfo.Type;
 
 export const WebhookInfo =
   S.Struct({
@@ -39,26 +21,22 @@ export const WebhookInfo =
     identifier: "WebhookInfo"
   });
 
-export type SetWebhookResult = Infer<typeof SetWebhookResult>;
 export const SetWebhookResult = S.Boolean
   .annotations({
     identifier: "SetWebhookResult"
   });
 
-export type SetBotNameResult = Infer<typeof SetBotNameResult>;
 export const SetBotNameResult = S.Boolean
   .annotations({
     identifier: "SetBotNameResult"
   });
 
-export type SetBotCommandsResult = Infer<typeof SetBotCommandsResult>;
 export const SetBotCommandsResult =
   S.Boolean
     .annotations({
       identifier: "SetMyCommandsResult"
     });
 
-export type GetBotCommandsResult = Infer<typeof GetBotCommandsResult>;
 export const GetBotCommandsResult =
   S.Array(BotCommand)
     .annotations({
@@ -66,23 +44,20 @@ export const GetBotCommandsResult =
     });
 
 
-export type UpdateMessageReplyMarkupResult = Infer<typeof UpdateMessageReplyMarkupResult>;
 export const UpdateMessageReplyMarkupResult =
   S.Union(
     S.Boolean,
-    S.suspend(() => MessageUpdate)
+    MessageUpdate
   ).annotations({
     identifier: "UpdateMessageReplyMarkupResult"
   });
 
-export type SetChatActionResult = Infer<typeof SetChatActionResult>;
 export const SetChatActionResult =
   S.Boolean
     .annotations({
       identifier: "SendChatActionResult"
     });
 
-export type FileInfo = Infer<typeof FileInfo>;
 export const FileInfo =
   S.Struct({
     file_id: S.String,
@@ -93,7 +68,6 @@ export const FileInfo =
     identifier: "FileInfo"
   });
 
-export type Chat = Infer<typeof Chat>;
 export const Chat =
   S.Struct({
     id: S.Number,
@@ -127,23 +101,6 @@ export const CommandScope =
     }),
   )
 
-// https://core.telegram.org/bots/api#inlinekeyboardbutton
-export const InlineKeyboardButton =
-  S.partial(
-    S.Struct({
-      text: S.required(S.String),
-      url: S.String,
-      web_app: S.suspend(() => WebApp),
-      callback_data: S.String,
-      switch_inline_query: S.String,
-      switch_inline_query_current_chat: S.String,
-      switch_inline_query_chosen_chat:
-        S.suspend(() => SwitchInlineQueryChosenChat)
-    })
-  ).annotations({
-    identifier: "InlineKeyboardButton"
-  })
-
 const WebApp =
   S.Struct({
     url: S.String
@@ -160,4 +117,20 @@ const SwitchInlineQueryChosenChat =
     allow_channel_chats: S.optional(S.Boolean),
   }).annotations({
     identifier: "SwitchInlineQueryChosenChat"
+  })
+
+  
+// https://core.telegram.org/bots/api#inlinekeyboardbutton
+// Exactly one of the optional fields must be used to specify type of the button.
+export const InlineKeyboardButton =
+  S.Struct({
+    text: S.String,
+    url: S.optional(S.String),
+    web_app: S.optional(WebApp),
+    callback_data: S.optional(S.String),
+    switch_inline_query: S.optional(S.String),
+    switch_inline_query_current_chat: S.optional(S.String),
+    switch_inline_query_chosen_chat: S.optional(SwitchInlineQueryChosenChat)
+  }).annotations({
+    identifier: "InlineKeyboardButton"
   })

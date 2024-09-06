@@ -22,8 +22,6 @@ const ReplyMarkup =
 const ParseMode = 
   S.Literal("MarkdownV2", "HTML")
 
-export type SendMessage = 
-  typeof SendMessage.Type;
 export const SendMessage = 
   S.Struct({
     text: S.String,
@@ -35,8 +33,6 @@ export const SendMessage =
     reply_markup: S.optional(ReplyMarkup)
   })
 
-export type EditMessageText = 
-  typeof EditMessageText.Type;
 export const EditMessageText = 
   S.Struct({
     text: S.String,
@@ -45,17 +41,12 @@ export const EditMessageText =
     reply_markup: S.optional(ReplyMarkup)
   })
 
-export type SetMessageReplyMarkup = 
-  typeof SetMessageReplyMarkup.Type;
 export const SetMessageReplyMarkup = 
   S.Struct({
     chat_id: ChatId,
     message_id: S.Number,
     reply_markup: ReplyMarkup
   });
-
-export type SendVoice = 
-  typeof SendVoice.Type;
 
 export const SendVoice = 
   S.Struct({
@@ -70,33 +61,23 @@ export const SendVoice =
       )
   });
 
-export type GetMe = typeof GetMe.Type;
 export const GetMe = S.Undefined;
-
-export type GetWebhook = typeof GetWebhook.Type;
 export const GetWebhook = S.Undefined;
-
-export type GetChat = typeof GetChat.Type
 export const GetChat = 
   S.Struct({
     chat_id: S.NonEmptyString
   });
 
-export type GetFile = typeof GetFile.Type
 export const GetFile = 
   S.Struct({
     file_id: S.String
   });
 
-export type SetBotName = typeof SetBotName.Type
 export const SetBotName = 
   S.Struct({
     name: S.String,
     language_code: S.optional(S.String)
   });
-
-export type SetChatAction = 
-  typeof SetChatAction.Type
   
 export const SetChatAction = 
   S.Struct({
@@ -108,8 +89,6 @@ export const SetChatAction =
 const AllowedUpdates =
   S.keyof(S.Struct(TgUpdateEvent.fields).pipe(S.omit("update_id")))
 
-export type SetWebhook = 
-  typeof SetWebhook.Type
 export const SetWebhook = 
   S.Struct({
     url: S.NonEmptyString.pipe(S.pattern(/^https:\/\/.*/)),
@@ -119,8 +98,6 @@ export const SetWebhook =
   });
 
 //https://core.telegram.org/bots/api#determining-list-of-commands
-export type SetBotCommands = 
-  typeof SetBotCommands.Type
 export const SetBotCommands = 
   S.Struct({
     commands: S.Array(BotCommand),
@@ -128,8 +105,6 @@ export const SetBotCommands =
     language_code: S.optional(S.String)
   });
 
-export type GetBotCommands = 
-  typeof GetBotCommands.Type
 export const GetBotCommands = 
   S.Struct({
     scope: S.optional(CommandScope),

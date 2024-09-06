@@ -2,18 +2,7 @@ import { HttpBody, HttpClient, HttpClientError, HttpClientRequest, HttpClientRes
 import { Layer, pipe, Effect, Context, Match, Redacted, Console } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { TgBotToken, ContractError, TgApiError } from "./domain/index.js";
-
-export type TgResponse =
-  typeof TgResponse.Type;
-
-export const TgResponse =
-  S.Struct({
-    ok: S.Boolean,
-    error_code: S.optional(S.Number),
-    description: S.optional(S.String),
-    result: S.optional(S.Unknown)
-  });
+import { TgBotToken, ContractError, TgApiError, TgResponse } from "./domain/index.js";
 
 export type RestClientError =
   HttpClientError.HttpClientError |
@@ -37,12 +26,12 @@ export type RestClientService = {
 
 export const baseUrl = "https://api.telegram.org";
 
-export class RestClient
-  extends Context.Tag("TgBot.RestClient")<RestClient, RestClientService>() { };
+export class TgRestClient
+  extends Context.Tag("TgBot.RestClient")<TgRestClient, RestClientService>() { };
 
-export const RestClientLive =
+export const TgRestClientLive =
   Layer.effect(
-    RestClient,
+    TgRestClient,
     pipe(
       Effect.Do,
       Effect.tap(Effect.logDebug("Creating Layer with TgRestClient")),
@@ -124,7 +113,7 @@ export const RestClientLive =
           )
       ),
       Effect.andThen(({ sendApiRequest, sendApiPostRequest }) =>
-        RestClient.of({
+        TgRestClient.of({
           sendApiPostRequest, sendApiRequest
         })
       )

@@ -2,7 +2,7 @@ import { Schema as S } from "@effect/schema";
 import { Effect } from "effect";
 
 import { MessageUpdate, getMessageUserName } from "./message-update.js"
-import { UnknownTgUpdate } from "../domain/index.js";
+import { UnknownTgUpdate } from "./error.js";
 
 export class TgUpdateEvent 
   extends S.Class<TgUpdateEvent>("TgUpdateEvent")({

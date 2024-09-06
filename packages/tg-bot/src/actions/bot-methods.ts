@@ -1,27 +1,27 @@
 import { Effect, pipe } from "effect"
 
-import { RestClient, RestClientLive } from "../rest-client.js"
+import { TgRestClient } from "../rest-client.js"
 import * as M from "../models/method.js";
 import * as D from "../models/domain.js";
-import { MessageUpdate } from "../domain/index.js";
+import { MessageUpdate, User } from "../domain/index.js";
 
 export const getMe = () =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/getMe",
         {},
-        D.User
+        User
       )
     )
   )
 
 export const sendMessage = (
-  input: M.SendMessage
+  input: typeof M.SendMessage.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/sendMessage",
@@ -32,10 +32,10 @@ export const sendMessage = (
   )
 
 export const editMessageText = (
-  input: M.EditMessageText
+  input: typeof M.EditMessageText.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/editMessageText",
@@ -46,10 +46,10 @@ export const editMessageText = (
   )
 
 export const sendVoice = (
-  input: M.SendVoice
+  input: typeof M.SendVoice.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/sendVoice",
@@ -61,7 +61,7 @@ export const sendVoice = (
 
 export const getWebhook = () =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/getWebhookInfo",
@@ -72,10 +72,10 @@ export const getWebhook = () =>
   )
 
 export const setWebhook = (
-  input: M.SetWebhook
+  input: typeof M.SetWebhook.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/setWebhook",
@@ -86,10 +86,10 @@ export const setWebhook = (
   )
 
 export const getChat = (
-  input: M.GetChat
+  input: typeof M.GetChat.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/getChat",
@@ -100,10 +100,10 @@ export const getChat = (
   )
 
 export const getFile = (
-  input: M.GetFile
+  input: typeof M.GetFile.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/getFile",
@@ -114,10 +114,10 @@ export const getFile = (
   )
 
 export const setBotName = (
-  input: M.SetBotName
+  input: typeof M.SetBotName.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/sendMyName",
@@ -128,10 +128,10 @@ export const setBotName = (
   )
 
 export const setBotCommands = (
-  input: M.SetBotCommands
+  input: typeof M.SetBotCommands.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/setMyCommands",
@@ -142,10 +142,10 @@ export const setBotCommands = (
   )
 
   export const getBotCommands = (
-    input: M.GetBotCommands
+    input: typeof M.GetBotCommands.Type
   ) =>
     pipe(
-      RestClient,
+      TgRestClient,
       Effect.andThen(client =>
         client.sendApiPostRequest(
           "/getMyCommands",
@@ -156,10 +156,10 @@ export const setBotCommands = (
     )
 
 export const setChatAction = (
-  input: M.SetChatAction
+  input: typeof M.SetChatAction.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/sendChatAction",
@@ -170,10 +170,10 @@ export const setChatAction = (
   )
 
 export const updateMessageReplyMarkup = (
-  input: M.SetMessageReplyMarkup
+  input: typeof M.SetMessageReplyMarkup.Type
 ) =>
   pipe(
-    RestClient,
+    TgRestClient,
     Effect.andThen(client =>
       client.sendApiPostRequest(
         "/editMessageReplyMarkup",

@@ -1,8 +1,6 @@
 import { Schema as S } from "@effect/schema";
 import { pipe } from "effect";
 
-import * as D from "../models/domain.js";
-
 export const getMessageUserName = (
   message: Pick<MessageUpdate, "from">
 ) =>
@@ -19,6 +17,16 @@ const PhotoArray =
     })
   );
 
+export const User =
+  S.Struct({
+    id: S.Number,
+    first_name: S.NonEmptyString,
+    username: S.optional(S.NonEmptyString),
+    is_bot: S.Boolean
+  }).annotations({
+    identifier: "TgUser"
+  });
+
 const Voice =
   S.Struct({
     file_id: S.String,
@@ -34,7 +42,7 @@ const messageFields = {
   photo: S.optional(PhotoArray),
   caption: S.optional(S.String),
   voice: S.optional(Voice),
-  from: S.optional(D.User),
+  from: S.optional(User),
   message_thread_id: S.optional(S.Number),
   chat: S.Struct({
     id: S.Number,
@@ -47,13 +55,16 @@ const messageFields = {
 export interface MessageUpdate 
   extends S.Struct.Type<typeof messageFields> {
     reply_to_message?: MessageUpdate | undefined
+    forward_from?: MessageUpdate | undefined
+    forward_origin?: MessageUpdate | undefined
   }
 
 export const MessageUpdate: S.Schema<MessageUpdate> = 
   S.Struct({
     ...messageFields,
-    reply_to_message:
-      S.optional(S.suspend(() => MessageUpdate))
+    reply_to_message: S.optional(S.suspend(() => MessageUpdate)),
+    forward_from: S.optional(S.suspend(() => MessageUpdate)),
+    forward_origin: S.optional(S.suspend(() => MessageUpdate))
   }).annotations({
     identifier: "MessageUpdate"
   })
