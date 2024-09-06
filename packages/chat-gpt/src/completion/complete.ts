@@ -1,10 +1,10 @@
-import { pipe, Effect } from "effect";
+import { pipe, Effect, Either } from "effect";
 import { Schema as S } from "@effect/schema";
 import * as Shared from "@efkit/shared";
 
 import { CompletionError } from "../completion/error.js";
 import { Completion, CompletionLive } from "./service.js";
-import { ChatCompletionRequest } from "./request.js";
+import { ChatCompletionRequest, MissingInputFieldsError } from "./request.js";
 
 export type UserMessage = typeof UserMessage.Type
 export const UserMessage =
@@ -39,13 +39,12 @@ export const completeFunctionCall = <O>(
         Effect.andThen(_ => pipe(
           Shared.parseJson(_),
           Effect.mapError(() =>
-            new CompletionError({ errorCode: "FunctionCallError" })
+            new CompletionError({ errorCode: "InvalidJson" })
           )
         )),
         Effect.andThen(S.validate(resultSchema))
       )
-    ),
-    Effect.provide(CompletionLive)
+    )
   )
 
 export const completeStructuredRequest = <O>(
@@ -60,15 +59,28 @@ export const completeStructuredRequest = <O>(
         Effect.andThen(_ => _.firstChoice),
         Effect.andThen(_ => _.message.content),
         Effect.filterOrFail(_ => _ != null, () => new CompletionError({ errorCode: "NoContent" })),
-        Effect.andThen(_ =>
+        Effect.andThen(response =>
           pipe(
-            Shared.parseJson(_),
-            Effect.mapError(() =>
-              new CompletionError({ errorCode: "FunctionCallError" })
+            S.decode(S.parseJson(S.Struct({ result: S.Unknown })))(response),
+            Effect.tapError(error => 
+              Effect.logDebug(error)
+            ),
+            Effect.catchTag("ParseError", () =>
+              new CompletionError({ errorCode: "NoJsonResult" })
+            ),
+            Effect.andThen(result =>
+              pipe(
+                S.validate(MissingInputFieldsError)(result.result),
+                Effect.matchEffect({
+                  onFailure: () => S.validate(resultSchema)(result.result),
+                  onSuccess: error => 
+                    new CompletionError({ 
+                      errorCode: "MissingRequiredFields", message: error.$$$error 
+                    })
+                })
+              )
             )
-          )),
-        Effect.andThen(S.validate(resultSchema))
+          ))
       )
-    ),
-    Effect.provide(CompletionLive)
+    )
   )

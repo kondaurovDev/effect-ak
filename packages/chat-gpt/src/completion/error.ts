@@ -9,11 +9,14 @@ const errors = {
   UnknownResponse: "Unknown response from openAI",
   ClientError: "Error on client side has happened",
   MissingFunctionArguments: "The response doesn't contain function arguments",
-  FunctionCallError: "Not valid json",
+  InvalidJson: "Not valid json",
+  NoJsonResult: "Json does not contain 'result'",
+  MissingRequiredFields: "Input is not complete"
 }
 
 export class CompletionError extends Data.TaggedError("CompletionError")<{
   errorCode: keyof typeof errors,
+  message?: string
   cause?: ParseResult.ParseError
 }> {
 

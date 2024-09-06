@@ -18,18 +18,19 @@ export const FinishReason =
 export class ResponseChoice
   extends S.Class<ResponseChoice>("ResponseChoice")({
     finish_reason: FinishReason,
-    message: S.Struct({
-      role: S.Literal("system", "user", "assistant"),
-      content: S.NullOr(S.String),
-      tool_calls: S.optional(S.Array(
-        S.Struct({
-          type: S.Literal("function"),
-          function: S.Struct({
-            arguments: S.String
+    message: 
+      S.Struct({
+        role: S.Literal("system", "user", "assistant"),
+        content: S.NullOr(S.String),
+        tool_calls: S.optional(S.Array(
+          S.Struct({
+            type: S.Literal("function"),
+            function: S.Struct({
+              arguments: S.String
+            })
           })
-        })
-      ))
-    })
+        ))
+      })
   }) {
 
   get functionArgumets() {

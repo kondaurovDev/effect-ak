@@ -1,10 +1,10 @@
 import { Schema as S, JSONSchema } from "@effect/schema";
-import { Effect } from "effect"
+import { Effect, pipe } from "effect"
 
 import { ToolChoice } from "../completion/request.js"
 
-export type ToolSchema =
-  typeof ToolSchema.Type
+const Parameters = 
+  S.Record({ key: S.String, value: S.Unknown });
 
 export const ToolSchema =
   S.Struct({
@@ -13,7 +13,7 @@ export const ToolSchema =
       S.Struct({
         name: S.NonEmptyString,
         description: S.NonEmptyString,
-        parameters: S.Unknown
+        parameters: Parameters
       })
   });
 
@@ -30,12 +30,11 @@ export const FunctionToolSchema =
 export const getTool = <F>(
   schemaName: string,
   functionSchema: S.Schema<F>
-): Effect.Effect<ToolSchema, unknown> =>
-  Effect.Do.pipe(
-    Effect.bind("jsonSchema", () =>
-      Effect.try(() =>
-        JSONSchema.make(functionSchema)
-      )
+) =>
+  pipe(
+    Effect.Do,
+    Effect.bind("jsonSchema", () => 
+      Effect.try(() => JSONSchema.make(functionSchema))
     ),
     Effect.bind("parts", ({ jsonSchema }) =>
       Effect.all({
@@ -46,16 +45,19 @@ export const getTool = <F>(
     Effect.catchTag("NoSuchElementException", () => 
       Effect.fail(`title, description must be defined for schema '${schemaName}'`)
     ),
-    Effect.andThen(({ parts, jsonSchema }) => {
-      return {
+    Effect.bind("jsonSchemaObject", ({ jsonSchema }) => 
+      S.validate(Parameters)(jsonSchema)
+    ),
+
+    Effect.andThen(({ parts, jsonSchemaObject }) => 
+      ToolSchema.make({
         type: "function",
         function: {
           name: parts.name,
           description: parts.description,
-          parameters: jsonSchema
+          parameters: jsonSchemaObject
         }
-      }
-    })
+      }))
   )
 
 export const getToolChoice = (

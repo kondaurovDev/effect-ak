@@ -16,19 +16,12 @@ const live =
 
 const currencySchema = 
   S.Struct({
-    currFrom: S.String.annotations({ title: "from which currency"}),
-    currTo: S.String.annotations({ title: "to which currency"}),
-    amount: S.Number.annotations({ title: "amount of money to convert from"})
+    currFrom: S.String.annotations({ title: "from which currency (ISO currency code)"}),
+    currTo: S.String.annotations({ title: "to which currency (ISO currency code)"}),
+    amount: S.Number.annotations({ title: "amount of money to convert"})
   }).annotations({
     title: "convertCurrency",
-    description: "convert currency from one to another",
-    // examples: [
-    //   {
-    //     amount: 5000,
-    //     currFrom: "EUR",
-    //     currTo: "AMD"
-    //   }
-    // ]
+    description: "convert currency from one to another"
   })
 
 
@@ -66,7 +59,7 @@ describe("chat completion test suite", () => {
     const actual = 
       await pipe(
         ChatCompletionRequest.createFunctionCall(
-          "currencySchema", currencySchema, "gpt-4o-mini", [], "translate 5000 american dollars to marocco currency"
+          "currencySchema", currencySchema, "gpt-4o-mini", [], "translate 5000 american dollars to armenian currency"
         ),
         Effect.tap(request =>
           Effect.logDebug(request.tools?.at(0)?.function.parameters)
@@ -93,15 +86,13 @@ describe("chat completion test suite", () => {
     const actual = 
       await pipe(
         ChatCompletionRequest.createStructuredRequest(
-          "currencySchema", currencySchema, "gpt-4o-mini", [], "translate 5000 american dollars to marocco currency"
-        ),
-        Effect.tap(request =>
-          Effect.logDebug(request.tools?.at(0)?.function.parameters)
+          "currencySchema", currencySchema, "gpt-4o-2024-08-06", [
+            "a user might mention countries, you need to understand the ISO currency code from it"
+          ], "convert 3 american dollars to morocco"
         ),
         Effect.andThen(request =>
           completeStructuredRequest(request, currencySchema)
         ),
-        Effect.tap(result => Effect.logInfo(result)),
         Effect.provide(live),
         Effect.runPromise
       );
@@ -109,7 +100,7 @@ describe("chat completion test suite", () => {
     expect(actual).toEqual({
       currFrom: "USD",
       currTo: "MAD",
-      amount: 5000
+      amount: 3
     })
 
   })

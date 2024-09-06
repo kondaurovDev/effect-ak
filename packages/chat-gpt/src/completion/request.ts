@@ -97,6 +97,16 @@ const ResponseFormat =
     })
   )
 
+export const MissingInputFieldsError = 
+  S.Struct({
+    $$$error: S.String.annotations({
+      description: "text with what is missing exactly, not all required fields listed"
+    })
+  }).annotations({
+    title: "MissingInputFields",
+    description: "required user information is not provided"
+  })
+
 export class ChatCompletionRequest
   extends S.Class<ChatCompletionRequest>("ChatCompletionRequest")({
     messages: S.Array(RequestMessageSchema),
@@ -148,24 +158,48 @@ export class ChatCompletionRequest
     ) {
 
       return pipe(
-        FunctionTool.getTool(schemaName, functionSchema),
-        Effect.andThen(({ function: fn }) =>
+        Effect.all({
+          successSchema: FunctionTool.getTool(schemaName, functionSchema),
+          errorSchema: FunctionTool.getTool("MissingFieldsError", MissingInputFieldsError)
+        }),
+        Effect.andThen(({ successSchema, errorSchema }) =>
           ChatCompletionRequest.make({
             model: model,
             max_tokens: 100,
             response_format: {
               type: "json_schema",
               json_schema: {
-                name: fn.name.replaceAll(" ", "_"),
-                description: fn.description,
-                schema: fn.parameters,
+                name: successSchema.function.name.replaceAll(" ", "_"),
+                description: successSchema.function.description,
+                schema: {
+                  type: "object",
+                  required: [ "result" ],
+                  additionalProperties: false,
+                  properties: {
+                    result: {
+                      anyOf: [
+                        successSchema.function.parameters,
+                        errorSchema.function.parameters
+                      ]
+                    }
+                  }
+                },
                 strict: true 
               }
             },
             messages: [
               { role: "system", content: [
+                ...[
+                  TextMessageContent.make({ 
+                    type: "text", text: "refuse to provide successful response if some required schema fields are missing"
+                  }),
+                  TextMessageContent.make({ 
+                    type: "text", text: "in case of error response specify missing fields related to user phrase, not all required fields"
+                  }),
+                  
+                ],
                 ...(systemMessages ? systemMessages.map(msg => 
-                  ({ type: "text", text: msg } as MessageContent)
+                  (TextMessageContent.make({ type: "text", text: msg }))
                 ) : [])
               ] },
               { role: "user", content: userMessage }
