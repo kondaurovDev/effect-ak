@@ -4,10 +4,10 @@ import { HttpBody, HttpClientRequest } from "@effect/platform";
 
 import { ChatCompletionRequest } from "./request.js"
 import { ChatCompletionResponse } from "./response.js"
-import { RestClient, RestClientLive, ValidJsonError } from "../client.js"
+import { OpenaiRestClient, ValidJsonError } from "../client.js"
 import { GptToken } from "../token.js";
 
-type CompletionService = {
+export type CompletionService = {
   complete: (request: ChatCompletionRequest) => Effect.Effect<ChatCompletionResponse, HttpBody.HttpBodyError | ValidJsonError, GptToken>
 }
 
@@ -15,10 +15,11 @@ export class Completion extends
   Context.Tag("ChatGPT.CompletionService")<CompletionService, CompletionService>() { };
 
 export const CompletionLive =
-  Layer.effect(
+  Layer.scoped(
     Completion,
-    Effect.Do.pipe(
-      Effect.bind("restClient", () => RestClient),
+    pipe(
+      Effect.Do,
+      Effect.bind("restClient", () => OpenaiRestClient),
       Effect.let("complete", ({ restClient }) =>
         (request: ChatCompletionRequest) =>
           pipe(
@@ -48,8 +49,4 @@ export const CompletionLive =
         })
       ),
     )
-  ).pipe(
-    Layer.provide(RestClientLive)
-  );
-
-
+  )

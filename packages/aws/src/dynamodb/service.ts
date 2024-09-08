@@ -9,7 +9,7 @@ export class AwsDynamoDb extends
   Context.Tag("AWS.DynamoDb")<AwsDynamoDb, _DynamoDbClient>() {}
 
 export const AwsDynamoDbLive =
-  Layer.effect(
+  Layer.scoped(
     AwsDynamoDb,
     pipe(
       Effect.Do,

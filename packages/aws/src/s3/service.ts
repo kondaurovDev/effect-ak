@@ -1,5 +1,5 @@
 import { S3 } from "@aws-sdk/client-s3"
-import { Context, Layer, Effect } from "effect"
+import { Context, Layer, Effect, pipe } from "effect"
 
 import { AwsRegion } from "../region.js";
 
@@ -7,9 +7,10 @@ export const Service =
   Context.GenericTag<S3>("AWS.S3");
 
 export const ServiceLive = 
-  Layer.effect(
+  Layer.scoped(
     Service,
-    Effect.Do.pipe(
+    pipe(
+      Effect.Do,
       Effect.bind("region", () => AwsRegion),
       Effect.bind("client", ({ region }) =>
         Effect.try(() =>

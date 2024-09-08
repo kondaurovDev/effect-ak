@@ -11,7 +11,7 @@ export type ValidJsonError =
 export type JsonError =
   HttpClientError.HttpClientError | Shared.JsonError
 
-export type RestClientService = (
+export type ClaudeRestClientService = (
   request: HttpClientRequest.HttpClientRequest
 ) => {
   buffer: Effect.Effect<ArrayBuffer, HttpClientError.HttpClientError, ClaudeToken>,
@@ -19,13 +19,14 @@ export type RestClientService = (
   validJson: <I>(_: S.Schema<I>) => Effect.Effect<I, ValidJsonError, ClaudeToken>
 }
 
-export class RestClient extends
-  Context.Tag("Claude.RestClient")<RestClient, RestClientService>() { };
+export class ClaudeRestClient extends
+  Context.Tag("Claude.RestClient")<ClaudeRestClient, ClaudeRestClientService>() { };
 
 export const RestClientLive =
-  Layer.effect(
-    RestClient,
-    Effect.Do.pipe(
+  Layer.scoped(
+    ClaudeRestClient,
+    pipe(
+      Effect.Do,
       Effect.bind("httpClient", () =>
         HttpClient.HttpClient
       ),
@@ -76,7 +77,7 @@ export const RestClientLive =
           )
       ),
       Effect.andThen(({ getBuffer, getJson }) =>
-        RestClient.of(
+        ClaudeRestClient.of(
           request => ({
             buffer: getBuffer(request),
             json: getJson(request),
@@ -91,8 +92,6 @@ export const RestClientLive =
         )
       )
     )
-  ).pipe(
-    Layer.provide(HttpClient.layer)
   )
 
 

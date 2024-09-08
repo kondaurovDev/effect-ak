@@ -1,7 +1,7 @@
 import { Brand, Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema";
 
-import { Completion, ChatCompletionRequest, MessageContent, CompletionError, CompletionLive } from "../completion/index.js";
+import { Completion, ChatCompletionRequest, MessageContent, CompletionError } from "../completion/index.js";
 
 export type ImageBytes = Uint8Array & Brand.Brand<"ImageBytes">;
 export const ImageBytes = Brand.nominal<ImageBytes>();
@@ -50,6 +50,5 @@ export const imagePrompt = (
         Effect.andThen(_ => _.firstChoice),
         Effect.andThen(_ => _.message.content)
       )
-    ),
-    Effect.provide(CompletionLive)
+    )
   )

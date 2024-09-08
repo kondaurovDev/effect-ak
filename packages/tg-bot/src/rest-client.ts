@@ -12,7 +12,7 @@ export type RestClientError =
 export type MethodResult<A> =
   Effect.Effect<A, RestClientError, TgBotToken>
 
-export type RestClientService = {
+export type TgRestClientService = {
   sendApiRequest: <O>(
     request: HttpClientRequest.HttpClientRequest,
     resultSchema: S.Schema<O>
@@ -27,10 +27,10 @@ export type RestClientService = {
 export const baseUrl = "https://api.telegram.org";
 
 export class TgRestClient
-  extends Context.Tag("TgBot.RestClient")<TgRestClient, RestClientService>() { };
+  extends Context.Tag("TgBot.RestClient")<TgRestClient, TgRestClientService>() { };
 
 export const TgRestClientLive =
-  Layer.effect(
+  Layer.scoped(
     TgRestClient,
     pipe(
       Effect.Do,

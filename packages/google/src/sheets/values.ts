@@ -1,7 +1,7 @@
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 import { prefix } from "./common.js";
 
 //https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
@@ -11,8 +11,9 @@ export const appendRow = (
   range: string,
   rowValues: string[]
 ) =>
-  Effect.Do.pipe(
-    Effect.bind("client", () => RestClient),
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => GoogleApiRestClient),
     Effect.andThen(({ client }) => 
       client.execute(
         "sheets",
@@ -31,6 +32,5 @@ export const appendRow = (
           }
         )
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

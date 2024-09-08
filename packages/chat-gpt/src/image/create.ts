@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema"
 
-import { RestClient, RestClientLive } from "../client.js";
+import { OpenaiRestClient } from "../client.js";
 
 const Response = 
   S.Struct({
@@ -23,9 +23,7 @@ export const createImage = (
     Effect.tap(() =>
       Effect.fail("expensive")
     ),
-    Effect.bind("client", () =>
-      RestClient
-    ),
+    Effect.bind("client", () => OpenaiRestClient),
     Effect.bind("body", () =>
       HttpBody.json({
         model,
@@ -47,6 +45,5 @@ export const createImage = (
     ),
     Effect.andThen(_ =>
       Effect.fromNullable(_.data.at(0)?.b64_json)
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

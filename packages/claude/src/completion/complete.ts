@@ -1,16 +1,17 @@
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema"
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { RestClient, RestClientLive } from "../client.js";
+import { ClaudeRestClient } from "../client.js";
 import { MessageResponse } from "./response.js";
 import { CreateMessageRequest } from "./request.js";
 
 export const complete = (
   request: CreateMessageRequest
 ) =>
-  Effect.Do.pipe(
-    Effect.bind("client", () => RestClient),
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => ClaudeRestClient),
     Effect.bind("requestBody", () =>
       HttpBody.json(request)
     ),
@@ -24,6 +25,5 @@ export const complete = (
     ),
     Effect.andThen(({ result }) =>
       S.decodeUnknown(MessageResponse)(result)
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

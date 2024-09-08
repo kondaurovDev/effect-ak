@@ -1,14 +1,15 @@
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 import { prefix } from "./common.js";
 
 export const insertCalendar = (
   calendarId: string
 ) =>
-  Effect.Do.pipe(
-    Effect.bind("client", () => RestClient),
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => GoogleApiRestClient),
     Effect.bind("body", () =>
       HttpBody.json({
         id: calendarId
@@ -22,13 +23,13 @@ export const insertCalendar = (
           body
         })
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   );
 
 export const listCalendars =
-  Effect.Do.pipe(
-    Effect.bind("client", () => RestClient),
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => GoogleApiRestClient),
     Effect.andThen(({ client }) =>
       client.execute(
         "apis",
@@ -36,7 +37,5 @@ export const listCalendars =
           `${prefix}/users/me/calendarList`, {
         })
       )
-    ),
-    Effect.provide(RestClientLive),
-    Effect.scoped
+    )
   );

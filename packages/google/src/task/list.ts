@@ -1,8 +1,8 @@
-import { Context, Effect, Layer, pipe } from "effect";
+import { Effect, pipe } from "effect";
 import { HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 
 const prefix = "/tasks/v1/users/@me";
 
@@ -22,7 +22,7 @@ export const Task =
 
 export const getLists =
   pipe(
-    RestClient,
+    GoogleApiRestClient,
     Effect.andThen(client =>
       client.execute(
         "tasks",
@@ -32,7 +32,6 @@ export const getLists =
     Effect.andThen(
       S.validate(S.Struct({ items: S.Array(TasksListSchema) }))
     ),
-    Effect.andThen(_ => _.items),
-    Effect.provide(RestClientLive)
+    Effect.andThen(_ => _.items)
   )
 

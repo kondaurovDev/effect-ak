@@ -1,9 +1,9 @@
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 import { parseDateWithTime } from "@efkit/shared"
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 import { prefix } from "./common.js";
 
 type CreateEventSchema = typeof CreateEventSchema.Type
@@ -27,8 +27,9 @@ export const CreateEventSchema =
 export const createEvent = (
   request: CreateEventSchema
 ) =>
-  Effect.Do.pipe(
-    Effect.bind("client", () => RestClient),
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => GoogleApiRestClient),
     Effect.bind("startDate", () => parseDateWithTime(request.start.dateTime)),
     Effect.bind("endDate", () => parseDateWithTime(request.end.dateTime)),
     Effect.bind("event", ({ startDate, endDate }) =>
@@ -51,6 +52,5 @@ export const createEvent = (
           body: event
         })
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

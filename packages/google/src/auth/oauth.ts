@@ -2,7 +2,7 @@ import { HttpBody } from "@effect/platform";
 import { Effect, Data, Context, pipe, Redacted } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 
 export type AuthResponse =
   typeof AuthResponse.Type
@@ -54,9 +54,10 @@ export const getAuthUrl =
 export const refreshAccessToken = (
   refreshToken: string
 ) =>
-  Effect.Do.pipe(
+  pipe(
+    Effect.Do,
     Effect.bind("clientCredentials", () => GoogleOAuthClientCredentials),
-    Effect.bind("restClient", () => RestClient),
+    Effect.bind("restClient", () => GoogleApiRestClient),
     Effect.let("formData", ({ clientCredentials }) => {
       const result = new FormData();
       result.append("client_id", clientCredentials.clientId);
@@ -70,8 +71,7 @@ export const refreshAccessToken = (
         restClient.token(formData),
         Effect.andThen(S.decodeUnknown(AuthResponse))
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   )
 
 // exchange
@@ -80,9 +80,10 @@ export const refreshAccessToken = (
 export const exchangeCode = (
   code: string
 ) =>
-  Effect.Do.pipe(
+  pipe(
+    Effect.Do,
     Effect.bind("credentials", () => GoogleOAuthClientCredentials),
-    Effect.bind("restClient", () => RestClient),
+    Effect.bind("restClient", () => GoogleApiRestClient),
     Effect.let("formData", ({ credentials }) => {
       const result = new FormData();
       result.append("client_id", credentials.clientId);
@@ -100,6 +101,5 @@ export const exchangeCode = (
           Effect.logDebug("Code has been exchanged", result.token_type)
         )
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

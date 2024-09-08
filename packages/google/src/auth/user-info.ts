@@ -2,7 +2,7 @@ import { HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema"
 import { Effect, pipe } from "effect";
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 
 const UserInfo =
   S.Struct({
@@ -13,7 +13,7 @@ const UserInfo =
 
 export const getUserInfo =
   pipe(
-    RestClient,
+    GoogleApiRestClient,
     Effect.andThen(client =>
       pipe(
         client.execute(
@@ -24,6 +24,5 @@ export const getUserInfo =
         ),
         Effect.andThen(S.validate(UserInfo))
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

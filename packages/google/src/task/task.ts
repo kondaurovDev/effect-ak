@@ -2,7 +2,7 @@ import { Schema as S } from "@effect/schema";
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 
 const prefix = "/tasks/v1/lists";
 
@@ -37,7 +37,7 @@ export const getTasks = (
   taskListId: string
 ) =>
   pipe(
-    RestClient,
+    GoogleApiRestClient,
     Effect.andThen((client) =>
       client.execute(
         "tasks",
@@ -47,8 +47,7 @@ export const getTasks = (
     Effect.andThen(
       S.validate(S.Struct({ items: S.Array(TaskSchema) }))
     ),
-    Effect.andThen(_ => _.items),
-    Effect.provide(RestClientLive)
+    Effect.andThen(_ => _.items)
   )
 
 export const createTask = (
@@ -57,7 +56,7 @@ export const createTask = (
 ) =>
   pipe(
     Effect.all({
-      client: RestClient,
+      client: GoogleApiRestClient,
       body: HttpBody.json(task)
     }),
     Effect.andThen(({ client, body }) =>
@@ -65,6 +64,5 @@ export const createTask = (
         "tasks",
         HttpClientRequest.post(`${prefix}/${taskListId}/tasks`, { body })
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

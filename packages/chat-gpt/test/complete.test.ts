@@ -9,6 +9,7 @@ import { GptToken } from "../src/token";
 
 const live = 
   Layer.mergeAll(
+    Rest
     LogLevelConfigFromEnvLive,
     CompletionLive,
     GptToken.createLayerFromConfig()

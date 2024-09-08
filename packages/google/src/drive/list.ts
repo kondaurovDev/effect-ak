@@ -1,11 +1,12 @@
 import { HttpClientRequest } from "@effect/platform";
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
 
-import { RestClient, RestClientLive } from "../client.js"
+import { GoogleApiRestClient } from "../client.js"
 
 export const GetSpreadsheetsList =
-  Effect.Do.pipe(
-    Effect.bind("client", () => RestClient),
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => GoogleApiRestClient),
     Effect.andThen(({ client }) =>
       client.execute(
         "apis",
@@ -15,6 +16,5 @@ export const GetSpreadsheetsList =
           }
         })
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   )

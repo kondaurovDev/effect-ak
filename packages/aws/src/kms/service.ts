@@ -7,7 +7,7 @@ export const Service =
   Context.GenericTag<KMS>("AWS.KMS")
 
 export const ServiceLive =
-  Layer.effect(
+  Layer.scoped(
     Service,
     Effect.Do.pipe(
       Effect.bind("region", () => AwsRegion),

@@ -10,7 +10,7 @@ export type ValidJsonError =
 export type JsonError =
   HttpClientError.HttpClientError | Shared.JsonError
 
-export type RestClientService = (
+export type OpenaiRestClientService = (
   request: HttpClientRequest.HttpClientRequest
 ) => {
   buffer: Effect.Effect<ArrayBuffer, HttpClientError.HttpClientError, GptToken>,
@@ -18,13 +18,14 @@ export type RestClientService = (
   validJson: <I>(_: S.Schema<I>) => Effect.Effect<I, ValidJsonError, GptToken>
 }
 
-export class RestClient
-  extends Context.Tag("Gpt.RestClient")<RestClient, RestClientService>() {};
+export class OpenaiRestClient
+  extends Context.Tag("Gpt.RestClient")<OpenaiRestClient, OpenaiRestClientService>() {};
 
-  export const RestClientLive =
-    Layer.effect(
-      RestClient,
-      Effect.Do.pipe(
+  export const OpenaiRestClientLive =
+    Layer.scoped(
+      OpenaiRestClient,
+      pipe(
+        Effect.Do,
         Effect.bind("httpClient", () => HttpClient.HttpClient),
         Effect.let("baseUrl", () => "https://api.openai.com"),
         Effect.let("restClient", ({ httpClient, baseUrl }) =>
@@ -32,13 +33,10 @@ export class RestClient
             HttpClient.mapRequest(
               HttpClientRequest.prependUrl(baseUrl)
             ),
-            HttpClient.tapRequest(
-              Effect.logDebug
-            ),
             HttpClient.transformResponse(
               HttpClientResponse.arrayBuffer
-            ),
-          ),
+            )
+          )
         ),
         Effect.let("getBuffer", ({ restClient }) =>
           (request: HttpClientRequest.HttpClientRequest) => {
@@ -68,16 +66,12 @@ export class RestClient
                 Effect.andThen(_ =>
                   Buffer.from(_).toString()
                 ),
-                Effect.tap(Effect.logDebug),
-                Effect.andThen(
-                  Shared.parseJson
-                ),
-                Effect.scoped,
+                Effect.andThen(Shared.parseJson)
               ),
             )
         ),
         Effect.andThen(({ getBuffer, getJson }) =>
-          RestClient.of(
+          OpenaiRestClient.of(
             request => ({
               buffer: getBuffer(request),
               json: getJson(request),
@@ -92,6 +86,4 @@ export class RestClient
           )
         )
       )
-    ).pipe(
-      Layer.provide(HttpClient.layer)
     )

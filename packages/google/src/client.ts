@@ -12,7 +12,7 @@ export class ClientError
     ConfigError.ConfigError
   }> { }
 
-type RestClientService = {
+type GoogleApiRestClientService = {
   token: (
     body: HttpBody.HttpBody
   ) => Effect.Effect<object, ClientError>
@@ -31,13 +31,14 @@ const baseUrlMap = {
   tasks: "tasks.googleapis.com"
 } as const;
 
-export class RestClient
-  extends Context.Tag(`Google.RestClient`)<RestClient, RestClientService>() { };
+export class GoogleApiRestClient
+  extends Context.Tag(`Google.RestClient`)<GoogleApiRestClient, GoogleApiRestClientService>() { };
 
-export const RestClientLive =
-  Layer.effect(
-    RestClient,
-    Effect.Do.pipe(
+export const GoogleApiRestClientLive =
+  Layer.scoped(
+    GoogleApiRestClient,
+    pipe(
+      Effect.Do,
       Effect.bind("httpClient", () => HttpClient.HttpClient),
       Effect.andThen(({ httpClient }) =>
         httpClient.pipe(
@@ -62,7 +63,7 @@ export const RestClientLive =
         )
       ),
       Effect.andThen(client =>
-        RestClient.of({
+        GoogleApiRestClient.of({
           token: (body) =>
             pipe(
               client(

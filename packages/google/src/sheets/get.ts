@@ -1,20 +1,20 @@
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
 import { HttpClientRequest } from "@effect/platform";
 
-import { RestClient, RestClientLive } from "../client.js";
+import { GoogleApiRestClient } from "../client.js";
 import * as T from "./types.js";
 import { prefix } from "./common.js";
 
 export const getSpreadsheet = (
   spreadsheetId: T.SpreadsheetId,
 ) =>
-  Effect.Do.pipe(
-    Effect.bind("client", () => RestClient),
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => GoogleApiRestClient),
     Effect.andThen(({ client }) => 
       client.execute(
         "sheets",
         HttpClientRequest.get(`${prefix}/${spreadsheetId}`)
       )
-    ),
-    Effect.provide(RestClientLive)
+    )
   );
