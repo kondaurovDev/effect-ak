@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 
 import { TgBotError } from "../domain/error.js";
-import { getMe } from "./bot-methods.js";
+import { getMe } from "./chat-methods.js";
 
 export const getTgBotName =
   pipe(

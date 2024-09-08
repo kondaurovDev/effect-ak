@@ -3,12 +3,15 @@ import { Effect } from "effect";
 
 import { MessageUpdate, getMessageUserName } from "./message-update.js"
 import { UnknownTgUpdate } from "./error.js";
+import { PreCheckoutQuery, SuccessfulPayment } from "./payment.js";
 
-export class TgUpdateEvent 
+export class TgUpdateEvent
   extends S.Class<TgUpdateEvent>("TgUpdateEvent")({
     update_id: S.Number,
     message: S.optional(MessageUpdate),
     channel_post: S.optional(MessageUpdate),
+    pre_checkout_query: S.optional(PreCheckoutQuery),
+    successful_payment: S.optional(SuccessfulPayment)
   }) {
   
     get updateEffect() {
