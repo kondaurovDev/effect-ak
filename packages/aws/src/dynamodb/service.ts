@@ -1,23 +1,23 @@
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, pipe } from "effect";
 
 import { AwsRegion } from "../region.js";
 
-export const Service =
-  Context.GenericTag<DynamoDB>("AWS.ApiGateway")
+export type _DynamoDbClient = DynamoDB
 
-export const ServiceLive =
+export class AwsDynamoDb extends 
+  Context.Tag("AWS.DynamoDb")<AwsDynamoDb, _DynamoDbClient>() {}
+
+export const AwsDynamoDbLive =
   Layer.effect(
-    Service,
-    Effect.Do.pipe(
+    AwsDynamoDb,
+    pipe(
+      Effect.Do,
       Effect.bind("region", () => AwsRegion),
-      Effect.bind("client", ({ region }) =>
+      Effect.andThen(({ region }) =>
         Effect.try(() =>
           new DynamoDB({ region })
         )
-      ),
-      Effect.andThen(({ client }) =>
-        client
       )
     )
   )

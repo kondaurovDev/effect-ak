@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 
 import * as D from "./types.js";
-import { Service, ServiceLive } from "./service.js"
+import { AwsDynamoDb } from "./service.js"
 import { tryAwsServiceMethod } from "../error.js";
 
 export const createTable = (
@@ -11,7 +11,7 @@ export const createTable = (
 ) =>
   pipe(
     Effect.Do,
-    Effect.bind("dynamoSDK", () => Service),
+    Effect.bind("dynamoSDK", () => AwsDynamoDb),
     Effect.andThen(({ dynamoSDK }) =>
       tryAwsServiceMethod(
         `creating table ${tableName}`,
@@ -23,6 +23,5 @@ export const createTable = (
             KeySchema: key
           })
       )
-    ),
-    Effect.provide(ServiceLive)
+    )
   );

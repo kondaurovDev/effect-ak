@@ -1,117 +1,126 @@
-import { Effect, Data, pipe, Context, Brand, Layer, Match } from "effect";
+import { Effect, Data, pipe, Context, Layer, Cause, identity, Logger } from "effect";
 import { Schema as S, ParseResult } from "@effect/schema";
 
-export type ActionName = string & Brand.Brand<"ActionName">;
-export const ActionName = Brand.nominal<ActionName>();
+export type ActionLog = {
+  message: unknown,
+  time: unknown
+  level: unknown
+}
 
-export type ActionResult<O = unknown, E = unknown, R = never> = 
+export type ActionSuccess<O> = {
+  readonly result: O,
+  readonly logs: ActionLog[]
+}
+
+export class ActionError<E = Error>
+  extends Data.TaggedError("ActionError")<{
+    cause: E | Cause.UnknownException
+  }> { }
+
+export class ActionInvalidIOError
+  extends Data.TaggedError("ActionInvalidIOError")<{
+    type: "input" | "output"
+    cause: ParseResult.ParseError
+  }> { }
+
+export type ActionResult<O, E, R> =
   Effect.Effect<O, E, R> | Promise<O> | O
 
-export type ActionInput<T = unknown> = {
-  readonly input: T
-}
-
 export type Action<I, O, E, R> = {
-  inputTag: Context.Tag<ActionInput<I>, ActionInput<I>>,
+  name: string,
+  inputTag: Context.Tag<I, I>,
   inputSchema: S.Schema<I>,
   outputSchema: S.Schema<O>,
-  action: (_: I) => ActionResult<O, E, R>,
-  createInput: (_: I) => Layer.Layer<ActionInput<I>>,
-  actionWithInput: Effect.Effect<O, ActionError, ActionInput<I> | R>
+  run: (_: I) => ActionResult<O, E, R>,
+  inputLayer: (_: I) => Layer.Layer<I>,
+  checkedRun: Effect.Effect<ActionSuccess<O>, ActionError<E> | ActionInvalidIOError, I | R>
 }
 
-export const Action = <I, O, E, R>(
-  name: ActionName,
+export const makeAction = <I, O, E, R>(
+  name: string,
   inputSchema: S.Schema<I>,
   outputSchema: S.Schema<O>,
-  action: (_: I) => ActionResult<O, E, R>,
-  getInput: (_: ActionInput) => I = _ => _.input as I,
+  run: (_: I) => ActionResult<O, E, R>,
+  getInput: (_: I) => I = identity
 ): Action<I, O, E, R> => {
   const inputTag =
-    Context.GenericTag<ActionInput<S.Schema.Type<typeof inputSchema>>>(`ActionInput.${name}`);
+    Context.GenericTag<typeof inputSchema.Type>(`ActionInput.${name}`);
+
+  const inputLayer =
+    (input: I) => Layer.succeed(inputTag, inputTag.of(input))
+
+  const checkedRun =
+    pipe(
+      Effect.Do,
+      Effect.let("actionLogs", () => [] as ActionLog[]),
+      Effect.bind("actionInput", () => inputTag),
+      Effect.bind("parsedInput", ({ actionInput }) =>
+        pipe(
+          S.validate(inputSchema)(getInput(actionInput)),
+          Effect.catchTag("ParseError", parseError =>
+            new ActionInvalidIOError({ type: "input", cause: parseError })
+          )
+        )
+      ),
+      Effect.bind("actionResult", ({ parsedInput, actionLogs }) =>
+        pipe(
+          Effect.async<O, E | Cause.UnknownException, R>((resume) => {
+            try {
+              const result = run(parsedInput)
+              if (Effect.isEffect(result)) {
+                const live = 
+                  Logger.replace(
+                    Logger.defaultLogger,
+                    Logger.make(({ message, date, logLevel }) => 
+                      actionLogs.push({
+                        message: message,
+                        time: date.toISOString(),
+                        level: logLevel.label
+                      })
+                    )
+                  )
+                return resume(Effect.provide(live)(result))
+              } else if (result instanceof Promise) {
+                console.log = function(...args) {
+                  actionLogs.push({
+                    message: args[0],
+                    time: Date.now(),
+                    level: "info"
+                  });
+                };
+                resume(Effect.tryPromise(() => result))
+              } else {
+                return resume(Effect.succeed(result))
+              }
+            } catch (e) {
+              resume(Effect.fail(e as E))
+            }
+          }),
+          Effect.mapError((executionError) =>
+            new ActionError({ cause: executionError })
+          )
+        )
+      ),
+      Effect.tap(({ actionResult }) =>
+        pipe(
+          S.validate(outputSchema)(actionResult),
+          Effect.catchTag("ParseError", parseError =>
+            new ActionInvalidIOError({ type: "output", cause: parseError })
+          )
+        )
+      ),
+      Effect.andThen(({ actionResult, actionLogs }) => ({
+        result: actionResult, logs: actionLogs
+      }) as ActionSuccess<O>)
+    )
 
   return ({
+    name,
     inputTag,
     inputSchema,
     outputSchema,
-    action,
-    createInput:
-      input =>
-        Layer.succeed(
-          inputTag,
-          inputTag.of({ input })
-        ),
-    actionWithInput:
-      Effect.Do.pipe(
-        Effect.bind("actionInput", () => inputTag),
-        Effect.bind("parsedInput", ({ actionInput }) =>
-          pipe(
-            S.validate(inputSchema)(getInput(actionInput)),
-            Effect.mapError(parseError => 
-              new ActionError({ cause: parseError })
-            )
-          )
-        ),
-        Effect.bind("actionResult", ({ parsedInput }) =>
-          pipe(
-            Effect.async<O, E, R>((resume) => {
-              try {
-                const result = action(parsedInput)
-                if (Effect.isEffect(result)) {
-                  return resume(result)
-                } else if (result instanceof Promise) {
-                  resume(
-                    pipe(
-                      Effect.tryPromise(() => result),
-                      Effect.mapError(error => error as unknown as E)
-                    )
-                )
-                } else {
-                  return resume(Effect.succeed(result))
-                }
-              } catch (e) {
-                resume(Effect.fail(e as E))
-              }
-            }),
-            Effect.tapError(error => 
-              Effect.logWarning(error)
-            ),
-            Effect.mapError((executionError) =>
-              new ActionError({ cause: executionError })
-            )
-          )
-        ),
-        Effect.andThen(({ actionResult }) =>
-          pipe(
-            S.validate(outputSchema)(actionResult),
-            Effect.catchTag("ParseError", parseError => 
-              new ActionError({ cause: parseError })
-            )
-          )
-        )
-      )
+    run,
+    inputLayer,
+    checkedRun
   })
 };
-
-export class ActionError extends Data.TaggedError("ActionError")<{
-  cause: unknown
-}> {
-
-  // get message() {
-  //   return pipe(
-  //     Match.value(this.error),
-  //     Match.when(
-  //       { type: "ExecutionError" }, 
-  //       error => {
-  //         const errorDetails = 
-  //           error.executionError instanceof Error ? error.executionError.message : error.executionError;
-  //         return `Execution error (${errorDetails})`
-  //       }
-  //     ),
-  //     Match.orElse(error =>
-  //       `${error.type}: ${error.parseError.message}`
-  //     )
-  //   )
-  // }
-
-}
