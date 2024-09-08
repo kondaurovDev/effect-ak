@@ -6,13 +6,16 @@ import { Schema as S } from "@effect/schema"
 import { ChatCompletionRequest, CompletionLive } from "../src/completion";
 import { completeChat, completeFunctionCall, completeStructuredRequest } from "../src/completion/complete";
 import { GptToken } from "../src/token";
+import { ChatGptLive } from "../src/live";
+import { HttpClient } from "@effect/platform";
 
 const live = 
   Layer.mergeAll(
-    Rest
+    ChatGptLive,
     LogLevelConfigFromEnvLive,
-    CompletionLive,
     GptToken.createLayerFromConfig()
+  ).pipe(
+    Layer.provide(HttpClient.layer)
   )
 
 const currencySchema = 
