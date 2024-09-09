@@ -1,25 +1,14 @@
-import { Brand, Config, Effect, pipe, Data, Redacted } from "effect";
+import { Config, Effect, pipe, Data, Redacted } from "effect";
 import { HttpClient, FileSystem, HttpClientRequest } from "@effect/platform";
 
-import { baseUrl } from "../rest-client.js";
-import { TgBotToken } from "../domain/index.js"
+import { baseUrl } from "../client/live.js";
+import { TgBotToken } from "../domain/token.js"
+import { FileExtension, RemoteFilePath } from "../domain/file.js";
 
 export class DownloadFileError 
   extends Data.TaggedError("Tg.DownloadFileError")<{
     message: string
   }> {}
-
-export type RemoteFilePath = 
-  string & Brand.Brand<"RemoteFilePath">
-
-export const RemoteFilePath =
-  Brand.nominal<RemoteFilePath>();
-
-export type FileExtension = 
-  string & Brand.Brand<"FileExtension">
-
-export const FileExtension =
-  Brand.nominal<FileExtension>();
 
 const tmpDir = 
   pipe(

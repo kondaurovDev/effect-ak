@@ -1,55 +1,20 @@
-import { HttpBody, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
-import { Layer, pipe, Effect, Context, Match, Redacted, Data } from "effect";
-import { ParseResult, Schema as S } from "@effect/schema"
+import { HttpClient, HttpClientRequest, HttpClientResponse } from "@effect/platform";
+import { Effect, Layer, pipe, Redacted } from "effect";
+import { Schema as S } from "@effect/schema"
 
-import { TgBotToken, TgResponse } from "./domain/index.js";
-
-export class TgBotApiClientError
-  extends Data.TaggedError("TgBotApiClientError")<{
-    cause: ParseResult.ParseError | HttpClientError.RequestError
-  }> {}
-
-export class TgBotApiServerError
-  extends Data.TaggedError("TgBotApiServerError")<{
-    cause: ParseResult.ParseError | TgResponse | HttpClientError.ResponseError
-  }> {
-
-    get message() {
-      return pipe(
-        Match.value(this.cause),
-        Match.when(({ _tag: "ParseError" }), error => error.message),
-        Match.when(({ _tag: "ResponseError" }), error => error.message),
-        Match.orElse(tgResponse => JSON.stringify(tgResponse))
-      )
-    }
-
-  }
-export type MethodResult<A> =
-  Effect.Effect<A, TgBotApiClientError | TgBotApiServerError, TgBotToken>
-
-export type TgRestClientService = {
-  sendApiRequest: <O>(
-    request: HttpClientRequest.HttpClientRequest,
-    resultSchema: S.Schema<O>
-  ) => MethodResult<O>
-  sendApiPostRequest: <O>(
-    methodName: `/${string}`,
-    body: Record<string, unknown>,
-    resultSchema: S.Schema<O>
-  ) => MethodResult<O>
-}
+import { TgRestClient } from "./tag.js";
+import { TgResponse } from "../domain/tg-response.js";
+import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
+import { TgBotToken } from "../domain/token.js";
+import { getFormData, validateResponse } from "./utils.js";
 
 export const baseUrl = "https://api.telegram.org";
-
-export class TgRestClient
-  extends Context.Tag("TgBot.RestClient")<TgRestClient, TgRestClientService>() { };
 
 export const TgRestClientLive =
   Layer.scoped(
     TgRestClient,
     pipe(
       Effect.Do,
-      Effect.tap(Effect.logDebug("Creating Layer with TgRestClient")),
       Effect.bind("httpClient", () => HttpClient.HttpClient),
       Effect.let("client", ({ httpClient }) =>
         httpClient.pipe(
@@ -58,14 +23,6 @@ export const TgRestClientLive =
               botAction: request.url.split("/").at(-1),
               body: request.body.toJSON()
             })
-          ),
-          HttpClient.tap(response =>
-            pipe(
-              response.json,
-              Effect.andThen(body =>
-                Effect.logDebug("telegram body response", body)
-              )
-            )
           ),
           HttpClient.mapEffectScoped(
             HttpClientResponse.schemaBodyJson(TgResponse)
@@ -113,7 +70,7 @@ export const TgRestClientLive =
             Effect.bind("botToken", () => TgBotToken),
             Effect.let("body", () =>
               Object.keys(body).length != 0
-                ? HttpBody.formData(getFormData(methodName, body))
+                ? getFormData(methodName, body)
                 : undefined
             ),
             Effect.let("request", ({ botToken, body }) =>
@@ -138,35 +95,4 @@ export const TgRestClientLive =
         })
       )
     )
-  )
-
-const getFormData = (
-  methodName: `/${string}`,
-  body: Record<string, unknown>
-) => {
-  const result = new FormData();
-  for (const [key, value] of Object.entries(body)) {
-    Match.value(typeof value).pipe(
-      Match.when("object",
-        () => {
-          if (value instanceof Uint8Array && methodName == "/sendVoice") {
-            result.append(key, new Blob([value]), "file.ogg")
-          } else {
-            result.append(key, JSON.stringify(value))
-          }
-        }
-      ),
-      Match.orElse(() => result.append(key, value))
-    )
-  }
-  return result;
-}
-
-const validateResponse = <O>(
-  outputSchema: S.Schema<O>,
-  response: unknown
-) =>
-  pipe(
-    S.validate(outputSchema)(response),
-    Effect.mapError((parseError) => new TgBotApiServerError({ cause: parseError }))
   )

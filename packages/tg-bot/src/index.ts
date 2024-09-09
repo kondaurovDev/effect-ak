@@ -1,5 +1,3 @@
-export * as Method from "./models/method.js"
 export * from "./actions/index.js"
-export * from "./rest-client.js"
 export * from "./domain/index.js"
-export { TgRestClient, TgRestClientLive } from "./rest-client.js"
+export { TgRestClientLive } from "./client/live.js"

@@ -1,7 +1,7 @@
 import { Schema as S } from "@effect/schema";
 
-import { ChatId } from "../models/domain.js";
 import { User } from "./message-update.js";
+import { ChatId } from "./chat.js";
 
 // https://core.telegram.org/bots/payments-stars#step-by-step-process
 

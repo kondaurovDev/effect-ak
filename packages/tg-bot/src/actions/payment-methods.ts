@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema";
 
-import { TgRestClient } from "../rest-client.js";
+import { TgRestClient } from "../client/tag.js";
 import { MessageUpdate, AnswerPreCheckoutQuery, SendStarsInvoice } from "../domain/index.js"
 
 // https://core.telegram.org/bots/api#sendinvoice
