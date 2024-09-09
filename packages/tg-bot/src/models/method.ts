@@ -1,22 +1,13 @@
 import { Schema as S } from "@effect/schema"
 
 import { TgUpdateEvent } from "../domain/index.js";
-import { ChatId, CommandScope, InlineKeyboardButton, BotCommand } from "./domain.js";
+import { ChatId, CommandScope, BotCommand } from "./domain.js";
+import { ReplyMarkup } from "../domain/reply-markup.js";
 
 const ReplyParameters = 
   S.Struct({
     message_id: S.Number,
     chat_id: ChatId
-  })
-
-const ReplyMarkup =
-  S.Struct({
-    inline_keyboard: 
-      S.Array(
-        S.Array(InlineKeyboardButton)
-      )
-  }).annotations({
-    identifier: "ReplyMarkup"
   })
 
 const ParseMode = 

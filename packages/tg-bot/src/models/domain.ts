@@ -100,37 +100,3 @@ export const CommandScope =
       user_id: S.Number
     }),
   )
-
-const WebApp =
-  S.Struct({
-    url: S.String
-  }).annotations({
-    identifier: "WebApp"
-  })
-
-const SwitchInlineQueryChosenChat =
-  S.Struct({
-    query: S.optional(S.String),
-    allow_user_chats: S.optional(S.Boolean),
-    allow_bot_chats: S.optional(S.Boolean),
-    allow_group_chats: S.optional(S.Boolean),
-    allow_channel_chats: S.optional(S.Boolean),
-  }).annotations({
-    identifier: "SwitchInlineQueryChosenChat"
-  })
-
-  
-// https://core.telegram.org/bots/api#inlinekeyboardbutton
-// Exactly one of the optional fields must be used to specify type of the button.
-export const InlineKeyboardButton =
-  S.Struct({
-    text: S.String,
-    url: S.optional(S.String),
-    web_app: S.optional(WebApp),
-    callback_data: S.optional(S.String),
-    switch_inline_query: S.optional(S.String),
-    switch_inline_query_current_chat: S.optional(S.String),
-    switch_inline_query_chosen_chat: S.optional(SwitchInlineQueryChosenChat)
-  }).annotations({
-    identifier: "InlineKeyboardButton"
-  })
