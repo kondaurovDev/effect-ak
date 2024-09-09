@@ -1,16 +1,31 @@
 import { HttpBody, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
-import { Layer, pipe, Effect, Context, Match, Redacted, Console } from "effect";
-import { Schema as S } from "@effect/schema"
+import { Layer, pipe, Effect, Context, Match, Redacted, Data } from "effect";
+import { ParseResult, Schema as S } from "@effect/schema"
 
-import { TgBotToken, ContractError, TgApiError, TgResponse } from "./domain/index.js";
+import { TgBotToken, TgResponse } from "./domain/index.js";
 
-export type RestClientError =
-  HttpClientError.HttpClientError |
-  ContractError |
-  TgApiError
+export class TgBotApiClientError
+  extends Data.TaggedError("TgBotApiClientError")<{
+    cause: ParseResult.ParseError | HttpClientError.RequestError
+  }> {}
 
+export class TgBotApiServerError
+  extends Data.TaggedError("TgBotApiServerError")<{
+    cause: ParseResult.ParseError | TgResponse | HttpClientError.ResponseError
+  }> {
+
+    get message() {
+      return pipe(
+        Match.value(this.cause),
+        Match.when(({ _tag: "ParseError" }), error => error.message),
+        Match.when(({ _tag: "ResponseError" }), error => error.message),
+        Match.orElse(tgResponse => JSON.stringify(tgResponse))
+      )
+    }
+
+  }
 export type MethodResult<A> =
-  Effect.Effect<A, RestClientError, TgBotToken>
+  Effect.Effect<A, TgBotApiClientError | TgBotApiServerError, TgBotToken>
 
 export type TgRestClientService = {
   sendApiRequest: <O>(
@@ -35,9 +50,7 @@ export const TgRestClientLive =
     pipe(
       Effect.Do,
       Effect.tap(Effect.logDebug("Creating Layer with TgRestClient")),
-      Effect.bind("httpClient", () =>
-        HttpClient.HttpClient
-      ),
+      Effect.bind("httpClient", () => HttpClient.HttpClient),
       Effect.let("client", ({ httpClient }) =>
         httpClient.pipe(
           HttpClient.tapRequest(request =>
@@ -58,11 +71,11 @@ export const TgRestClientLive =
             HttpClientResponse.schemaBodyJson(TgResponse)
           ),
           HttpClient.catchTag("ParseError", parseError =>
-            Effect.fail(new ContractError({ parseError, type: "api" }))
+            Effect.fail(new TgBotApiServerError({ cause: parseError }))
           ),
           HttpClient.filterOrFail(
             response => response.ok,
-            response => new TgApiError({ response })
+            response => new TgBotApiServerError({ cause: response })
           ),
           HttpClient.map(_ => _.result)
         )
@@ -76,13 +89,17 @@ export const TgRestClientLive =
             TgBotToken,
             Effect.andThen(token =>
               client(
-                request
-                  .pipe(
-                    HttpClientRequest.prependUrl(`${baseUrl}/bot${Redacted.value(token)}`)
-                  )
+                pipe(
+                  request,
+                  HttpClientRequest.prependUrl(`${baseUrl}/bot${Redacted.value(token)}`)
+                )
               )
             ),
-            Effect.andThen(_ => validateResponse(resultSchema, _))
+            Effect.andThen(_ => validateResponse(resultSchema, _)),
+            Effect.catchTags({
+              RequestError: cause => new TgBotApiClientError({ cause }),
+              ResponseError: cause => new TgBotApiServerError({ cause }),
+            })
           )
       ),
       Effect.let("sendApiPostRequest", ({ client }) =>
@@ -93,7 +110,6 @@ export const TgRestClientLive =
         ) =>
           pipe(
             Effect.Do,
-            Effect.tap(Console.log(`executing method '${methodName}'`)),
             Effect.bind("botToken", () => TgBotToken),
             Effect.let("body", () =>
               Object.keys(body).length != 0
@@ -109,17 +125,19 @@ export const TgRestClientLive =
             Effect.andThen(({ request }) =>
               client(request),
             ),
-            Effect.andThen(_ => validateResponse(resultSchema, _))
+            Effect.andThen(_ => validateResponse(resultSchema, _)),
+            Effect.catchTags({
+              RequestError: cause => new TgBotApiClientError({ cause }),
+              ResponseError: cause => new TgBotApiServerError({ cause }),
+            })
           )
       ),
-      Effect.andThen(({ sendApiRequest, sendApiPostRequest }) =>
+      Effect.andThen(({ sendApiPostRequest, sendApiRequest }) =>
         TgRestClient.of({
           sendApiPostRequest, sendApiRequest
         })
       )
     )
-  ).pipe(
-    Layer.provide(HttpClient.layer)
   )
 
 const getFormData = (
@@ -150,5 +168,5 @@ const validateResponse = <O>(
 ) =>
   pipe(
     S.validate(outputSchema)(response),
-    Effect.mapError((parseError) => new ContractError({ type: "response", parseError }))
+    Effect.mapError((parseError) => new TgBotApiServerError({ cause: parseError }))
   )

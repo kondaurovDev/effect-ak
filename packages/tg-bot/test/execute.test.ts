@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect, Layer, pipe, Redacted } from "effect"
 
-import { ExecuteBotMethod, Method, RestClientLive, TgBotToken } from "../src/index"
+import { ChatMethods, Method, TgRestClientLive, TgBotToken } from "../src/index"
 import { LogLevelConfigFromEnvLive } from "@efkit/shared";
 import { HttpClient } from "@effect/platform";
 
@@ -9,7 +9,7 @@ describe("execute bot command", () => {
 
   const live = 
     Layer.mergeAll(
-      RestClientLive,
+      TgRestClientLive,
       LogLevelConfigFromEnvLive,
       Layer.succeed(TgBotToken, TgBotToken.of(Redacted.make(process.env["TG_TOKEN"]!!)))
     ).pipe(
@@ -20,7 +20,7 @@ describe("execute bot command", () => {
 
     const actual = 
       await pipe(
-        ExecuteBotMethod.getBotCommands(
+        ChatMethods.getBotCommands(
           Method.GetBotCommands.make({})
         ),
         Effect.provide(live),
