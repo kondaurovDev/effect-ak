@@ -32,6 +32,6 @@ export const validateResponse = <O>(
   response: unknown
 ) =>
   pipe(
-    S.validate(outputSchema)(response),
+    S.decodeUnknown(outputSchema)(response),
     Effect.mapError((parseError) => new TgBotApiServerError({ cause: parseError }))
   )
