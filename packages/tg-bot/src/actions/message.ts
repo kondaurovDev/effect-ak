@@ -15,7 +15,9 @@ export const SendMessageInput =
     message_thread_id: S.optional(S.Number),
     parse_mode: S.optional(ParseMode),
     reply_parameters: S.optional(ReplyParameters),
-    reply_markup: S.optional(ReplyMarkup)
+    reply_markup: S.optional(ReplyMarkup),
+    message_effect_id: S.optional(S.String),
+    protect_content: S.optional(S.Boolean)
   })
 
 export const sendMessage = (
