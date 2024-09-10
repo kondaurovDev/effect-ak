@@ -32,7 +32,7 @@ export const sendMessage = (
     )
   )
 
-const EditMessageTextInput = 
+export const EditMessageTextInput = 
   S.Struct({
     text: S.String,
     chat_id: ChatId,

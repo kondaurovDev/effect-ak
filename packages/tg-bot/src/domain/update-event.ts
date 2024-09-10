@@ -1,8 +1,9 @@
 import { Schema as S } from "@effect/schema";
 import { Effect, Match, pipe, Cause } from "effect";
 
-import { MessageUpdate, getMessageUserName } from "./message-update.js"
+import { MessageUpdate } from "./message-update.js"
 import { PreCheckoutQuery, SuccessfulPayment } from "./payment.js";
+import { getUserName } from "./user.js";
 
 export type TgUpdateEvent =
   typeof TgUpdateEvent.Type
@@ -25,7 +26,7 @@ export const getMessageUpdate = (
       Effect.succeed({
         chatId: messageUpdate.message.chat.id,
         source: "message",
-        authorId: getMessageUserName(messageUpdate.message),
+        authorId: getUserName(messageUpdate.message.from),
         updateId: messageUpdate.update_id,
         update: messageUpdate.message
       })
@@ -34,7 +35,7 @@ export const getMessageUpdate = (
       Effect.succeed({
         chatId: channelUpdate.channel_post.chat.id,
         source: "channel",
-        authorId: getMessageUserName(channelUpdate.channel_post),
+        authorId: getUserName(channelUpdate.channel_post.from),
         updateId: channelUpdate.update_id,
         update: channelUpdate.channel_post
       })

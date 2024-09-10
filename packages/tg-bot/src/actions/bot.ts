@@ -17,7 +17,7 @@ export const getMe = () =>
     )
   )
 
-const SetBotNameInput =
+export const SetBotNameInput =
   S.Struct({
     name: S.String,
     language_code: S.optional(S.String)
@@ -37,7 +37,7 @@ export const setBotName = (
     )
   )
 
-const SetBotCommandsInput = 
+export const SetBotCommandsInput = 
   S.Struct({
     commands: S.Array(BotCommand),
     scope: S.suspend(() => CommandScope),
@@ -95,7 +95,7 @@ export const getWebhook = () =>
   )
 
 const AllowedUpdates =
-  S.keyof(S.Struct(TgUpdateEvent.fields).pipe(S.omit("update_id")))
+  S.keyof(TgUpdateEvent.pipe(S.omit("update_id")))
 
 export const SetWebhookInput = 
   S.Struct({

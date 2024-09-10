@@ -2,7 +2,7 @@ import { Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema"
 
 import { TgRestClient } from "../client/tag.js"
-import { Chat } from "../domain/chat.js";
+import { ChatInfo, ChatAction } from "../domain/chat.js";
 
 export const GetChatInput = 
   S.Struct({
@@ -18,7 +18,7 @@ export const getChat = (
       client.sendApiPostRequest(
         "/getChat",
         input,
-        Chat
+        ChatInfo
       )
     )
   )
@@ -26,7 +26,7 @@ export const getChat = (
 export const SetChatAction =
   S.Struct({
     chat_id: S.String,
-    action: S.Literal("typing", "record_voice"),
+    action: ChatAction,
     message_thread_id: S.optional(S.Number)
   });
 

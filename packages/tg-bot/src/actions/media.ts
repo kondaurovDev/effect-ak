@@ -6,7 +6,7 @@ import { ParseMode, ReplyParameters } from "../domain/message.js";
 import { TgRestClient } from "../client/tag.js";
 import { MessageUpdate } from "../domain/message-update.js";
 
-const SendVoiceInput = 
+export const SendVoiceInput = 
   S.Struct({
     chat_id: ChatId,
     parse_mode: S.optional(ParseMode),
