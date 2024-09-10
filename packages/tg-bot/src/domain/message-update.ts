@@ -7,19 +7,21 @@ export class MessageUpdate
   extends S.Class<MessageUpdate>("MessageUpdate")({
     message_id: S.Number, // Unix time
     date: S.Number,
-    text: S.optional(S.NonEmptyString),
+    effect_id: S.optional(S.String),
+    text: S.optional(S.String),
     photo: S.optional(S.suspend(() => PhotoArray)),
     caption: S.optional(S.String),
     voice: S.optional(S.suspend(() => Voice)),
     from: S.optional(S.suspend(() => User)),
     message_thread_id: S.optional(S.Number),
     reply_markup: S.optional(ReplyMarkup),
-    chat: S.Struct({
-      id: S.Number,
-      username: S.optional(S.NonEmptyString),
-      first_name: S.optional(S.NonEmptyString),
-      type: S.Literal("group", "private", "channel", "supergroup" )
-    }),
+    chat:
+      S.Struct({
+        id: S.Number,
+        username: S.optional(S.NonEmptyString),
+        first_name: S.optional(S.NonEmptyString),
+        type: S.Literal("group", "private", "channel", "supergroup" )
+      }),
     reply_to_message: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
     forward_from: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
     forward_origin: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate))
@@ -38,5 +40,5 @@ const Voice =
     file_id: S.String,
     file_unique_id: S.String,
     duration: S.Number,
-    mime_type: S.optional(S.NonEmptyString)
+    mime_type: S.optional(S.String)
   })
