@@ -1,20 +1,22 @@
 import { Layer, pipe, Effect, Context, Redacted } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
-import * as Shared from "@efkit/shared";
+import { UtilError } from "@efkit/shared";
+import { ParsedJson, parseJson } from "@efkit/shared/utils";
+
 import { GptToken } from "./token.js";
 
 export type ValidJsonError =
-  HttpClientError.HttpClientError | Shared.JsonError | ParseResult.ParseError
+  HttpClientError.HttpClientError | UtilError | ParseResult.ParseError
 
 export type JsonError =
-  HttpClientError.HttpClientError | Shared.JsonError
+  HttpClientError.HttpClientError | UtilError
 
 export type OpenaiRestClientService = (
   request: HttpClientRequest.HttpClientRequest
 ) => {
   buffer: Effect.Effect<ArrayBuffer, HttpClientError.HttpClientError, GptToken>,
-  json: Effect.Effect<Shared.ParsedJson, JsonError, GptToken>
+  json: Effect.Effect<ParsedJson, JsonError, GptToken>
   validJson: <I>(_: S.Schema<I>) => Effect.Effect<I, ValidJsonError, GptToken>
 }
 
@@ -66,7 +68,7 @@ export class OpenaiRestClient
                 Effect.andThen(_ =>
                   Buffer.from(_).toString()
                 ),
-                Effect.andThen(Shared.parseJson)
+                Effect.andThen(parseJson)
               ),
             )
         ),

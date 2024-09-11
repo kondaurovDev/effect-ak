@@ -1,6 +1,6 @@
 import { Cache, Duration, Effect, pipe } from "effect"
 
-import { SharedError } from "./error.js"
+import { UtilError } from "../error.js"
 
 const dateTimeFormatter = (
   timezone: string
@@ -45,29 +45,25 @@ export const parseDateWithTime = (
     Effect.filterOrFail(date =>
       !isNaN(date.getTime())
     ),
-    Effect.mapError(error => {
-      if (error._tag == "NoSuchElementException") {
-        return new SharedError({
-          message: `Input '${input}' isn't a date string`
+    Effect.catchTags({
+      NoSuchElementException: () =>
+        new UtilError({
+          name: "date",
+          details: `Input '${input}' isn't a date string`
+        }),
+      UnknownException: () =>
+        new UtilError({
+          name: "date",
+          details: `Input '${input}' can't be transformed to a date`
         })
-      } else if (error._tag == "UnknownException") {
-        return new SharedError({
-          message: `Input '${input}' can't be transformed to a date`
-        })
-      } else {
-        return new SharedError({
-          message: `Input '${input}'. Unknown exception`
-        })
-      }
     })
   )
-
-
 
 const getGMTOffsetByTimezone = (
   timezone: string
 ) => 
-  Effect.Do.pipe(
+  pipe(
+    Effect.Do,
     Effect.bind("parts", () =>
       getDatePartsFromTimestamp(
         Date.now(),
@@ -80,8 +76,12 @@ const getGMTOffsetByTimezone = (
           .find(part => part.type === 'timeZoneName')
       ),
     ),
-    Effect.catchAll(errors =>
-      new SharedError({ message: `getting gmt by timezone ${timezone}: ${errors.message}` })
+    Effect.catchAll(cause =>
+      new UtilError({ 
+        name: "date",
+        details: `getting gmt by timezone ${timezone}`, 
+        cause 
+      })
     ),
     Effect.andThen(result => result.value)
   )

@@ -1,6 +1,6 @@
 import { pipe, Effect, Either } from "effect";
 import { Schema as S } from "@effect/schema";
-import * as Shared from "@efkit/shared";
+import { parseJson } from "@efkit/shared/utils";
 
 import { CompletionError } from "../completion/error.js";
 import { Completion, CompletionLive } from "./service.js";
@@ -36,12 +36,13 @@ export const completeFunctionCall = <O>(
         complete(request),
         Effect.andThen(_ => _.firstChoice),
         Effect.andThen(_ => _.functionArgumets),
-        Effect.andThen(_ => pipe(
-          Shared.parseJson(_),
-          Effect.mapError(() =>
-            new CompletionError({ errorCode: "InvalidJson" })
-          )
-        )),
+        Effect.andThen(_ =>
+          pipe(
+            parseJson(_),
+            Effect.mapError(() =>
+              new CompletionError({ errorCode: "InvalidJson" })
+            )
+          )),
         Effect.andThen(S.validate(resultSchema))
       )
     )
@@ -62,7 +63,7 @@ export const completeStructuredRequest = <O>(
         Effect.andThen(response =>
           pipe(
             S.decode(S.parseJson(S.Struct({ result: S.Unknown })))(response),
-            Effect.tapError(error => 
+            Effect.tapError(error =>
               Effect.logDebug(error)
             ),
             Effect.catchTag("ParseError", () =>
@@ -73,9 +74,9 @@ export const completeStructuredRequest = <O>(
                 S.validate(MissingInputFieldsError)(result.result),
                 Effect.matchEffect({
                   onFailure: () => S.validate(resultSchema)(result.result),
-                  onSuccess: error => 
-                    new CompletionError({ 
-                      errorCode: "MissingRequiredFields", message: error.$$$error 
+                  onSuccess: error =>
+                    new CompletionError({
+                      errorCode: "MissingRequiredFields", message: error.$$$error
                     })
                 })
               )

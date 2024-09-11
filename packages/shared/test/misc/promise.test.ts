@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest"
 import { Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { trySafePromise } from "../src/promise";
+import { trySafePromise } from "../../src/misc/index";
 
 const actionStub = vi.fn()
 
@@ -55,7 +55,7 @@ describe("promise test suite", () => {
         Effect.runPromise
       );
 
-    expect(success._tag).toEqual("PromiseSchemaError");
+    expect(success._tag).toMatch(/.*PromiseSchemaError$/);
 
   })
 

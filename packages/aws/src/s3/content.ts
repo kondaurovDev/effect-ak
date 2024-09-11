@@ -1,11 +1,10 @@
 import { Effect, pipe } from "effect";
-import { parseJson } from "@efkit/shared";
+import { parseJson } from "@efkit/shared/utils";
 import { S3 } from "@efkit/aws";
 
 import * as T from "./types.js";
 import { Service } from "./service.js"
 import { tryAwsServiceMethod } from "../error.js";
-
 
 export const createFileWithContent = (
   bucketName: T.BucketName,
@@ -32,7 +31,8 @@ export const getFileContent = (
   bucketName: T.BucketName,
   key: T.BucketKey
 ) =>
-  Effect.Do.pipe(
+  pipe(
+    Effect.Do,
     Effect.bind("fileName", () =>
       Effect.fromNullable(key.split("/").at(-1))
     ),

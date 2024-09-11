@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
-import { parseDateWithTime } from "@efkit/shared"
+import { parseDateWithTime } from "@efkit/shared/utils"
 
 import { GoogleApiRestClient } from "../client.js";
 import { prefix } from "./common.js";

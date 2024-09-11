@@ -1,6 +1,6 @@
 import { Schema as S } from "@effect/schema";
 import { randomBytes, scrypt, timingSafeEqual } from "crypto"
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
 
 export type HashedPassword = typeof HashedPassword.Type; 
 export const HashedPassword = 
@@ -32,7 +32,8 @@ export const isPasswordValid = (
   storedHashedPassword: HashedPassword,
   plainPassword: string
 ) => 
-  Effect.Do.pipe(
+  pipe(
+    Effect.Do,
     Effect.let("parts", () => storedHashedPassword.split(".")),
     Effect.let("hashedPasswordBuffer", ({ parts }) => 
       Buffer.from(parts[0], "base64")

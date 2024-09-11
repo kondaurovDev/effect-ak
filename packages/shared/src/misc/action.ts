@@ -1,5 +1,7 @@
-import { Effect, Data, pipe, Context, Layer, Cause, identity, Logger } from "effect";
-import { Schema as S, ParseResult } from "@effect/schema";
+import { Effect, pipe, Context, Layer, Cause, identity, Logger } from "effect";
+import { Schema as S } from "@effect/schema";
+
+import { ActionError, ActionInvalidIOError } from "../error.js";
 
 export type ActionLog = {
   message: unknown,
@@ -11,17 +13,6 @@ export type ActionSuccess<O> = {
   readonly result: O,
   readonly logs: ActionLog[]
 }
-
-export class ActionError<E = Error>
-  extends Data.TaggedError("ActionError")<{
-    cause: E | Cause.UnknownException
-  }> { }
-
-export class ActionInvalidIOError
-  extends Data.TaggedError("ActionInvalidIOError")<{
-    type: "input" | "output"
-    cause: ParseResult.ParseError
-  }> { }
 
 export type ActionResult<O, E, R> =
   Effect.Effect<O, E, R> | Promise<O> | O

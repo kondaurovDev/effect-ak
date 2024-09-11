@@ -2,8 +2,7 @@ import { describe, it, expect, vi } from "vitest"
 import { Effect, Layer, pipe } from "effect";
 import { HttpClient, HttpClientRequest, HttpBody } from "@effect/platform";
 
-import { ResponseFactory, createFakeClient } from "../src/fake-http";
-
+import { ResponseFactory, createFakeClient } from "../../src/utils";
 
 describe("client suite", () => {
 

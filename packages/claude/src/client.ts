@@ -1,21 +1,22 @@
 import { Layer, pipe, Effect, Context, Redacted } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
-import * as Shared from "@efkit/shared";
+import { UtilError } from "@efkit/shared";
+import { ParsedJson, parseJson } from "@efkit/shared/utils";
 
 import { ClaudeToken } from "./token.js"
 
 export type ValidJsonError =
-  HttpClientError.HttpClientError | Shared.JsonError | ParseResult.ParseError
+  HttpClientError.HttpClientError | UtilError | ParseResult.ParseError
 
 export type JsonError =
-  HttpClientError.HttpClientError | Shared.JsonError
+  HttpClientError.HttpClientError | UtilError
 
 export type ClaudeRestClientService = (
   request: HttpClientRequest.HttpClientRequest
 ) => {
   buffer: Effect.Effect<ArrayBuffer, HttpClientError.HttpClientError, ClaudeToken>,
-  json: Effect.Effect<Shared.ParsedJson, JsonError, ClaudeToken>
+  json: Effect.Effect<ParsedJson, JsonError, ClaudeToken>
   validJson: <I>(_: S.Schema<I>) => Effect.Effect<I, ValidJsonError, ClaudeToken>
 }
 
@@ -69,9 +70,7 @@ export const RestClientLive =
               Effect.andThen(_ =>
                 Buffer.from(_).toString()
               ),
-              Effect.andThen(
-                Shared.parseJson
-              ),
+              Effect.andThen(parseJson),
               Effect.scoped,
             ),
           )

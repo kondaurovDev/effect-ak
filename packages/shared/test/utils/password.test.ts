@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { hashPassword, isPasswordValid } from "../src/password";
+import { hashPassword, isPasswordValid } from "../../src/utils";
 
 describe("password test suite", () => {
 

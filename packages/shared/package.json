@@ -12,11 +12,22 @@
   },
   "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/public/index.js",
+  "types": "./dist/public/index.d.ts",
   "files": [
     "dist"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/misc/index.d.ts",
+      "default": "./dist/misc/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
+    }
+  },
   "devDependencies": {
     "@effect/platform-node": "catalog:"
   },

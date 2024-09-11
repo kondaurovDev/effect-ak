@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import { Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { ActionError, makeAction } from "../src/action";
+import { makeAction } from "../../src/misc/index";
 
 class MySchema extends S.Class<MySchema>("MySchema")(
   {
@@ -66,7 +66,7 @@ describe("action test suite", () => {
           Effect.runPromise
         );
 
-    expect(result2._tag).toEqual("ActionError");
+    expect(result2._tag).toMatch(/.*ActionError$/)
 
   })
 
@@ -78,7 +78,7 @@ describe("action test suite", () => {
           Effect.provide(action.inputLayer("throwInternalError")),
           Effect.flip,
           Effect.runPromise
-        ) as ActionError;
+        );
 
     expect(result.cause.message).toEqual("Internal error")
 

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { Effect, pipe } from "effect";
 
-import { hashText } from "../src/text"
+import { hashText } from "../../src/utils"
 
 describe("text", () => {
 

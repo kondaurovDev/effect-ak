@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import { Effect, LogLevel, Logger, pipe } from "effect";
 import { NodeContext } from "@effect/platform-node";
 
-import { executeShellCommand } from "../src/shell-executor";
+import { executeShellCommand } from "../../src/utils";
 
 describe("shell executor", () => {
 

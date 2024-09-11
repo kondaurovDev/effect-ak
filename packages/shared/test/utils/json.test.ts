@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import {Effect, pipe} from "effect";
 
-import {prepareReply, toJsonString, JsonReplacerOmitUnderscore, JsonString} from "../src/json";
+import {prepareReply, toJsonString, JsonReplacerOmitUnderscore} from "../../src/utils";
 
 describe("json test suite", () => {
 

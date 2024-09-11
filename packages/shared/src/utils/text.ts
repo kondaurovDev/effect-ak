@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import { createHash, createSign } from "node:crypto";
 
-import { SharedError } from "./error.js";
+import { UtilError } from "../error.js";
 
 export const toBase64Url = (
   input: unknown
@@ -24,9 +24,11 @@ export const signText = (
         signer.update(input).sign(privateKey, "base64url")
       )
     ),
-    Effect.mapError(error =>
-      new SharedError({
-        message: "sign text error: " + error
+    Effect.mapError(cause =>
+      new UtilError({
+        name: "text",
+        details: "sign text error",
+        cause
       })
     )
   )
@@ -41,9 +43,11 @@ export const hashText = (
     Effect.andThen(hasher =>
       hasher.update(input).digest("base64url")
     ),
-    Effect.mapError(error =>
-      new SharedError({
-        message: "hashText error: " + error.message
+    Effect.mapError(cause =>
+      new UtilError({
+        name: "text",
+        details: `hashText error, input '${input}'`,
+        cause
       })
     )
   )

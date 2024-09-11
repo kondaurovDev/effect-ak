@@ -1,6 +1,6 @@
 import { Config, Effect, Layer, LogLevel, Logger, pipe } from "effect";
 
-export const LogLevelConfigFromEnvLive = 
+export const LogLevelConfigFromEnv = 
   pipe(
     Config.logLevel("LOG_LEVEL"),
     Effect.catchTag("ConfigError", () => 

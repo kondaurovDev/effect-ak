@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Effect, pipe } from "effect";
 
-import { GMTByTimezoneNameCache, timestampToPrettyDateTime } from "../src/date";
+import { GMTByTimezoneNameCache, timestampToPrettyDateTime } from "../../src/utils";
 
 describe("date test suite", () => {
   it("get yerevan's GMT", () => {
