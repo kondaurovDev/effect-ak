@@ -1,10 +1,11 @@
 import { Effect, pipe } from "effect";
 import { parseJson } from "@efkit/shared";
+import { S3 } from "@efkit/aws";
 
 import * as T from "./types.js";
 import { Service } from "./service.js"
 import { tryAwsServiceMethod } from "../error.js";
-import { S3 } from "@efkit/aws";
+
 
 export const createFileWithContent = (
   bucketName: T.BucketName,

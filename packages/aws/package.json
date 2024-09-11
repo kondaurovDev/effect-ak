@@ -30,9 +30,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.635.0",
-    "@aws-sdk/client-kms": "^3.635.0",
     "@aws-sdk/util-dynamodb": "^3.635.0",
-    "@aws-sdk/client-ssm": "^3.635.0",
     "@aws-sdk/client-s3": "^3.635.0"
   },
   "peerDependencies": {
