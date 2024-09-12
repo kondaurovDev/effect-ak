@@ -10,6 +10,9 @@ export const trySafePromise = <O, E>(
   pipe(
     Effect.logDebug(`executing (${actionName})`),
     Effect.andThen(() => action()),
+    Effect.tap(result =>
+      Effect.logDebug(`promise success (${actionName})`, result),
+    ),
     Effect.catchTag("UnknownException", (exception) =>
       pipe(
         Effect.logDebug(`promise exception (${actionName})`, exception.cause),
