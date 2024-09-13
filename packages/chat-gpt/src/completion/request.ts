@@ -189,15 +189,6 @@ export class ChatCompletionRequest
             },
             messages: [
               { role: "system", content: [
-                ...[
-                  TextMessageContent.make({ 
-                    type: "text", text: "refuse to provide successful response if some required schema fields are missing"
-                  }),
-                  TextMessageContent.make({ 
-                    type: "text", text: "in case of error response specify missing fields related to user phrase, not all required fields"
-                  }),
-                  
-                ],
                 ...(systemMessages ? systemMessages.map(msg => 
                   (TextMessageContent.make({ type: "text", text: msg }))
                 ) : [])
