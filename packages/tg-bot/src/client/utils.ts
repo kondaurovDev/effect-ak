@@ -27,8 +27,8 @@ export const getFormData = (
   return HttpBody.formData(result);
 }
 
-export const validateResponse = <O>(
-  outputSchema: S.Schema<O>,
+export const validateResponse = <O, O2>(
+  outputSchema: S.Schema<O, O2>,
   response: unknown
 ) =>
   pipe(

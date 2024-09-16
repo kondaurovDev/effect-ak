@@ -9,14 +9,14 @@ export type MethodResult<A> =
   Effect.Effect<A, TgBotApiClientError | TgBotApiServerError, TgBotToken>
 
 export type TgRestClientService = {
-  sendApiRequest: <O>(
+  sendApiRequest: <O, O2>(
     request: HttpClientRequest.HttpClientRequest,
-    resultSchema: S.Schema<O>
+    resultSchema: S.Schema<O, O2>
   ) => MethodResult<O>
-  sendApiPostRequest: <O>(
+  sendApiPostRequest: <O, O2>(
     methodName: `/${string}`,
     body: Record<string, unknown>,
-    resultSchema: S.Schema<O>
+    resultSchema: S.Schema<O, O2>
   ) => MethodResult<O>
 }
 

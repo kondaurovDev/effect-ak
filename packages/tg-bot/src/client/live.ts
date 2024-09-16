@@ -38,9 +38,9 @@ export const TgRestClientLive =
         )
       ),
       Effect.let("sendApiRequest", ({ client }) =>
-        <O>(
+        <O, O2>(
           request: HttpClientRequest.HttpClientRequest,
-          resultSchema: S.Schema<O>
+          resultSchema: S.Schema<O, O2>
         ) =>
           pipe(
             TgBotToken,
@@ -60,10 +60,10 @@ export const TgRestClientLive =
           )
       ),
       Effect.let("sendApiPostRequest", ({ client }) =>
-        <O>(
+        <O, O2>(
           methodName: `/${string}`,
           body: Record<string, unknown>,
-          resultSchema: S.Schema<O>
+          resultSchema: S.Schema<O, O2>
         ) =>
           pipe(
             Effect.Do,

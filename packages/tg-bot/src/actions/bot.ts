@@ -1,9 +1,10 @@
-import { Effect, pipe } from "effect"
+import { DateTime, Duration, Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema"
 
 import { TgRestClient } from "../client/tag.js"
 import { TgUpdateEvent, User } from "../domain/index.js";
 import { BotCommand, CommandScope } from "../domain/bot-command.js";
+
 
 export const getMe = () =>
   pipe(
@@ -88,7 +89,16 @@ export const getWebhook = () =>
         S.Struct({
           url: S.String,
           pending_update_count: S.Number,
-          last_error_date: S.optional(S.Number)
+          last_error_date:
+            S.transform(
+              S.Number,
+              S.DateTimeUtcFromSelf,
+              {
+                strict: true,
+                decode: seconds => DateTime.unsafeMake(seconds * 1000),
+                encode: dt => dt.epochMillis / 1000
+              }
+            )
         })
       )
     )
