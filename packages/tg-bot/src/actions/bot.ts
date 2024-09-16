@@ -98,6 +98,8 @@ export const getWebhook = () =>
                 decode: seconds => DateTime.unsafeMake(seconds * 1000),
                 encode: dt => dt.epochMillis / 1000
               }
+            ).pipe(
+              S.optional
             )
         })
       )
