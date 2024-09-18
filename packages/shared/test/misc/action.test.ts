@@ -1,15 +1,19 @@
 import { describe, it, expect } from "vitest"
-import { Effect, pipe } from "effect";
+import { Effect, Exit, pipe } from "effect";
 import { Schema as S } from "@effect/schema"
 
 import { makeAction } from "../../src/misc/index";
 
 class MySchema extends S.Class<MySchema>("MySchema")(
   {
-    message: S.NonEmptyString
-  }, {
-  title: "body"
-}) { }
+    message: S.NonEmptyString,
+    date: S.Number,
+    a: 
+      pipe(
+        S.Positive,
+        S.optional
+      )
+  }) { }
 
 const action =
   makeAction(
@@ -27,14 +31,14 @@ const action =
       }
 
       if (input === "check2") {
-        return new MySchema({ message: input })
+        return S.decode(MySchema)({ message: input, date: 34 })
       }
 
       return (
         pipe(
           Effect.logInfo("hey"),
           Effect.andThen(
-            new MySchema({ message: input })
+            S.decode(MySchema)({ message: input, date: 434545 })
           )
         )
       )
@@ -49,10 +53,10 @@ describe("action test suite", () => {
       await action.checkedRun
         .pipe(
           Effect.provide(action.inputLayer("check2")),
-          Effect.runPromise
+          Effect.runPromiseExit
         );
 
-    expect(result.result).toEqual({ message: "check2" });
+    expect(Exit.map(result, _ => _.result.message)).toEqual(Exit.succeed("check2"));
 
   });
 
@@ -94,7 +98,7 @@ describe("action test suite", () => {
         );
 
     expect(result.logs).not.toHaveLength(0)
-    expect(result.result).toEqual({ message: "check" });
+    expect(result.result.message).toEqual("check");
 
   });
 

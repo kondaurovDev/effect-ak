@@ -1,5 +1,4 @@
 import { Effect, Match, pipe } from "effect";
-import type * as Sdk from "@aws-sdk/client-dynamodb";
 
 import * as D from "./types.js";
 import { getProjectionAndAttributeNames, getUpdateExpression } from "./utils/index.js";
@@ -96,8 +95,7 @@ export const updateOne = (
     Effect.andThen(({ dynamoSDK, request }) =>
       tryAwsServiceMethod(
         `updateItem in ${tableName}`,
-        () =>
-          dynamoSDK.updateItem(request as Sdk.UpdateItemCommandInput)
+        () => dynamoSDK.updateItem(request)
       )
     )
   )

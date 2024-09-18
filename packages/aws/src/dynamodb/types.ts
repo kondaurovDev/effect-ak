@@ -7,6 +7,9 @@ export const TableName = Brand.nominal<TableName>();
 export type AttributeDefinition = Sdk.AttributeDefinition & Brand.Brand<"AttributeDefinition">;
 export const AttributeDefinition = Brand.nominal<AttributeDefinition>();
 
+export type BatchWriteCommandInput = Sdk.BatchWriteItemCommandInput & Brand.Brand<"BatchWriteCommandInput">;
+export const BatchWriteCommandInput = Brand.nominal<BatchWriteCommandInput>();
+
 export type UpdateItemInput = Sdk.UpdateItemInput & Brand.Brand<"UpdateItemInput">;
 export const UpdateItemInput = Brand.nominal<UpdateItemInput>();
 

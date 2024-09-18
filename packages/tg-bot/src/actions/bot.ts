@@ -1,10 +1,9 @@
-import { DateTime, Duration, Effect, pipe } from "effect"
+import { DateTime, Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema"
 
 import { TgRestClient } from "../client/tag.js"
-import { TgUpdateEvent, User } from "../domain/index.js";
+import { UpdateEventType, User } from "../domain/index.js";
 import { BotCommand, CommandScope } from "../domain/bot-command.js";
-
 
 export const getMe = () =>
   pipe(
@@ -106,13 +105,10 @@ export const getWebhook = () =>
     )
   )
 
-const AllowedUpdates =
-  S.keyof(TgUpdateEvent.pipe(S.omit("update_id")))
-
 export const SetWebhookInput = 
   S.Struct({
     url: S.NonEmptyString.pipe(S.pattern(/^https:\/\/.*/)),
-    allow_updates: S.Array(AllowedUpdates),
+    allow_updates: S.optional(S.Array(UpdateEventType)),
     drop_pending_updates: S.optional(S.Boolean),
     secret_token: S.NonEmptyString.pipe(S.minLength(3))
   });

@@ -35,7 +35,7 @@ export const makeAction = <I, O, E, R>(
   getInput: (_: I) => I = identity
 ): Action<I, O, E, R> => {
   const inputTag =
-    Context.GenericTag<typeof inputSchema.Type>(`ActionInput.${name}`);
+    Context.GenericTag<I>(`ActionInput.${name}`);
 
   const inputLayer =
     (input: I) => Layer.succeed(inputTag, inputTag.of(input))
