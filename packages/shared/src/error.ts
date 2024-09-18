@@ -3,6 +3,13 @@ import { Cause, Data } from "effect"
 
 const packageName = "@efkit/shared"
 
+export type ActionLog = {
+  message: unknown,
+  time: unknown
+  level: unknown
+  cause: unknown
+}
+
 export class UtilError
   extends Data.TaggedError(`${packageName}.SharedError`)<{
     name: "text" | "date" | "json",
@@ -12,13 +19,17 @@ export class UtilError
 
 export class ActionError<E = Error>
   extends Data.TaggedError(`${packageName}.ActionError`)<{
-    cause: E | Cause.UnknownException
+    actionName: string,
+    cause: Cause.Cause<E | Cause.UnknownException>,
+    logs: ActionLog[]
   }> { }
 
 export class ActionInvalidIOError
   extends Data.TaggedError(`${packageName}.ActionInvalidIOError`)<{
+    actionName: string,
     type: "input" | "output"
-    cause: ParseResult.ParseError
+    cause: Cause.Cause<ParseResult.ParseError>,
+    logs: ActionLog[]
   }> { }
 
 export class PromiseError<E>

@@ -1,13 +1,7 @@
 import { Effect, pipe, Context, Layer, Cause, identity, Logger } from "effect";
 import { Schema as S } from "@effect/schema";
 
-import { ActionError, ActionInvalidIOError } from "../error.js";
-
-export type ActionLog = {
-  message: unknown,
-  time: unknown
-  level: unknown
-}
+import { ActionError, ActionInvalidIOError, ActionLog } from "../error.js";
 
 export type ActionSuccess<O> = {
   readonly result: O,
@@ -45,58 +39,58 @@ export const makeAction = <I, O, E, R>(
       Effect.Do,
       Effect.let("actionLogs", () => [] as ActionLog[]),
       Effect.bind("actionInput", () => inputTag),
-      Effect.bind("parsedInput", ({ actionInput }) =>
+      Effect.bind("parsedInput", ({ actionInput, actionLogs }) =>
         pipe(
           S.validate(inputSchema)(getInput(actionInput)),
           Effect.catchTag("ParseError", parseError =>
-            new ActionInvalidIOError({ type: "input", cause: parseError })
+            new ActionInvalidIOError({ type: "input", cause: Cause.fail(parseError), logs: actionLogs, actionName: name })
           )
         )
       ),
       Effect.bind("actionResult", ({ parsedInput, actionLogs }) =>
-        pipe(
-          Effect.async<O, E | Cause.UnknownException, R>((resume) => {
-            try {
-              const result = run(parsedInput)
-              if (Effect.isEffect(result)) {
-                const live = 
-                  Logger.replace(
-                    Logger.defaultLogger,
-                    Logger.make(({ message, date, logLevel }) => 
-                      actionLogs.push({
-                        message: message,
-                        time: date.toISOString(),
-                        level: logLevel.label
-                      })
-                    )
+        Effect.async<O, E | Cause.UnknownException, R>((resume) => {
+          try {
+            const result = run(parsedInput)
+            if (Effect.isEffect(result)) {
+              const live = 
+                Logger.add(
+                  Logger.make(({ message, date, logLevel, cause }) => 
+                    actionLogs.push({
+                      message,
+                      cause: cause,
+                      time: date.toISOString(),
+                      level: logLevel.label
+                    })
                   )
-                return resume(Effect.provide(live)(result))
-              } else if (result instanceof Promise) {
-                console.log = function(...args) {
-                  actionLogs.push({
-                    message: args[0],
-                    time: Date.now(),
-                    level: "info"
-                  });
-                };
-                resume(Effect.tryPromise(() => result))
-              } else {
-                return resume(Effect.succeed(result))
-              }
-            } catch (e) {
-              resume(Effect.fail(e as E))
+                )
+              return resume(Effect.provide(live)(result))
+            } else if (result instanceof Promise) {
+              console.log = function(...args) {
+                actionLogs.push({
+                  message: args[0],
+                  time: Date.now(),
+                  level: "info",
+                  cause: args.find(_ => _ instanceof Error)
+                });
+              };
+              resume(Effect.tryPromise(() => result))
+            } else {
+              return resume(Effect.succeed(result))
             }
-          }),
-          Effect.mapError((executionError) =>
-            new ActionError({ cause: executionError })
+          } catch (e) {
+            resume(Effect.fail(e as E))
+          }
+        }).pipe(
+          Effect.catchAllCause(error =>
+            new ActionError({ cause: error, logs: actionLogs, actionName: name })
           )
-        )
+        ),
       ),
-      Effect.tap(({ actionResult }) =>
+      Effect.tap(({ actionResult, actionLogs }) =>
         pipe(
           S.validate(outputSchema)(actionResult),
           Effect.catchTag("ParseError", parseError =>
-            new ActionInvalidIOError({ type: "output", cause: parseError })
+            new ActionInvalidIOError({ type: "output", cause: Cause.fail(parseError), logs: actionLogs, actionName: name })
           )
         )
       ),

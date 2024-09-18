@@ -1,5 +1,6 @@
 import { Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema";
+
 import { PromiseError, PromiseSchemaError } from "../error.js";
 
 export const trySafePromise = <O, E>(
@@ -15,11 +16,11 @@ export const trySafePromise = <O, E>(
     ),
     Effect.catchTag("UnknownException", (exception) =>
       pipe(
-        Effect.logDebug(`promise exception (${actionName})`, exception.cause),
+        Effect.logDebug(`Promise exception '${actionName}'`, exception.toJSON()),
         Effect.andThen(S.validate(errorSchema)(exception.error)),
         Effect.matchEffect({
           onSuccess: error => new PromiseError({ actionName, cause: error }),
-          onFailure: () => new PromiseSchemaError({ actionName, cause: exception })
+          onFailure: () => new PromiseSchemaError({ actionName, cause: exception.error as Error })
         })
       )
     )

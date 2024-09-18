@@ -13,7 +13,7 @@ export class MarshallError
 export const marshallItem = (
   item: unknown,
   itemName: string,
-  options?: marshallOptions,
+  options: marshallOptions = { convertTopLevelContainer: true },
 ) =>
   pipe(
     Effect.try({

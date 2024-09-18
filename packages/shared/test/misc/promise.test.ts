@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { Effect, pipe } from "effect";
+import { Effect, Logger, LogLevel, pipe } from "effect";
 import { Schema as S } from "@effect/schema"
 
 import { trySafePromise } from "../../src/misc/index";
@@ -51,8 +51,9 @@ describe("promise test suite", () => {
     const success =
       await pipe(
         trySafePromise("my action", actionStub, ErrorShema),
-        Effect.flip,
-        Effect.runPromise
+        Logger.withMinimumLogLevel(LogLevel.Debug),
+        Effect.flip,   
+        Effect.runPromise,
       );
 
     expect(success._tag).toMatch(/.*PromiseSchemaError$/);
