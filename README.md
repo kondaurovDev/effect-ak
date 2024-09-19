@@ -15,7 +15,6 @@ As developers, we often find ourselves rewriting similar integration code across
 
 ## Features
 
-- AWS integration: Interact with various AWS services
 - Google services wrapper: Includes Calendar integration for adding and managing events
 - ChatGPT API wrapper: Interact with OpenAI's ChatGPT seamlessly
 - Claude AI integration: Utilize Anthropic's Claude AI in your projects

@@ -5,10 +5,7 @@
   "scripts": {
     "clean": "node scripts/clean.mjs",
     "test": "vitest run",
-    "compile": "tsc -b tsconfig.src.json",
-    "pack-all": "pnpm -r run pack-tar --pack-destination ../../dist",
-    "show-tar": "tar xfO dist/efkit-claude-0.0.1.tgz package/dist/index.js",
-    "show-tar2": "tar xfO dist/efkit-aws-0.0.1.tgz package/package.json"
+    "compile": "tsc -b tsconfig.src.json"
   },
   "devDependencies": {
     "@types/node": "20.14.8",

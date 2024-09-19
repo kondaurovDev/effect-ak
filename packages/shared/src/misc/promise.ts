@@ -1,18 +1,39 @@
-import { Data, Effect, pipe } from "effect";
+import { Cause, Data, Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema";
+
 import { packageName } from "../common.js";
 
 export class PromiseError<E>
   extends Data.TaggedError(`${packageName}.PromiseError`)<{
     actionName: string,
-    cause: E
+    cause: Cause.Cause<E>
   }> { }
 
 export class PromiseSchemaError
   extends Data.TaggedError(`${packageName}.PromiseSchemaError`)<{
     actionName: string,
-    cause: Error
+    cause: Cause.Cause<unknown>
   }> { }
+
+export const tryPromise = <O>(
+  actionName: string,
+  action: () => Promise<O>
+): Effect.Effect<O, PromiseError<unknown>> =>
+  pipe(
+    Effect.logDebug(`executing (${actionName})`),
+    Effect.andThen(() => action()),
+    Effect.tap(result =>
+      Effect.logDebug(`promise success (${actionName})`, result),
+    ),
+    Effect.catchTag("UnknownException", (exception) =>
+      pipe(
+        Effect.logDebug(`Promise exception '${actionName}'`, exception.toJSON()),
+        Effect.andThen(() =>
+          new PromiseError({ actionName, cause: Cause.fail(exception) })
+        )
+      )
+    )
+  )
 
 export const trySafePromise = <O, E>(
   actionName: string,
@@ -30,8 +51,8 @@ export const trySafePromise = <O, E>(
         Effect.logDebug(`Promise exception '${actionName}'`, exception.toJSON()),
         Effect.andThen(S.validate(errorSchema)(exception.error)),
         Effect.matchEffect({
-          onSuccess: error => new PromiseError({ actionName, cause: error }),
-          onFailure: () => new PromiseSchemaError({ actionName, cause: exception.error as Error })
+          onSuccess: error => new PromiseError({ actionName, cause: Cause.fail(error) }),
+          onFailure: () => new PromiseSchemaError({ actionName, cause: Cause.fail(exception) })
         })
       )
     )

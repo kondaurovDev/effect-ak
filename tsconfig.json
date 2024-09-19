@@ -3,7 +3,6 @@
   "include": [],
   "references": [
     { "path": "packages/shared" },
-    { "path": "packages/aws" },
     { "path": "packages/claude" },
     { "path": "packages/chat-gpt" },
     { "path": "packages/tg-bot" },
