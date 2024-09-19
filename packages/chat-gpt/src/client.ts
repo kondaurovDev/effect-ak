@@ -1,7 +1,7 @@
 import { Layer, pipe, Effect, Context, Redacted } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
-import { UtilError } from "@efkit/shared";
+import { UtilError } from "@efkit/shared/utils";
 import { ParsedJson, parseJson } from "@efkit/shared/utils";
 
 import { GptToken } from "./token.js";

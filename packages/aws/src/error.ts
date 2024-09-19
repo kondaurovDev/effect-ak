@@ -1,5 +1,5 @@
 import { Schema as S } from "@effect/schema"
-import { trySafePromise } from "@efkit/shared"
+import { trySafePromise } from "@efkit/shared/misc"
 
 export type ServiceError = 
   typeof ServiceError.Type

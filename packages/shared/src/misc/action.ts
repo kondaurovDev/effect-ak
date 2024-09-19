@@ -1,7 +1,7 @@
 import { Effect, pipe, Context, Layer, Cause, identity, Logger } from "effect";
 import { Schema as S } from "@effect/schema";
 
-import { ActionError, ActionInvalidIOError, ActionLog } from "../error.js";
+import { ActionError, ActionInvalidIOError, ActionLog } from "./action-error.js";
 
 export type ActionSuccess<O> = {
   readonly result: O,

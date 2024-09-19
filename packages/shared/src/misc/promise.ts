@@ -1,7 +1,18 @@
-import { Effect, pipe } from "effect";
+import { Data, Effect, pipe } from "effect";
 import { Schema as S } from "@effect/schema";
+import { packageName } from "../common.js";
 
-import { PromiseError, PromiseSchemaError } from "../error.js";
+export class PromiseError<E>
+  extends Data.TaggedError(`${packageName}.PromiseError`)<{
+    actionName: string,
+    cause: E
+  }> { }
+
+export class PromiseSchemaError
+  extends Data.TaggedError(`${packageName}.PromiseSchemaError`)<{
+    actionName: string,
+    cause: Error
+  }> { }
 
 export const trySafePromise = <O, E>(
   actionName: string,

@@ -1,5 +1,5 @@
-import { Effect, Brand, Data, pipe } from "effect";
-import { UtilError } from "../error.js";
+import { Effect, Brand, pipe } from "effect";
+import { UtilError } from "./util-error.js";
 
 export type ParsedJson = unknown & Brand.Brand<"ParsedJson">;
 export const ParsedJson = Brand.nominal<ParsedJson>();

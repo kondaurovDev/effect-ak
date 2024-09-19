@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import { createHash, createSign } from "node:crypto";
 
-import { UtilError } from "../error.js";
+import { UtilError } from "./util-error.js";
 
 export const toBase64Url = (
   input: unknown

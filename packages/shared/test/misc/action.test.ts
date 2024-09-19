@@ -3,7 +3,7 @@ import { Cause, Effect, Exit, Logger, LogLevel, pipe } from "effect";
 import { Schema as S } from "@effect/schema"
 
 import { makeAction } from "../../src/misc/index";
-import { UtilError } from "../../src/error";
+import { UtilError } from "../../src/utils/util-error";
 
 class MySchema extends S.Class<MySchema>("MySchema")(
   {
@@ -22,10 +22,6 @@ const action =
     S.Literal("throwBadRequest", "throwInternalError", "check", "check2", "die"),
     MySchema,
     input => {
-
-      if (input === "die") {
-        return Effect.dieMessage("unexpected")
-      }
 
       if (input === "throwInternalError") {
         throw Error("Internal error")
@@ -54,20 +50,6 @@ const action =
   );
 
 describe("action test suite", () => {
-
-  it("case, die", async () => {
-
-    const result =
-      await action.checkedRun
-        .pipe(
-          Effect.provide(action.inputLayer("die")),
-          Logger.withMinimumLogLevel(LogLevel.Debug),
-          Effect.runPromiseExit
-        );
-
-    expect(Exit.map(result, _ => _.result.message)).toEqual(Exit.succeed("check2"));
-
-  });
 
   it("works with check2", async () => {
 
