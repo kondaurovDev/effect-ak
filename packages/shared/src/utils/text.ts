@@ -1,4 +1,4 @@
-import { Effect, pipe } from "effect";
+import { Cause, Effect, pipe } from "effect";
 import { createHash, createSign } from "node:crypto";
 
 import { UtilError } from "./util-error.js";
@@ -28,7 +28,7 @@ export const signText = (
       new UtilError({
         name: "text",
         details: "sign text error",
-        cause
+        cause: Cause.fail(cause)
       })
     )
   )
@@ -47,7 +47,7 @@ export const hashText = (
       new UtilError({
         name: "text",
         details: `hashText error, input '${input}'`,
-        cause
+        cause: Cause.fail(cause)
       })
     )
   )

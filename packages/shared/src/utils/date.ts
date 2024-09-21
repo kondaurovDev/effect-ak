@@ -80,7 +80,7 @@ const getGMTOffsetByTimezone = (
       new UtilError({ 
         name: "date",
         details: `getting gmt by timezone ${timezone}`, 
-        cause: Cause.die(cause)
+        cause: Cause.fail(cause)
       })
     ),
     Effect.andThen(result => result.value)
