@@ -1,14 +1,14 @@
 import { Effect, pipe, Context, Layer, Cause, identity, Logger } from "effect";
 import { Schema as S } from "@effect/schema";
 
-import { ActionError, ActionInvalidIOError, ActionLog } from "./action-error.js";
+import { ActionError, ActionIOError, ActionLog } from "./action-error.js";
 
 export type ActionSuccess<O> = {
   readonly result: O,
   readonly logs: ActionLog[]
 }
 
-export type ActionResult<O, E, R> =
+export type ActionCallbackResult<O, E, R> =
   Effect.Effect<O, E, R> | Promise<O> | O
 
 export type Action<I, O, E, R> = {
@@ -16,16 +16,16 @@ export type Action<I, O, E, R> = {
   inputTag: Context.Tag<I, I>,
   inputSchema: S.Schema<I>,
   outputSchema: S.Schema<O>,
-  run: (_: I) => ActionResult<O, E, R>,
+  run: (_: I) => ActionCallbackResult<O, E, R>,
   inputLayer: (_: I) => Layer.Layer<I>,
-  checkedRun: Effect.Effect<ActionSuccess<O>, ActionError<E> | ActionInvalidIOError, I | R>
+  checkedRun: Effect.Effect<ActionSuccess<O>, ActionError<Cause.Cause<E | Cause.UnknownException>> | ActionIOError, I | R>
 }
 
 export const makeAction = <I, O, E, R>(
   name: string,
   inputSchema: S.Schema<I>,
   outputSchema: S.Schema<O>,
-  run: (_: I) => ActionResult<O, E, R>,
+  run: (_: I) => ActionCallbackResult<O, E, R>,
   getInput: (_: I) => I = identity
 ): Action<I, O, E, R> => {
   const inputTag =
@@ -43,54 +43,82 @@ export const makeAction = <I, O, E, R>(
         pipe(
           S.validate(inputSchema)(getInput(actionInput)),
           Effect.catchTag("ParseError", parseError =>
-            new ActionInvalidIOError({ type: "input", cause: Cause.fail(parseError), logs: actionLogs, actionName: name })
+            new ActionIOError({
+              type: "input", cause: parseError, logs: actionLogs, actionName: name
+            })
           )
         )
       ),
       Effect.bind("actionResult", ({ parsedInput, actionLogs }) =>
-        Effect.async<O, E | Cause.UnknownException, R>((resume) => {
-          try {
-            const result = run(parsedInput)
-            if (Effect.isEffect(result)) {
-              const live = 
-                Logger.add(
-                  Logger.make(({ message, date, logLevel, cause }) => 
-                    actionLogs.push({
-                      message,
-                      cause: cause,
-                      time: date.toISOString(),
-                      level: logLevel.label
-                    })
-                  )
+        Effect.async<O, Cause.Cause<E | Cause.UnknownException>, R>((resume) => {
+
+          // capturing logs
+          console.log = function (...args) {
+            actionLogs.push({
+              message: args[0],
+              time: Date.now(),
+              level: "info",
+              cause: args.find(_ => _ instanceof Error)
+            });
+          };
+
+          const liftedResult: Effect.Effect<O, Cause.Cause<E | Cause.UnknownException>, R> = (function () {
+            try {
+              const callbackResult = run(parsedInput); // Running callback, which can return Effect, Promise, Synchronous value
+              if (Effect.isEffect(callbackResult)) {
+                return pipe(
+                  callbackResult,
+                  Effect.sandbox
                 )
-              return resume(Effect.provide(live)(result))
-            } else if (result instanceof Promise) {
-              console.log = function(...args) {
-                actionLogs.push({
-                  message: args[0],
-                  time: Date.now(),
-                  level: "info",
-                  cause: args.find(_ => _ instanceof Error)
-                });
-              };
-              resume(Effect.tryPromise(() => result))
-            } else {
-              return resume(Effect.succeed(result))
+              } else if (callbackResult instanceof Promise) {
+                const a = pipe(
+                  Effect.tryPromise<O>(() => callbackResult),
+                  Effect.sandbox
+                )
+                return a;
+              } else {
+                return Effect.succeed(callbackResult)
+              }
+            } catch (error) {
+              return Effect.fail(Cause.fail(new Cause.UnknownException({ error })))
             }
-          } catch (e) {
-            resume(Effect.fail(e as E))
-          }
+          }());
+
+          resume(liftedResult)
         }).pipe(
+          Effect.provide(
+            Logger.add(
+              Logger.make(({ message, date, logLevel, cause }) =>
+                actionLogs.push({
+                  message,
+                  cause: cause,
+                  time: date.toISOString(),
+                  level: logLevel.label
+                })
+              )
+            )
+          ),
           Effect.catchAllCause(error =>
-            new ActionError({ cause: error, logs: actionLogs, actionName: name })
-          )
+            new ActionError({
+              cause: error, logs: actionLogs, actionName: name
+            })
+          ),
+          Effect.catchAllDefect(defect =>
+            new ActionError({
+              cause: Cause.die(defect), logs: actionLogs, actionName: name
+            })
+          ),
         ),
       ),
       Effect.tap(({ actionResult, actionLogs }) =>
         pipe(
           S.validate(outputSchema)(actionResult),
           Effect.catchTag("ParseError", parseError =>
-            new ActionInvalidIOError({ type: "output", cause: Cause.fail(parseError), logs: actionLogs, actionName: name })
+            new ActionIOError({
+              type: "output",
+              logs: actionLogs, actionName: name,
+              cause: parseError
+            })
           )
         )
       ),

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { Effect, Logger, LogLevel, pipe } from "effect";
+import { Cause, Effect, Logger, LogLevel, pipe } from "effect";
 import { Schema as S } from "@effect/schema"
 
 import { trySafePromise } from "../../src/misc/index";
@@ -26,7 +26,7 @@ describe("promise test suite", () => {
         Effect.runPromise
       );
 
-    expect(failed.cause.message).toEqual("Some error");
+    expect(Cause.squash(failed.cause)).toEqual({ message: "Some error" });
 
   })
 

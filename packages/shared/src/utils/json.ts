@@ -1,4 +1,4 @@
-import { Effect, Brand, pipe } from "effect";
+import { Effect, Brand, pipe, Cause } from "effect";
 import { UtilError } from "./util-error.js";
 
 export type ParsedJson = unknown & Brand.Brand<"ParsedJson">;
@@ -37,7 +37,7 @@ export const toJsonString = (
     Effect.catchTag("UnknownException", exception =>
       new UtilError({ 
         name: "json",
-        cause: exception, 
+        cause: Cause.die(exception), 
         details: {
           action: "SERIALIZATION_ERROR",
         }

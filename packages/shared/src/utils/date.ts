@@ -1,4 +1,4 @@
-import { Cache, Duration, Effect, pipe } from "effect"
+import { Cache, Cause, Duration, Effect, pipe } from "effect"
 
 import { UtilError } from "./util-error.js"
 
@@ -80,7 +80,7 @@ const getGMTOffsetByTimezone = (
       new UtilError({ 
         name: "date",
         details: `getting gmt by timezone ${timezone}`, 
-        cause 
+        cause: Cause.die(cause)
       })
     ),
     Effect.andThen(result => result.value)

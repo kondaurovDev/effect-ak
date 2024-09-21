@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest"
 import { Cause, Effect, Exit, Logger, LogLevel, pipe } from "effect";
-import { Schema as S } from "@effect/schema"
+import { Schema as S, Schema } from "@effect/schema"
 
-import { makeAction } from "../../src/misc/index";
+import { isActionError, makeAction } from "../../src/misc/index";
 import { UtilError } from "../../src/utils/util-error";
 
 class MySchema extends S.Class<MySchema>("MySchema")(
   {
     message: S.NonEmptyString,
-    date: S.Number,
+    date: S.optional(S.Number),
     a: 
       pipe(
         S.Positive,
@@ -19,21 +19,29 @@ class MySchema extends S.Class<MySchema>("MySchema")(
 const action =
   makeAction(
     "testAction",
-    S.Literal("throwBadRequest", "throwInternalError", "check", "check2", "die"),
+    S.Literal("throwBadRequest", "throwBadRequest2", "throwInternalError", "check", "check2", "die"),
     MySchema,
     input => {
 
       if (input === "throwInternalError") {
-        throw Error("Internal error")
+        throw Error("Internal error :)")
       }
 
       if (input === "throwBadRequest") {
-        return Effect.fail(Error("Bad request"))
+        return Effect.fail(Error("Bad request ;)"))
+      }
+
+      if (input === "throwBadRequest2") {
+        const res = pipe(
+          Schema.decodeUnknown(S.Number)("some"),
+          Effect.andThen(_ => ({ message: "hey" }))
+        )
+        return res;
       }
 
       if (input === "check2") {
         return pipe(
-          Effect.logError({ hey: 1 }, new UtilError({ name: "text", details: "hmm" })),
+          Effect.logError({ hey: 1 }, new UtilError({ name: "text", details: "hmm", cause: Cause.fail(Error("asd")) })),
           Effect.andThen(() => S.decode(MySchema)({ message: input, date: 34 }))
         )
       }
@@ -81,6 +89,21 @@ describe("action test suite", () => {
 
   })
 
+  it("case, throwBadRequest2", async () => {
+
+    const result2 =
+      await action.checkedRun
+        .pipe(
+          Effect.tapError(Effect.logError),
+          Effect.provide(action.inputLayer("throwBadRequest2")),
+          Effect.flip,
+          Effect.runPromise
+        );
+
+    expect(result2._tag).toMatch(/.*ActionError$/)
+
+  })
+
   it("works with throwInternalError", async () => {
 
     const result =
@@ -91,7 +114,10 @@ describe("action test suite", () => {
           Effect.runPromise
         );
 
-    expect((Cause.squash(result.cause) as Error).message).toEqual("Internal error")
+    if (isActionError(result)) {
+      const err = Cause.squash(result.cause);
+      expect(err).toEqual("Internal error")
+    }
 
   })
 

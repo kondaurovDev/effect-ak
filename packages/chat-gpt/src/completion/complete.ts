@@ -1,4 +1,4 @@
-import { pipe, Effect, Either } from "effect";
+import { pipe, Effect } from "effect";
 import { Schema as S } from "@effect/schema";
 import { parseJson } from "@efkit/shared/utils";
 
