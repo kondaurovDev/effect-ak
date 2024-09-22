@@ -1,59 +1,47 @@
-import { Cause, Data, Effect, pipe } from "effect";
-import { Schema as S } from "@effect/schema";
+import { Data, Effect, pipe } from "effect";
 
 import { packageName } from "../common.js";
 
 export class PromiseError<E>
   extends Data.TaggedError(`${packageName}.PromiseError`)<{
     actionName: string,
-    cause: Cause.Cause<E>
+    typedError: E
   }> { }
 
-export class PromiseSchemaError
-  extends Data.TaggedError(`${packageName}.PromiseSchemaError`)<{
+export class PromiseUnknownError
+  extends Data.TaggedError(`${packageName}.PromiseUnknownError`)<{
     actionName: string,
-    cause: Cause.Cause<unknown>
+    error: unknown
   }> { }
 
-export const tryPromise = <O>(
-  actionName: string,
-  action: () => Promise<O>
-): Effect.Effect<O, PromiseError<unknown>> =>
-  pipe(
-    Effect.logDebug(`executing (${actionName})`),
-    Effect.andThen(() => action()),
-    Effect.tap(result =>
-      Effect.logDebug(`promise success (${actionName})`, result),
-    ),
-    Effect.catchTag("UnknownException", (exception) =>
-      pipe(
-        Effect.logDebug(`Promise exception '${actionName}'`, exception.toJSON()),
-        Effect.andThen(() =>
-          new PromiseError({ actionName, cause: Cause.fail(exception) })
-        )
-      )
-    )
-  )
+export class PromiseSuccess<A>
+  extends Data.TaggedError(`${packageName}.PromiseSuccess`)<{
+    actionName: string,
+    success: A
+  }> { }
 
-export const trySafePromise = <O, E>(
+export type Constructor<T> = new (...args: any[]) => T;
+
+export const liftPromiseToEffect = <O, E>(
   actionName: string,
-  action: () => Promise<O>,
-  errorSchema: S.Schema<E>,
-): Effect.Effect<O, PromiseError<E> | PromiseSchemaError> =>
+  action: () => PromiseLike<O>,
+  errorFactory: Constructor<E>
+) =>
   pipe(
-    Effect.logDebug(`executing (${actionName})`),
-    Effect.andThen(() => action()),
-    Effect.tap(result =>
-      Effect.logDebug(`promise success (${actionName})`, result),
-    ),
-    Effect.catchTag("UnknownException", (exception) =>
-      pipe(
-        Effect.logDebug(`Promise exception '${actionName}'`, exception.toJSON()),
-        Effect.andThen(S.validate(errorSchema)(exception.error)),
-        Effect.matchEffect({
-          onSuccess: error => new PromiseError({ actionName, cause: Cause.fail(error) }),
-          onFailure: () => new PromiseSchemaError({ actionName, cause: Cause.fail(exception) })
-        })
-      )
+    Effect.tryPromise({
+      try: action,
+      catch: exception =>
+        exception instanceof errorFactory ?
+          new PromiseError({
+            actionName,
+            typedError: exception
+          }) :
+          new PromiseUnknownError({
+            actionName,
+            error: exception
+          })
+    }),
+    Effect.map(result =>
+      new PromiseSuccess({ actionName, success: result })
     )
   )

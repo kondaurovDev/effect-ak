@@ -1,15 +1,14 @@
 import { describe, it, expect } from "vitest"
 import { Cause, Effect, Exit, Logger, LogLevel, pipe } from "effect";
-import { Schema as S, Schema } from "@effect/schema"
+import { Schema as S } from "@effect/schema"
 
-import { isActionError, makeAction } from "../../src/misc/index";
-import { UtilError } from "../../src/utils/util-error";
+import { ActionError, makeAction } from "../../src/misc/index";
 
 class MySchema extends S.Class<MySchema>("MySchema")(
   {
     message: S.NonEmptyString,
     date: S.optional(S.Number),
-    a: 
+    a:
       pipe(
         S.Positive,
         S.optional
@@ -33,7 +32,8 @@ const action =
 
       if (input === "throwBadRequest2") {
         const res = pipe(
-          Schema.decodeUnknown(S.Number)("some"),
+          // Schema.decodeUnknown(S.Number)("some"),
+          Effect.try(() => { throw Error("Thrown error :/") }),
           Effect.andThen(_ => ({ message: "hey" }))
         )
         return res;
@@ -41,8 +41,9 @@ const action =
 
       if (input === "check2") {
         return pipe(
-          Effect.logError({ hey: 1 }, new UtilError({ name: "text", details: "hmm", cause: Cause.fail(Error("asd")) })),
-          Effect.andThen(() => S.decode(MySchema)({ message: input, date: 34 }))
+          Effect.logError({ hey: 1 }, Cause.fail(Cause.fail(Cause.fail(Cause.fail(Error("cause to log")))))),
+          Effect.andThen(() => S.decode(MySchema)({ message: input, date: 34 })),
+          Effect.andThen(_ => _)
         )
       }
 
@@ -100,6 +101,8 @@ describe("action test suite", () => {
           Effect.runPromise
         );
 
+    const a = Cause.squash((result2 as ActionError<unknown>).cause)
+
     expect(result2._tag).toMatch(/.*ActionError$/)
 
   })
@@ -114,10 +117,8 @@ describe("action test suite", () => {
           Effect.runPromise
         );
 
-    if (isActionError(result)) {
       const err = Cause.squash(result.cause);
       expect(err).toEqual("Internal error")
-    }
 
   })
 

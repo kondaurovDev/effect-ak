@@ -13,24 +13,15 @@ export type ActionLog = {
 export class ActionError<E>
   extends Data.TaggedError(`${packageName}.ActionError`)<{
     actionName: string,
-    cause: Cause.Cause<E | Cause.UnknownException>,
+    cause: Cause.Cause<E>,
+    details?: string,
     logs: ActionLog[]
   }> { }
 
 export class ActionIOError
-  extends Data.TaggedError(`${packageName}.ActionInvalidIOError`)<{
+  extends Data.TaggedError(`${packageName}.ActionIOError`)<{
+    type: "input" | "output",
     actionName: string,
-    type: "input" | "output"
-    cause: ParseResult.ParseError,
+    error: ParseResult.ParseError,
     logs: ActionLog[]
   }> { }
-
-export const isActionError = <E>(
-  error: ActionError<E> | ActionIOError
-): error is ActionError<E> =>
-  !("type" in error)
-
-export const isActionIOError = <E>(
-  error: ActionError<E> | ActionIOError
-): error is ActionError<E> =>
-  ("type" in error)

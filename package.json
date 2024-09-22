@@ -5,7 +5,8 @@
   "scripts": {
     "clean": "node scripts/clean.mjs",
     "test": "vitest run",
-    "compile": "tsc -b tsconfig.src.json"
+    "compile": "tsc -b tsconfig.src.json",
+    "pack-all": "pnpm -r pack-tar"
   },
   "devDependencies": {
     "@types/node": "20.14.8",

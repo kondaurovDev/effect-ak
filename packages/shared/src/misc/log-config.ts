@@ -1,4 +1,4 @@
-import { Config, Effect, Layer, LogLevel, Logger, pipe } from "effect";
+import { Config, Effect, Layer, LogLevel, Logger, pipe, Console } from "effect";
 
 export const LogLevelConfigFromEnv = 
   pipe(
@@ -6,8 +6,9 @@ export const LogLevelConfigFromEnv =
     Effect.catchTag("ConfigError", () => 
       Effect.succeed(LogLevel.Info)
     ),
-    Effect.map(level =>
-      Logger.minimumLogLevel(level)
+    Effect.tap(level =>
+      Console.log("Log level =>", level.label)
     ),
+    Effect.map(Logger.minimumLogLevel),
     Layer.unwrapEffect
   )

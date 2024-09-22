@@ -1,62 +1,50 @@
 import { describe, it, expect, vi } from "vitest"
-import { Cause, Effect, Logger, LogLevel, pipe } from "effect";
-import { Schema as S } from "@effect/schema"
+import { Effect, pipe } from "effect";
 
-import { trySafePromise } from "../../src/misc/index";
+import { Constructor, liftPromiseToEffect, PromiseError } from "../../src/misc/index";
 
 const actionStub = vi.fn()
 
 actionStub.mockResolvedValue
 
-const ErrorShema = 
-  S.Struct({
-    message: S.String
-  });
+function createErrorConstructor(message: string): Constructor<Error> {
+  return class extends Error {
+    constructor() {
+      super(message);
+    }
+  };
+}
 
 describe("promise test suite", () => {
 
   it("fail with error", async () => {
 
-    actionStub.mockRejectedValue(Error("Some error"))
+    const constructor = createErrorConstructor("Some error")
+    actionStub.mockRejectedValue(new constructor);
 
     const failed =
       await pipe(
-        trySafePromise("make fail", actionStub, ErrorShema),
+        liftPromiseToEffect("make fail", actionStub, constructor),
         Effect.flip,
         Effect.runPromise
       );
 
-    expect(Cause.squash(failed.cause)).toEqual({ message: "Some error" });
+    expect((failed as PromiseError<Error>).typedError.message).toEqual("Some error");
 
   })
 
   it("return successful resutl", async () => {
 
+    const constructor = createErrorConstructor("Some error")
     actionStub.mockResolvedValue("Good result")
 
-    const success =
+    const result =
       await pipe(
-        trySafePromise("resolve some", actionStub, ErrorShema),
+        liftPromiseToEffect("resolve some", actionStub, constructor),
         Effect.runPromise
       );
 
-    expect(success).toEqual(`Good result`);
-
-  })
-
-  it("fail with unexpected error", async () => {
-
-    actionStub.mockRejectedValue({ clientError: "some internal error"})
-
-    const success =
-      await pipe(
-        trySafePromise("my action", actionStub, ErrorShema),
-        Logger.withMinimumLogLevel(LogLevel.Debug),
-        Effect.flip,   
-        Effect.runPromise,
-      );
-
-    expect(success._tag).toMatch(/.*PromiseSchemaError$/);
+    expect(result.success).toEqual(`Good result`);
 
   })
 

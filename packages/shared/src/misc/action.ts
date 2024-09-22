@@ -18,7 +18,7 @@ export type Action<I, O, E, R> = {
   outputSchema: S.Schema<O>,
   run: (_: I) => ActionCallbackResult<O, E, R>,
   inputLayer: (_: I) => Layer.Layer<I>,
-  checkedRun: Effect.Effect<ActionSuccess<O>, ActionError<Cause.Cause<E | Cause.UnknownException>> | ActionIOError, I | R>
+  checkedRun: Effect.Effect<ActionSuccess<O>, ActionError<E> | ActionError<unknown> | ActionIOError, I | R>
 }
 
 export const makeAction = <I, O, E, R>(
@@ -44,46 +44,35 @@ export const makeAction = <I, O, E, R>(
           S.validate(inputSchema)(getInput(actionInput)),
           Effect.catchTag("ParseError", parseError =>
             new ActionIOError({
-              type: "input", cause: parseError, logs: actionLogs, actionName: name
+              type: "input",
+              actionName: name,
+              error: parseError,
+              logs: actionLogs
             })
           )
         )
       ),
       Effect.bind("actionResult", ({ parsedInput, actionLogs }) =>
-        Effect.async<O, Cause.Cause<E | Cause.UnknownException>, R>((resume) => {
-
-          // capturing logs
-          console.log = function (...args) {
-            actionLogs.push({
-              message: args[0],
-              time: Date.now(),
-              level: "info",
-              cause: args.find(_ => _ instanceof Error)
-            });
-          };
-
-          const liftedResult: Effect.Effect<O, Cause.Cause<E | Cause.UnknownException>, R> = (function () {
+        Effect.async<O, E | Cause.UnknownException, R>((resume) => {
+          const liftedResult: Effect.Effect<O, E | Cause.UnknownException, R> = (function () {
             try {
               const callbackResult = run(parsedInput); // Running callback, which can return Effect, Promise, Synchronous value
               if (Effect.isEffect(callbackResult)) {
                 return pipe(
-                  callbackResult,
-                  Effect.sandbox
+                  callbackResult
                 )
               } else if (callbackResult instanceof Promise) {
                 const a = pipe(
-                  Effect.tryPromise<O>(() => callbackResult),
-                  Effect.sandbox
+                  Effect.tryPromise<O>(() => callbackResult)
                 )
                 return a;
               } else {
                 return Effect.succeed(callbackResult)
               }
             } catch (error) {
-              return Effect.fail(Cause.fail(new Cause.UnknownException({ error })))
+              return Effect.die(error)
             }
           }());
-
           resume(liftedResult)
         }).pipe(
           Effect.provide(
@@ -91,21 +80,34 @@ export const makeAction = <I, O, E, R>(
               Logger.make(({ message, date, logLevel, cause }) =>
                 actionLogs.push({
                   message,
-                  cause: cause,
+                  cause: Cause.squash(cause),
                   time: date.toISOString(),
                   level: logLevel.label
                 })
               )
             )
           ),
-          Effect.catchAllCause(error =>
-            new ActionError({
-              cause: error, logs: actionLogs, actionName: name
-            })
-          ),
+          Effect.catchAll(error => {
+            if (Cause.isUnknownException(error)) {
+              return new ActionError({
+                actionName: name,
+                cause: Cause.fail(error),
+                details: (error.error as Error).message,
+                logs: actionLogs
+              })
+            } else {
+              return new ActionError({
+                actionName: name,
+                cause: Cause.die(error), 
+                logs: actionLogs
+              })
+            }
+          }),
           Effect.catchAllDefect(defect =>
             new ActionError({
-              cause: Cause.die(defect), logs: actionLogs, actionName: name
+              actionName: name,
+              cause: Cause.die(defect), 
+              logs: actionLogs
             })
           ),
         ),
@@ -115,16 +117,20 @@ export const makeAction = <I, O, E, R>(
           S.validate(outputSchema)(actionResult),
           Effect.catchTag("ParseError", parseError =>
             new ActionIOError({
+              actionName: name,
               type: "output",
-              logs: actionLogs, actionName: name,
-              cause: parseError
+              logs: actionLogs,
+              error: parseError,
             })
           )
         )
       ),
-      Effect.andThen(({ actionResult, actionLogs }) => ({
-        result: actionResult, logs: actionLogs
-      }) as ActionSuccess<O>)
+      Effect.andThen(({ actionResult, actionLogs }) =>
+        ({
+          result: actionResult,
+          logs: actionLogs
+        }) as ActionSuccess<O>
+      )
     )
 
   return ({
