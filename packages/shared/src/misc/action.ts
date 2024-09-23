@@ -1,15 +1,19 @@
-import { Effect, pipe, Context, Layer, Cause, identity, Logger } from "effect";
+import { Effect, pipe, Context, Layer, Cause, identity, Logger, Data } from "effect";
 import { Schema as S } from "@effect/schema";
 
 import { ActionError, ActionIOError, ActionLog } from "./action-error.js";
+import { packageName } from "../common.js";
 
-export type ActionSuccess<O> = {
-  readonly result: O,
-  readonly logs: ActionLog[]
-}
+export class ActionSuccess<O>
+  extends Data.TaggedClass(`${packageName}.ActionSuccess`)<{
+    result: O,
+    logs: ActionLog[]
+  }> { }
 
 export type ActionCallbackResult<O, E, R> =
   Effect.Effect<O, E, R> | Promise<O> | O
+
+// class ActionLiftedError extends 
 
 export type Action<I, O, E, R> = {
   name: string,
@@ -53,63 +57,57 @@ export const makeAction = <I, O, E, R>(
         )
       ),
       Effect.bind("actionResult", ({ parsedInput, actionLogs }) =>
-        Effect.async<O, E | Cause.UnknownException, R>((resume) => {
-          const liftedResult: Effect.Effect<O, E | Cause.UnknownException, R> = (function () {
+        Effect.async<O, Cause.Cause<E> | Cause.Cause<Cause.UnknownException>, R>((resume) => {
+          const liftedResult = (function () {
             try {
               const callbackResult = run(parsedInput); // Running callback, which can return Effect, Promise, Synchronous value
               if (Effect.isEffect(callbackResult)) {
                 return pipe(
-                  callbackResult
+                  callbackResult,
+                  Effect.sandbox
                 )
               } else if (callbackResult instanceof Promise) {
                 const a = pipe(
-                  Effect.tryPromise<O>(() => callbackResult)
+                  Effect.tryPromise<O>(() => callbackResult),
+                  Effect.sandbox
                 )
                 return a;
               } else {
                 return Effect.succeed(callbackResult)
               }
             } catch (error) {
-              return Effect.die(error)
+              const a = Effect.fail(Cause.fail(new Cause.UnknownException(error)))
+              return a;
             }
           }());
           resume(liftedResult)
         }).pipe(
+          Effect.catchAll(error => 
+            new ActionError({
+              actionName: name,
+              cause: error,
+              logs: actionLogs
+            })
+          ),
+          Effect.catchAllDefect(defect =>
+            new ActionError({
+              actionName: name,
+              cause: Cause.die(defect),
+              logs: actionLogs
+            })
+          ),
           Effect.provide(
             Logger.add(
               Logger.make(({ message, date, logLevel, cause }) =>
                 actionLogs.push({
                   message,
-                  cause: Cause.squash(cause),
+                  cause: Cause.pretty(cause, { renderErrorCause: true }),
                   time: date.toISOString(),
                   level: logLevel.label
                 })
               )
             )
-          ),
-          Effect.catchAll(error => {
-            if (Cause.isUnknownException(error)) {
-              return new ActionError({
-                actionName: name,
-                cause: Cause.fail(error),
-                details: (error.error as Error).message,
-                logs: actionLogs
-              })
-            } else {
-              return new ActionError({
-                actionName: name,
-                cause: Cause.die(error), 
-                logs: actionLogs
-              })
-            }
-          }),
-          Effect.catchAllDefect(defect =>
-            new ActionError({
-              actionName: name,
-              cause: Cause.die(defect), 
-              logs: actionLogs
-            })
-          ),
+          )
         ),
       ),
       Effect.tap(({ actionResult, actionLogs }) =>
@@ -126,10 +124,10 @@ export const makeAction = <I, O, E, R>(
         )
       ),
       Effect.andThen(({ actionResult, actionLogs }) =>
-        ({
+        new ActionSuccess({
           result: actionResult,
           logs: actionLogs
-        }) as ActionSuccess<O>
+        })
       )
     )
 

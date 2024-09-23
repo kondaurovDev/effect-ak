@@ -25,7 +25,7 @@ export type Constructor<T> = new (...args: any[]) => T;
 export const liftPromiseToEffect = <O, E>(
   actionName: string,
   action: () => PromiseLike<O>,
-  errorFactory: Constructor<E>
+  errorFactory: Constructor<E> = Error as unknown as Constructor<E>
 ) =>
   pipe(
     Effect.tryPromise({

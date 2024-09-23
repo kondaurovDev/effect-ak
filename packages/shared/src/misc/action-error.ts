@@ -13,8 +13,7 @@ export type ActionLog = {
 export class ActionError<E>
   extends Data.TaggedError(`${packageName}.ActionError`)<{
     actionName: string,
-    cause: Cause.Cause<E>,
-    details?: string,
+    cause: Cause.Cause<E> | Cause.Cause<Cause.UnknownException>,
     logs: ActionLog[]
   }> { }
 

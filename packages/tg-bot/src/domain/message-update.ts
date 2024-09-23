@@ -7,6 +7,7 @@ export class MessageUpdate
   extends S.Class<MessageUpdate>("MessageUpdate")({
     message_id: S.Number, // Unix time
     date: S.Number,
+    media_group_id: S.optional(S.String),
     effect_id: S.optional(S.String),
     text: S.optional(S.String),
     photo: S.optional(S.suspend(() => PhotoArray)),

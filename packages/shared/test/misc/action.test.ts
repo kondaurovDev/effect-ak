@@ -41,7 +41,7 @@ const action =
 
       if (input === "check2") {
         return pipe(
-          Effect.logError({ hey: 1 }, Cause.fail(Cause.fail(Cause.fail(Cause.fail(Error("cause to log")))))),
+          Effect.logInfo({ hey: 1 }, Cause.fail(Cause.fail(Cause.fail(Cause.fail(Error("cause to log")))))),
           Effect.andThen(() => S.decode(MySchema)({ message: input, date: 34 })),
           Effect.andThen(_ => _)
         )
@@ -95,13 +95,16 @@ describe("action test suite", () => {
     const result2 =
       await action.checkedRun
         .pipe(
-          Effect.tapError(Effect.logError),
           Effect.provide(action.inputLayer("throwBadRequest2")),
           Effect.flip,
           Effect.runPromise
         );
 
-    const a = Cause.squash((result2 as ActionError<unknown>).cause)
+    const cause = (result2 as ActionError<unknown>).cause;
+
+    const prettyError = Cause.pretty(cause, { renderErrorCause: true });
+
+    expect(prettyError).contain("Thrown error :/")
 
     expect(result2._tag).toMatch(/.*ActionError$/)
 
