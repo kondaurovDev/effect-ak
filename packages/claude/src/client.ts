@@ -1,4 +1,4 @@
-import { Layer, pipe, Effect, Context, Redacted } from "effect";
+import { Layer, pipe, Effect, Context, Redacted, Stream, Chunk, Option } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
 import { UtilError } from "@efkit/shared/utils";
@@ -42,38 +42,45 @@ export const RestClientLive =
           HttpClient.mapRequest(
             HttpClientRequest.prependUrl(baseUrl)
           ),
-          HttpClient.transformResponse(
-            HttpClientResponse.arrayBuffer
-          ),
+          HttpClient.mapEffect(response =>
+            HttpClientResponse.stream(Effect.succeed(response)).pipe(
+              stream => Stream.runCollect(stream)
+            )
+          )
         ),
       ),
       Effect.let("getBuffer", ({ client }) =>
         (request: HttpClientRequest.HttpClientRequest) =>
-          Effect.suspend(() =>
-            pipe(
-              ClaudeToken,
-              Effect.andThen(token =>
-                client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
-              ),
-              Effect.scoped,
-            )
+          pipe(
+            ClaudeToken,
+            Effect.andThen(token =>
+              client.execute(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
+            ),
+            Effect.andThen(_ =>
+              pipe(
+                Option.getOrElse(() => [])(Chunk.get(0)(_)),
+                data => Buffer.from(data)
+              )
+            ),
+            Effect.scoped,
           )
       ),
       Effect.let("getJson", ({ client }) =>
         (request: HttpClientRequest.HttpClientRequest) =>
-          Effect.suspend(() =>
-            pipe(
-              ClaudeToken,
-              Effect.andThen(token =>
-                client(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
-              ),
-              Effect.andThen(_ =>
-                Buffer.from(_).toString()
-              ),
-              Effect.andThen(parseJson),
-              Effect.scoped,
+          pipe(
+            ClaudeToken,
+            Effect.andThen(token =>
+              client.execute(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
             ),
-          )
+            Effect.andThen(_ =>
+              pipe(
+                Option.getOrElse(() => [])(Chunk.get(0)(_)),
+                data => Buffer.from(data).toString()
+              )
+            ),
+            Effect.andThen(parseJson),
+            Effect.scoped,
+          ),
       ),
       Effect.andThen(({ getBuffer, getJson }) =>
         ClaudeRestClient.of(

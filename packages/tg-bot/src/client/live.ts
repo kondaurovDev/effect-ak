@@ -1,4 +1,4 @@
-import { HttpClient, HttpClientRequest, HttpClientResponse } from "@effect/platform";
+import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Effect, Layer, pipe, Redacted } from "effect";
 import { Schema as S } from "@effect/schema"
 
@@ -20,11 +20,10 @@ export const TgRestClientLive =
         httpClient.pipe(
           HttpClient.tapRequest(request =>
             Effect.logDebug(`request to telegram bot api`, {
-              botAction: request.url.split("/").at(-1),
-              body: request.body.toJSON()
+              botAction: request.url.split("/").at(-1)
             })
           ),
-          HttpClient.mapEffectScoped(
+          HttpClient.mapEffect(
             HttpClientResponse.schemaBodyJson(TgResponse)
           ),
           HttpClient.catchTag("ParseError", parseError =>
@@ -37,29 +36,7 @@ export const TgRestClientLive =
           HttpClient.map(_ => _.result)
         )
       ),
-      Effect.let("sendApiRequest", ({ client }) =>
-        <O, O2>(
-          request: HttpClientRequest.HttpClientRequest,
-          resultSchema: S.Schema<O, O2>
-        ) =>
-          pipe(
-            TgBotToken,
-            Effect.andThen(token =>
-              client(
-                pipe(
-                  request,
-                  HttpClientRequest.prependUrl(`${baseUrl}/bot${Redacted.value(token)}`)
-                )
-              )
-            ),
-            Effect.andThen(_ => validateResponse(resultSchema, _)),
-            Effect.catchTags({
-              RequestError: cause => new TgBotApiClientError({ cause }),
-              ResponseError: cause => new TgBotApiServerError({ cause }),
-            })
-          )
-      ),
-      Effect.let("sendApiPostRequest", ({ client }) =>
+      Effect.let("execute", ({ client }) =>
         <O, O2>(
           methodName: `/${string}`,
           body: Record<string, unknown>,
@@ -68,30 +45,33 @@ export const TgRestClientLive =
           pipe(
             Effect.Do,
             Effect.bind("botToken", () => TgBotToken),
-            Effect.let("body", () =>
-              Object.keys(body).length != 0
-                ? getFormData(methodName, body)
-                : undefined
+            Effect.tap(() =>
+              Effect.logDebug("request body", body)
             ),
-            Effect.let("request", ({ botToken, body }) =>
+            Effect.let("formData", () =>
+              Object.keys(body).length != 0 ? 
+                getFormData(methodName, body) : undefined
+            ),
+            Effect.let("request", ({ botToken, formData }) =>
               HttpClientRequest.post(
                 `${baseUrl}/bot${Redacted.value(botToken)}${methodName}`, {
-                body
+                body: formData
               })
             ),
             Effect.andThen(({ request }) =>
-              client(request),
+              client.execute(request),
             ),
             Effect.andThen(_ => validateResponse(resultSchema, _)),
             Effect.catchTags({
               RequestError: cause => new TgBotApiClientError({ cause }),
               ResponseError: cause => new TgBotApiServerError({ cause }),
-            })
+            }),
+            Effect.scoped
           )
       ),
-      Effect.andThen(({ sendApiPostRequest, sendApiRequest }) =>
+      Effect.andThen(({ execute }) =>
         TgRestClient.of({
-          sendApiPostRequest, sendApiRequest
+          execute
         })
       )
     )

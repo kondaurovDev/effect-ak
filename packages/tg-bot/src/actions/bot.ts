@@ -9,7 +9,7 @@ export const getMe = () =>
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/getMe",
         {},
         User
@@ -29,7 +29,7 @@ export const setBotName = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/sendMyName",
         input,
         S.Boolean
@@ -50,7 +50,7 @@ export const setBotCommands = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/setMyCommands",
         input,
         S.Boolean
@@ -70,7 +70,7 @@ export const getBotCommands = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/getMyCommands",
         input,
         S.Array(BotCommand)
@@ -82,7 +82,7 @@ export const getWebhook = () =>
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/getWebhookInfo",
         {},
         S.Struct({
@@ -119,7 +119,7 @@ export const setWebhook = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/setWebhook",
         input,
         S.Boolean

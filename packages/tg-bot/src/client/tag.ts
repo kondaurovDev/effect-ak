@@ -3,17 +3,12 @@ import { Schema as S } from "@effect/schema"
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js"
 import { TgBotToken } from "../domain/token.js"
-import { HttpClientRequest } from "@effect/platform"
 
 export type MethodResult<A> =
   Effect.Effect<A, TgBotApiClientError | TgBotApiServerError, TgBotToken>
 
 export type TgRestClientService = {
-  sendApiRequest: <O, O2>(
-    request: HttpClientRequest.HttpClientRequest,
-    resultSchema: S.Schema<O, O2>
-  ) => MethodResult<O>
-  sendApiPostRequest: <O, O2>(
+  execute: <O, O2>(
     methodName: `/${string}`,
     body: Record<string, unknown>,
     resultSchema: S.Schema<O, O2>

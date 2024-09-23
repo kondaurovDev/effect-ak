@@ -7,17 +7,17 @@ settings:
 catalogs:
   default:
     '@effect/platform':
-      specifier: ^0.63.0
-      version: 0.63.3
+      specifier: ^0.66.0
+      version: 0.66.0
     '@effect/platform-node':
-      specifier: ^0.58.0
-      version: 0.58.3
+      specifier: ^0.61.0
+      version: 0.61.0
     '@effect/schema':
-      specifier: ^0.72.0
-      version: 0.72.4
+      specifier: ^0.74.0
+      version: 0.74.0
     effect:
-      specifier: ^3.7.0
-      version: 3.8.2
+      specifier: ^3.8.3
+      version: 3.8.3
 
 importers:
 
@@ -43,37 +43,37 @@ importers:
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
+        version: 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.58.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)
+        version: 0.61.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)
       '@effect/schema':
         specifier: 'catalog:'
-        version: 0.72.4(effect@3.8.2)
+        version: 0.74.0(effect@3.8.3)
       '@efkit/shared':
         specifier: workspace:^
         version: link:../shared
       effect:
         specifier: 'catalog:'
-        version: 3.8.2
+        version: 3.8.3
 
   packages/claude:
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
+        version: 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.58.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)
+        version: 0.61.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)
       '@effect/schema':
         specifier: 'catalog:'
-        version: 0.72.4(effect@3.8.2)
+        version: 0.74.0(effect@3.8.3)
       '@efkit/shared':
         specifier: workspace:^
         version: link:../shared
       effect:
         specifier: 'catalog:'
-        version: 3.8.2
+        version: 3.8.3
 
   packages/google:
     dependencies:
@@ -83,68 +83,68 @@ importers:
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
+        version: 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.58.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)
+        version: 0.61.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)
       '@effect/schema':
         specifier: 'catalog:'
-        version: 0.72.4(effect@3.8.2)
+        version: 0.74.0(effect@3.8.3)
       effect:
         specifier: 'catalog:'
-        version: 3.8.2
+        version: 3.8.3
 
   packages/notion:
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
+        version: 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.58.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)
+        version: 0.61.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)
       '@effect/schema':
         specifier: 'catalog:'
-        version: 0.72.4(effect@3.8.2)
+        version: 0.74.0(effect@3.8.3)
       '@efkit/shared':
         specifier: workspace:^
         version: link:../shared
       effect:
         specifier: 'catalog:'
-        version: 3.8.2
+        version: 3.8.3
 
   packages/shared:
     dependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
+        version: 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
       '@effect/schema':
         specifier: 'catalog:'
-        version: 0.72.4(effect@3.8.2)
+        version: 0.74.0(effect@3.8.3)
       effect:
         specifier: 'catalog:'
-        version: 3.8.2
+        version: 3.8.3
     devDependencies:
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.58.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)
+        version: 0.61.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)
 
   packages/tg-bot:
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
+        version: 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.58.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)
+        version: 0.61.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)
       '@effect/schema':
         specifier: 'catalog:'
-        version: 0.72.4(effect@3.8.2)
+        version: 0.74.0(effect@3.8.3)
       '@efkit/shared':
         specifier: workspace:^
         version: link:../shared
       effect:
         specifier: 'catalog:'
-        version: 3.8.2
+        version: 3.8.3
 
 packages:
 
@@ -193,28 +193,28 @@ packages:
     resolution: {integrity: sha512-/l42B1qxpG6RdfYf343Uw1vmDjeNhneUXtzhojE7pDgfpEypmRhI6j1kr17XCVv4Cgl9HdAiQY2x0GwKm7rWCw==}
     engines: {node: '>=6.9.0'}
 
-  '@effect/platform-node-shared@0.13.3':
-    resolution: {integrity: sha512-3d7TtVgJmaL3/6rqemROJqC0iD2x3WYnasKLscMatP7kwz+wjDc8sBqovuYUCbHK3XsfBpLU7mmATGJYvD0fbA==}
+  '@effect/platform-node-shared@0.16.0':
+    resolution: {integrity: sha512-fFbVJ9oMGmltNisoEop+GVpiLcUtKYdO0gURmtAXDrdGliuOE6vPKVeueO0LA9hZhQ/F89tg0vnts6aflfF+bA==}
     peerDependencies:
-      '@effect/platform': ^0.63.3
-      effect: ^3.7.2
+      '@effect/platform': ^0.66.0
+      effect: ^3.8.3
 
-  '@effect/platform-node@0.58.3':
-    resolution: {integrity: sha512-qT6udbuXTjSfLrgtzVxEE4CcWlLfU5n/B7CL8z2wMaI2CBYXOoRfWqoBtfu8XEUxAKeB1mAq4hz0NUKAlHQ2FA==}
+  '@effect/platform-node@0.61.0':
+    resolution: {integrity: sha512-Uw9DBkFmW9oRenduWXC4t0inOlqONGtG1kFqkrdfrnPzk4DacNzet5vuBfcChJ5UOQMl0WMvy8twv897qCWTkQ==}
     peerDependencies:
-      '@effect/platform': ^0.63.3
-      effect: ^3.7.2
+      '@effect/platform': ^0.66.0
+      effect: ^3.8.3
 
-  '@effect/platform@0.63.3':
-    resolution: {integrity: sha512-mFBOSdcdGSyotkB2Y54ksZVNj1wreGgcMooaNtQeSRgiJauvcniUcwm4nNRd1wPjNd2NwIAFi92OezMTZqWUiA==}
+  '@effect/platform@0.66.0':
+    resolution: {integrity: sha512-NldICVd5sEP3/yE4SBJTCxzVybj5xThB6mc6ivXTbhHH0wL1kmrTAanzg+l77idMH+paoklOeJU1IQZnTviyHA==}
     peerDependencies:
-      '@effect/schema': ^0.72.2
-      effect: ^3.7.2
+      '@effect/schema': ^0.74.0
+      effect: ^3.8.3
 
-  '@effect/schema@0.72.4':
-    resolution: {integrity: sha512-DCAOuLmfFf18ci/LeFaweN1uaYbgmbPwSFALHhS/Hj3seB4BPneGzZnNwBnI7kZ8NXFDhei7uuhXLvDjMCwphQ==}
+  '@effect/schema@0.74.0':
+    resolution: {integrity: sha512-o7rBmUH6JSTyyJTIUyXb79I47DjxRBZZ/QAZgEh9loDlPxX2OPw9Fx10cYrthEY8FBIoXFsJ6JwVo3hwRUeMaQ==}
     peerDependencies:
-      effect: ^3.7.3
+      effect: ^3.8.3
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -822,8 +822,8 @@ packages:
   effect@3.3.2:
     resolution: {integrity: sha512-695XQBtp+UUYG50oREG9ujnRoeQU7xhwHDhT6ZAexm3Q+umdml1kjxcPoYRrS65crmaLlhVpjZHePJNzWOODnA==}
 
-  effect@3.8.2:
-    resolution: {integrity: sha512-MuzjpmffWLUfXz0mzYikaHxbU5J4pYNg83/LAMQAwhD6SR9V35JxLQbqjwnhNkzeMV5jl6/ObDY3WqwtKp1OLg==}
+  effect@3.8.3:
+    resolution: {integrity: sha512-ZHTNRik0mJWK+g12/HHwsouOux0OE2v+qRD7zsEJLtZ1RJdrlxvCpSXdJ+KgOqJ4wigIToDSb5e5HG885uKs/w==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -1666,18 +1666,18 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
-  '@effect/platform-node-shared@0.13.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)':
+  '@effect/platform-node-shared@0.16.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)':
     dependencies:
-      '@effect/platform': 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
+      '@effect/platform': 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
       '@parcel/watcher': 2.4.1
-      effect: 3.8.2
+      effect: 3.8.3
       multipasta: 0.2.5
 
-  '@effect/platform-node@0.58.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)':
+  '@effect/platform-node@0.61.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)':
     dependencies:
-      '@effect/platform': 0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)
-      '@effect/platform-node-shared': 0.13.3(@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2))(effect@3.8.2)
-      effect: 3.8.2
+      '@effect/platform': 0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)
+      '@effect/platform-node-shared': 0.16.0(@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3))(effect@3.8.3)
+      effect: 3.8.3
       mime: 3.0.0
       undici: 6.19.8
       ws: 8.18.0
@@ -1685,16 +1685,16 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform@0.63.3(@effect/schema@0.72.4(effect@3.8.2))(effect@3.8.2)':
+  '@effect/platform@0.66.0(@effect/schema@0.74.0(effect@3.8.3))(effect@3.8.3)':
     dependencies:
-      '@effect/schema': 0.72.4(effect@3.8.2)
-      effect: 3.8.2
+      '@effect/schema': 0.74.0(effect@3.8.3)
+      effect: 3.8.3
       find-my-way-ts: 0.1.5
       multipasta: 0.2.5
 
-  '@effect/schema@0.72.4(effect@3.8.2)':
+  '@effect/schema@0.74.0(effect@3.8.3)':
     dependencies:
-      effect: 3.8.2
+      effect: 3.8.3
       fast-check: 3.21.0
 
   '@esbuild/aix-ppc64@0.21.5':
@@ -2220,7 +2220,7 @@ snapshots:
 
   effect@3.3.2: {}
 
-  effect@3.8.2: {}
+  effect@3.8.3: {}
 
   emoji-regex@8.0.0: {}
 

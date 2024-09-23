@@ -26,7 +26,7 @@ export const sendMessage = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/sendMessage",
         input,
         MessageUpdate
@@ -48,7 +48,7 @@ export const editMessageText = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/editMessageText",
         input,
         MessageUpdate
@@ -69,7 +69,7 @@ export const updateMessageReplyMarkup = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/editMessageReplyMarkup",
         input,
         S.Union(

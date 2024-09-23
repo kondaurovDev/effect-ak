@@ -27,7 +27,7 @@ export type ResponseFactory = {
 export function createFakeClient(
   createResponse: ResponseFactory
 ) {
-  return HttpClient.makeDefault((request) =>
+  return HttpClient.makeService((request) =>
     createClientJsonResponse(request, 
       createResponse.request(request)
     )

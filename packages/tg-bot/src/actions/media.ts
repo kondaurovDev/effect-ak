@@ -25,7 +25,7 @@ export const sendVoice = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/sendVoice",
         input,
         MessageUpdate

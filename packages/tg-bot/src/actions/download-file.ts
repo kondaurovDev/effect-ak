@@ -50,7 +50,7 @@ export const downloadFile = (
           pipe(
             HttpClient.HttpClient,
             Effect.andThen(client =>
-              client(
+              client.execute(
                 HttpClientRequest.get(`${baseUrl}/file/bot${Redacted.value(botToken)}/${remoteFilePath}`)
               ).pipe(
                 Effect.mapError(error =>

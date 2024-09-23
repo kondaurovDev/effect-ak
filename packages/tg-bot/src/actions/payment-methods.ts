@@ -11,7 +11,7 @@ export const sendStarsInvoice = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/sendInvoice",
         input,
         MessageUpdate
@@ -26,7 +26,7 @@ export const answerPreCheckoutQuery = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/answerPreCheckoutQuery",
         input,
         S.Boolean

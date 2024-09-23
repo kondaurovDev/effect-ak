@@ -15,7 +15,7 @@ export const getFileInfo = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/getFile",
         input,
         FileInfo

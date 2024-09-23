@@ -1,4 +1,4 @@
-import { Layer, pipe, Effect, Context, Redacted } from "effect";
+import { Layer, pipe, Effect, Context, Redacted, Stream, Option, Chunk } from "effect";
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
 import { UtilError } from "@efkit/shared/utils";
@@ -35,8 +35,10 @@ export class OpenaiRestClient
             HttpClient.mapRequest(
               HttpClientRequest.prependUrl(baseUrl)
             ),
-            HttpClient.transformResponse(
-              HttpClientResponse.arrayBuffer
+            HttpClient.mapEffect(response =>
+              HttpClientResponse.stream(Effect.succeed(response)).pipe(
+                stream => Stream.runCollect(stream)
+              )
             )
           )
         ),
@@ -46,8 +48,14 @@ export class OpenaiRestClient
               pipe(
                 GptToken,
                 Effect.andThen(token =>
-                  restClient(
+                  restClient.execute(
                     HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)(request)
+                  )
+                ),
+                Effect.andThen(_ =>
+                  pipe(
+                    Option.getOrElse(() => [])(Chunk.get(0)(_)),
+                    data => Buffer.from(data)
                   )
                 ),
                 Effect.scoped,
@@ -61,14 +69,18 @@ export class OpenaiRestClient
               pipe(
                 GptToken,
                 Effect.andThen(token =>
-                  restClient(
+                  restClient.execute(
                     HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)(request)
                   )
                 ),
                 Effect.andThen(_ =>
-                  Buffer.from(_).toString()
+                  pipe(
+                    Option.getOrElse(() => [])(Chunk.get(0)(_)),
+                    data => Buffer.from(data).toString()
+                  )
                 ),
-                Effect.andThen(parseJson)
+                Effect.andThen(parseJson),
+                Effect.scoped
               ),
             )
         ),

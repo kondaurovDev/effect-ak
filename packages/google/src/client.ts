@@ -54,7 +54,7 @@ export const GoogleApiRestClientLive =
             )
           ),
           HttpClient.filterStatusOk,
-          HttpClient.mapEffectScoped(
+          HttpClient.mapEffect(
             HttpClientResponse.schemaBodyJson(S.Object)
           ),
           HttpClient.catchAll(error =>
@@ -66,13 +66,14 @@ export const GoogleApiRestClientLive =
         GoogleApiRestClient.of({
           token: (body) =>
             pipe(
-              client(
+              client.execute(
                 HttpClientRequest.post(
                   "https://oauth2.googleapis.com/token", {
                     body
                   }
                 )
-              )
+              ),
+              Effect.scoped
             ),
           execute: (
             baseUrl: BaseUrlDomain,
@@ -81,13 +82,14 @@ export const GoogleApiRestClientLive =
             pipe(
               GoogleUserAccessToken,
               Effect.andThen(token =>
-                client(
+                client.execute(
                   pipe(
                     HttpClientRequest.setHeader("Authorization", `Bearer ${token}`)(request),
                     HttpClientRequest.prependUrl("https://" + baseUrlMap[baseUrl])
                   )
                 )
-              )
+              ),
+              Effect.scoped
             )
         })
       )

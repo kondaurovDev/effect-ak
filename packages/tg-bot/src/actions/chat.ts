@@ -15,7 +15,7 @@ export const getChat = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/getChat",
         input,
         ChatInfo
@@ -36,7 +36,7 @@ export const setChatAction = (
   pipe(
     TgRestClient,
     Effect.andThen(client =>
-      client.sendApiPostRequest(
+      client.execute(
         "/sendChatAction",
         input,
         S.Boolean
