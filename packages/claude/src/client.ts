@@ -1,5 +1,5 @@
-import { Layer, pipe, Effect, Context, Redacted, Stream, Chunk, Option } from "effect";
-import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
+import { Layer, pipe, Effect, Context, Redacted } from "effect";
+import { HttpClient, HttpClientError, HttpClientRequest } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
 import { UtilError } from "@efkit/shared/utils";
 import { ParsedJson, parseJson } from "@efkit/shared/utils";
@@ -42,11 +42,7 @@ export const RestClientLive =
           HttpClient.mapRequest(
             HttpClientRequest.prependUrl(baseUrl)
           ),
-          HttpClient.mapEffect(response =>
-            HttpClientResponse.stream(Effect.succeed(response)).pipe(
-              stream => Stream.runCollect(stream)
-            )
-          )
+          HttpClient.mapEffect(_ => _.arrayBuffer)
         ),
       ),
       Effect.let("getBuffer", ({ client }) =>
@@ -56,12 +52,7 @@ export const RestClientLive =
             Effect.andThen(token =>
               client.execute(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
             ),
-            Effect.andThen(_ =>
-              pipe(
-                Option.getOrElse(() => [])(Chunk.get(0)(_)),
-                data => Buffer.from(data)
-              )
-            ),
+            Effect.andThen(Buffer.from),
             Effect.scoped,
           )
       ),
@@ -72,12 +63,8 @@ export const RestClientLive =
             Effect.andThen(token =>
               client.execute(HttpClientRequest.setHeader("x-api-key", Redacted.value(token))(request))
             ),
-            Effect.andThen(_ =>
-              pipe(
-                Option.getOrElse(() => [])(Chunk.get(0)(_)),
-                data => Buffer.from(data).toString()
-              )
-            ),
+            Effect.andThen(Buffer.from),
+            Effect.andThen(_ => _.toString()),
             Effect.andThen(parseJson),
             Effect.scoped,
           ),

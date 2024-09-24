@@ -8,7 +8,7 @@ export const ChatInfo =
   S.Struct({
     id: ChatId,
     type: S.Literal("private", "group", "supergroup", "channel"),
-    title: S.optional(S.String)
+    title: S.UndefinedOr(S.String)
   }).annotations({
     identifier: "Chat"
   });

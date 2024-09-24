@@ -20,7 +20,7 @@ export const getMe = () =>
 export const SetBotNameInput =
   S.Struct({
     name: S.String,
-    language_code: S.optional(S.String)
+    language_code: S.UndefinedOr(S.String)
   });
 
 export const setBotName = (
@@ -41,7 +41,7 @@ export const SetBotCommandsInput =
   S.Struct({
     commands: S.Array(BotCommand),
     scope: S.suspend(() => CommandScope),
-    language_code: S.optional(S.String)
+    language_code: S.UndefinedOr(S.String)
   });
 
 export const setBotCommands = (
@@ -60,8 +60,8 @@ export const setBotCommands = (
 
 export const GetBotCommandsInput = 
   S.Struct({
-    scope: S.optional(S.suspend(() => CommandScope)),
-    language_code: S.optional(S.NonEmptyString)
+    scope: S.UndefinedOr(S.suspend(() => CommandScope)),
+    language_code: S.UndefinedOr(S.NonEmptyString)
   });
 
 export const getBotCommands = (
@@ -98,7 +98,7 @@ export const getWebhook = () =>
                 encode: dt => dt.epochMillis / 1000
               }
             ).pipe(
-              S.optional
+              S.UndefinedOr
             )
         })
       )
@@ -108,8 +108,8 @@ export const getWebhook = () =>
 export const SetWebhookInput = 
   S.Struct({
     url: S.NonEmptyString.pipe(S.pattern(/^https:\/\/.*/)),
-    allow_updates: S.optional(S.Array(UpdateEventType)),
-    drop_pending_updates: S.optional(S.Boolean),
+    allow_updates: S.UndefinedOr(S.Array(UpdateEventType)),
+    drop_pending_updates: S.UndefinedOr(S.Boolean),
     secret_token: S.NonEmptyString.pipe(S.minLength(3))
   });
 

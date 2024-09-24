@@ -9,9 +9,9 @@ import { MessageUpdate } from "../domain/message-update.js";
 export const SendVoiceInput = 
   S.Struct({
     chat_id: ChatId,
-    parse_mode: S.optional(ParseMode),
+    parse_mode: S.UndefinedOr(ParseMode),
     reply_parameters: ReplyParameters,
-    caption: S.optional(S.String),
+    caption: S.UndefinedOr(S.String),
     voice: 
       S.Union(
         S.Uint8Array,

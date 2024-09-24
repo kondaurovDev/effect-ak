@@ -14,12 +14,12 @@ export type OriginUpdateEvent =
 export const OriginUpdateEvent =
   S.Struct({
     update_id: S.Number,
-    message: S.optional(MessageUpdate),
-    edited_message: S.optional(MessageUpdate),
-    channel_post: S.optional(MessageUpdate),
-    edited_channel_post: S.optional(MessageUpdate),
-    pre_checkout_query: S.optional(PreCheckoutQuery),
-    successful_payment: S.optional(SuccessfulPayment)
+    message: S.UndefinedOr(MessageUpdate),
+    edited_message: S.UndefinedOr(MessageUpdate),
+    channel_post: S.UndefinedOr(MessageUpdate),
+    edited_channel_post: S.UndefinedOr(MessageUpdate),
+    pre_checkout_query: S.UndefinedOr(PreCheckoutQuery),
+    successful_payment: S.UndefinedOr(SuccessfulPayment)
   })
 
 export const UpdateEventType =

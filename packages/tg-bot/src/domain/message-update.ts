@@ -7,7 +7,7 @@ export class MessageUpdate
   extends S.Class<MessageUpdate>("MessageUpdate")({
     message_id: S.Number, // Unix time
     date: S.Number,
-    media_group_id: S.optional(S.String),
+    media_group_id: S.UndefinedOr(S.String),
     effect_id: S.optional(S.String),
     text: S.optional(S.String),
     photo: S.optional(S.suspend(() => PhotoArray)),
@@ -23,7 +23,7 @@ export class MessageUpdate
         first_name: S.optional(S.NonEmptyString),
         type: S.Literal("group", "private", "channel", "supergroup" )
       }),
-    reply_to_message: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
+    reply_to_message: S.UndefinedOr(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
     forward_from: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
     forward_origin: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate))
   }) {}
