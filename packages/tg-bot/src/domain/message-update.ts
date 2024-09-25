@@ -7,39 +7,38 @@ export class MessageUpdate
   extends S.Class<MessageUpdate>("MessageUpdate")({
     message_id: S.Number, // Unix time
     date: S.Number,
-    media_group_id: S.UndefinedOr(S.String),
+    chat: S.suspend(() => Chat),
+    media_group_id: S.optional(S.String),
     effect_id: S.optional(S.String),
     text: S.optional(S.String),
-    photo: S.optional(S.suspend(() => PhotoArray)),
+    photo: S.optional(S.suspend(() => S.Array(MessageFile))),
+    document: S.optional(S.suspend(() => MessageFile)),
     caption: S.optional(S.String),
-    voice: S.optional(S.suspend(() => Voice)),
+    voice: S.optional(S.suspend(() => MessageFile)),
     from: S.optional(S.suspend(() => User)),
     message_thread_id: S.optional(S.Number),
     reply_markup: S.optional(ReplyMarkup),
-    chat:
-      S.Struct({
-        id: S.Number,
-        username: S.optional(S.NonEmptyString),
-        first_name: S.optional(S.NonEmptyString),
-        type: S.Literal("group", "private", "channel", "supergroup" )
-      }),
-    reply_to_message: S.UndefinedOr(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
+    reply_to_message: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
     forward_from: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
     forward_origin: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate))
-  }) {}
+  }) { }
 
-const PhotoArray = 
-  S.Array(
-    S.Struct({
-      file_id: S.String,
-      file_size: S.optional(S.Number)
-    })
-  );
+export type Chat = typeof Chat.Type
+export const Chat =
+  S.Struct({
+    id: S.Number,
+    username: S.optional(S.NonEmptyString),
+    first_name: S.optional(S.NonEmptyString),
+    type: S.Literal("group", "private", "channel", "supergroup")
+  })
 
-const Voice =
+export type MessageFile = typeof MessageFile.Type
+export const MessageFile = 
   S.Struct({
     file_id: S.String,
     file_unique_id: S.String,
-    duration: S.Number,
-    mime_type: S.optional(S.String)
+    file_size: S.optional(S.Number),
+    mime_type: S.optional(S.String),
+    duration: S.optional(S.Number)
   })
+
