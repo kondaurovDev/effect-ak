@@ -37,8 +37,8 @@ export const MessageFile =
   S.Struct({
     file_id: S.String,
     file_unique_id: S.String,
-    file_size: S.UndefinedOr(S.Number),
-    mime_type: S.UndefinedOr(S.String),
-    duration: S.UndefinedOr(S.Number)
+    file_size: S.optional(S.Number),
+    mime_type: S.optional(S.String),
+    duration: S.optional(S.Number)
   })
 
