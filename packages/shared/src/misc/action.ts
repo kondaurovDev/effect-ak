@@ -13,19 +13,17 @@ export class ActionSuccess<O>
 export type ActionCallbackResult<O, E, R> =
   Effect.Effect<O, E, R> | Promise<O> | O
 
-// class ActionLiftedError extends 
-
-export type Action<I, O, E, R> = {
-  name: string,
-  inputTag: Context.Tag<I, I>,
-  inputSchema: S.Schema<I>,
-  outputSchema: S.Schema<O>,
-  run: (_: I) => ActionCallbackResult<O, E, R>,
-  inputLayer: (_: I) => Layer.Layer<I>,
-  checkedRun: Effect.Effect<ActionSuccess<O>, ActionError<E> | ActionError<unknown> | ActionIOError, I | R>
+export interface Action<I = unknown, O = unknown, E = never, R = never> {
+  readonly name: string,
+  readonly inputTag: Context.Tag<I, I>,
+  readonly inputSchema: S.Schema<I>,
+  readonly outputSchema: S.Schema<O>,
+  readonly run: (_: I) => ActionCallbackResult<O, E, R>,
+  readonly inputLayer: (_: I) => Layer.Layer<I>,
+  readonly checkedRun: Effect.Effect<ActionSuccess<O>, ActionError<E> | ActionError<unknown> | ActionIOError, I | R>
 }
 
-export const makeAction = <I, O, E, R>(
+export const makeAction = <I = unknown, O = unknown, E = never, R = never>(
   name: string,
   inputSchema: S.Schema<I>,
   outputSchema: S.Schema<O>,

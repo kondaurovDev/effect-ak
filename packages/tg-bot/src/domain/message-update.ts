@@ -5,30 +5,30 @@ import { User } from "./user.js";
 
 export class MessageUpdate
   extends S.Class<MessageUpdate>("MessageUpdate")({
-    message_id: S.Number, // Unix time
+    message_id: S.Number,
     date: S.Number,
     chat: S.suspend(() => Chat),
-    media_group_id: S.UndefinedOr(S.String),
-    effect_id: S.UndefinedOr(S.String),
-    text: S.UndefinedOr(S.String),
-    photo: S.UndefinedOr(S.suspend(() => S.Array(MessageFile))),
-    document: S.UndefinedOr(S.suspend(() => MessageFile)),
-    caption: S.UndefinedOr(S.String),
-    voice: S.UndefinedOr(S.suspend(() => MessageFile)),
-    from: S.UndefinedOr(S.suspend(() => User)),
-    message_thread_id: S.UndefinedOr(S.Number),
-    reply_markup: S.UndefinedOr(ReplyMarkup),
-    reply_to_message: S.UndefinedOr(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
-    forward_from: S.UndefinedOr(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
-    forward_origin: S.UndefinedOr(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate))
+    reply_to_message: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
+    from: S.optional(S.suspend(() => User)),
+    text: S.optional(S.String),
+    photo: S.optional(S.suspend(() => S.Array(MessageFile))),
+    voice: S.optional(S.suspend(() => MessageFile)),
+    document: S.optional(S.suspend(() => MessageFile)),
+    media_group_id: S.optional(S.String),
+    effect_id: S.optional(S.String),
+    caption: S.optional(S.String),
+    message_thread_id: S.optional(S.Number),
+    reply_markup: S.optional(ReplyMarkup),
+    forward_from: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate)),
+    forward_origin: S.optional(S.suspend((): S.Schema<MessageUpdate> => MessageUpdate))
   }) { }
 
 export type Chat = typeof Chat.Type
 export const Chat =
   S.Struct({
     id: S.Number,
-    username: S.UndefinedOr(S.NonEmptyString),
-    first_name: S.UndefinedOr(S.NonEmptyString),
+    username: S.optional(S.NonEmptyString),
+    first_name: S.optional(S.NonEmptyString),
     type: S.Literal("group", "private", "channel", "supergroup")
   })
 
@@ -41,4 +41,3 @@ export const MessageFile =
     mime_type: S.optional(S.String),
     duration: S.optional(S.Number)
   })
-

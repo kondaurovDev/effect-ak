@@ -1,7 +1,7 @@
 import { Schema as S } from "@effect/schema"
 
-export const ChatId = 
-  S.Union(S.Number, S.String);
+export type ChatId = typeof ChatId.Type;
+export const ChatId = S.Number.pipe(S.brand("ChatId"))
 
 export type ChatInfo = typeof ChatInfo.Type
 export const ChatInfo =

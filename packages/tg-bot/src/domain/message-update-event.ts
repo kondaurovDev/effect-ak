@@ -1,4 +1,4 @@
-import { Match, pipe, Data } from "effect";
+import { Data } from "effect";
 
 import { MessageUpdate } from "./message-update.js";
 import { OriginUpdateEvent } from "./origin-update-event.js";
@@ -32,32 +32,34 @@ export class MessageUpdateEvent
     }
 
     static fromOriginUpdateEvent(input: OriginUpdateEvent) {
-      return (
-        pipe(
-          Match.value(input),
-          Match.when(({ message: Match.defined }), ({ message }) => 
-            MessageUpdateEvent.fromMessageUpdateEvent(
-              message, "group", input.update_id, false, 
-            )
-          ),
-          Match.when(({ edited_message: Match.defined }), ({ edited_message }) => 
-            MessageUpdateEvent.fromMessageUpdateEvent(
-              edited_message, "group", input.update_id, true
-            )
-          ),
-          Match.when(({ channel_post: Match.defined }), ({ channel_post }) =>
-            MessageUpdateEvent.fromMessageUpdateEvent(
-              channel_post, "channel", input.update_id, false
-            )
-          ),
-          Match.when(({ edited_channel_post: Match.defined }), ({ edited_channel_post }) =>
-            MessageUpdateEvent.fromMessageUpdateEvent(
-              edited_channel_post, "channel", input.update_id, true
-            )
-          ),
-          Match.orElse(() => undefined)
-        )      
-      )
+
+      if (input.message) {
+        return (
+          MessageUpdateEvent.fromMessageUpdateEvent(
+            input.message, "group", input.update_id, false, 
+          )
+        )
+      } else if (input.edited_message) {
+        return (
+          MessageUpdateEvent.fromMessageUpdateEvent(
+            input.edited_message, "group", input.update_id, true
+          )
+        )
+      } else if (input.channel_post) {
+        return (
+          MessageUpdateEvent.fromMessageUpdateEvent(
+            input.channel_post, "channel", input.update_id, false
+          )
+        )
+      } else if (input.edited_channel_post) {
+        return (
+          MessageUpdateEvent.fromMessageUpdateEvent(
+            input.edited_channel_post, "channel", input.update_id, true
+          )
+        )
+      } else {
+        return undefined;
+      }
     } 
 
   }
