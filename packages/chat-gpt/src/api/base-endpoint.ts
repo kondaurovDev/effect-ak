@@ -1,10 +1,10 @@
 import { Layer, pipe, Effect, Context, Redacted } from "effect";
-import { HttpClient, HttpClientError, HttpClientRequest } from "@effect/platform";
+import { FetchHttpClient, HttpClient, HttpClientError, HttpClientRequest } from "@effect/platform";
 import { Schema as S, ParseResult } from "@effect/schema";
 import { UtilError } from "@efkit/shared/utils";
 import { ParsedJson, parseJson } from "@efkit/shared/utils";
 
-import { GptToken } from "./token.js";
+import { TokenProvider } from "./token.js";
 
 export type ValidJsonError =
   HttpClientError.HttpClientError | UtilError | ParseResult.ParseError
@@ -12,20 +12,20 @@ export type ValidJsonError =
 export type JsonError =
   HttpClientError.HttpClientError | UtilError
 
-export type OpenaiRestClientService = (
-  request: HttpClientRequest.HttpClientRequest
-) => {
-  buffer: Effect.Effect<ArrayBuffer, HttpClientError.HttpClientError, GptToken>,
-  json: Effect.Effect<ParsedJson, JsonError, GptToken>
-  validJson: <I>(_: S.Schema<I>) => Effect.Effect<I, ValidJsonError, GptToken>
+export type BaseEndpointInterface = {
+  execute(_: HttpClientRequest.HttpClientRequest): {
+    buffer: Effect.Effect<ArrayBuffer, HttpClientError.HttpClientError, TokenProvider>,
+    json: Effect.Effect<ParsedJson, JsonError, TokenProvider>
+    validJson: <I>(_: S.Schema<I>) => Effect.Effect<I, ValidJsonError, TokenProvider>
+  }
 }
 
-export class OpenaiRestClient
-  extends Context.Tag("Gpt.RestClient")<OpenaiRestClient, OpenaiRestClientService>() {};
+export class BaseEndpoint
+  extends Context.Tag("Openai.BaseEndpoint")<BaseEndpoint, BaseEndpointInterface>() {
 
-  export const OpenaiRestClientLive =
+  static live =
     Layer.scoped(
-      OpenaiRestClient,
+      BaseEndpoint, 
       pipe(
         Effect.Do,
         Effect.bind("httpClient", () => HttpClient.HttpClient),
@@ -42,7 +42,7 @@ export class OpenaiRestClient
           (request: HttpClientRequest.HttpClientRequest) => {
             return Effect.suspend(() =>
               pipe(
-                GptToken,
+                TokenProvider,
                 Effect.andThen(token =>
                   restClient.execute(
                     HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)(request)
@@ -58,7 +58,7 @@ export class OpenaiRestClient
           (request: HttpClientRequest.HttpClientRequest) =>
             Effect.suspend(() =>
               pipe(
-                GptToken,
+                TokenProvider,
                 Effect.andThen(token =>
                   restClient.execute(
                     HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)(request)
@@ -71,8 +71,8 @@ export class OpenaiRestClient
             )
         ),
         Effect.andThen(({ getBuffer, getJson }) =>
-          OpenaiRestClient.of(
-            request => ({
+          BaseEndpoint.of({
+            execute: request => ({
               buffer: getBuffer(request),
               json: getJson(request),
               validJson: schema =>
@@ -83,7 +83,12 @@ export class OpenaiRestClient
                   )
                 )
             })
-          )
+          })
         )
       )
+    ).pipe(
+      Layer.provide(FetchHttpClient.layer)
     )
+
+};
+
