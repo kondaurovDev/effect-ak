@@ -5,7 +5,7 @@ import { makeFunctionTool, makeToolChoice } from "./function-tool.js";
 import { GptModelName } from "../schema/model-name.js";
 import { ChatCompletionRequest } from "../schema/request.js";
 import { TextMessageContent } from "../schema/message-content.js";
-import { UserOrSystemMessage } from "../schema/message.js";
+import { SystemMessage, UserMessage } from "../schema/message.js";
 
 export const makeFunctionCallRequest = <F>(
   schemaName: string,
@@ -23,7 +23,7 @@ export const makeFunctionCallRequest = <F>(
         tools: [tool],
         tool_choice: makeToolChoice(tool.function.name),
         messages: [
-          UserOrSystemMessage.make({
+          SystemMessage.make({
             role: "system",
             content: [
               ...(systemMessages ? systemMessages.map(msg =>
@@ -31,7 +31,7 @@ export const makeFunctionCallRequest = <F>(
               ) : [])
             ]
           }),
-          UserOrSystemMessage.make({
+          UserMessage.make({
             role: "user",
             content: userMessage
           })

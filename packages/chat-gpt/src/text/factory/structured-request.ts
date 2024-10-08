@@ -6,7 +6,7 @@ import { TextMessageContent } from "../schema/message-content.js";
 import { makeFunctionTool } from "./function-tool.js";
 import { ChatCompletionRequest } from "../schema/request.js";
 import { MissingInputFieldsError } from "../schema/error.js";
-import { UserOrSystemMessage } from "../schema/message.js";
+import { SystemMessage, UserMessage } from "../schema/message.js";
 import { StructuredResponseFormat } from "../schema/response-format.js";
 
 export const makeStructuredRequest = <F>(
@@ -48,7 +48,7 @@ export const makeStructuredRequest = <F>(
             }
           }),
         messages: [
-          UserOrSystemMessage.make({
+          SystemMessage.make({
             role: "system",
             content: [
               ...(systemMessages ? systemMessages.map(msg =>
@@ -56,7 +56,7 @@ export const makeStructuredRequest = <F>(
               ) : [])
             ]
           }),
-          UserOrSystemMessage.make({ role: "user", content: userMessage })
+          UserMessage.make({ role: "user", content: userMessage })
         ]
       })
     )

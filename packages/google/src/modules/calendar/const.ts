@@ -1,0 +1,1 @@
+export const calendarUrlV3Prefix = "/calendar/v3";

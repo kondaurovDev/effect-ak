@@ -1,4 +1,4 @@
-import { Effect, pipe } from "effect";
+import { Effect, pipe, Redacted } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { hashPassword, isPasswordValid } from "../../src/utils";
@@ -15,7 +15,7 @@ describe("password test suite", () => {
 
     const isValid =
       await pipe(
-        isPasswordValid(hashedPassword, "secret"),
+        isPasswordValid(hashedPassword, Redacted.make("secret")),
         Effect.runPromise
       )
 

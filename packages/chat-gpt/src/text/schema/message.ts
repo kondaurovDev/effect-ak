@@ -10,9 +10,21 @@ export class ToolRoleMessage extends
     tool_call_id: S.String
   }) { }
 
-export class UserOrSystemMessage
-  extends S.Class<UserOrSystemMessage>("UserOrSystemMessage")({
-    role: S.Literal("system", "user"),
+export class CommonUserOrAssistantMessageFields
+  extends S.Class<CommonUserOrAssistantMessageFields>("UserOrSystemMessageFields")({
+
+  }) { }
+
+export class UserMessage
+  extends S.Class<UserMessage>("UserMessage")({
+    role: S.Literal("user"),
+    content: MessageContent,
+    name: S.String.pipe(S.optional)
+  }) { }
+
+export class SystemMessage
+  extends S.Class<SystemMessage>("SystemMessage")({
+    role: S.Literal("system"),
     content: MessageContent,
     name: S.String.pipe(S.optional)
   }) { }
@@ -39,6 +51,7 @@ export class AssistantMessage
 export const OneOfMessage =
   S.Union(
     ToolRoleMessage,
-    UserOrSystemMessage,
-    AssistantMessage
+    UserMessage,
+    AssistantMessage,
+    SystemMessage
   );

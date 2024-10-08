@@ -1,6 +1,6 @@
 import { Schema as S } from "@effect/schema"
 
-import { OneOfMessage, UserOrSystemMessage } from "./message.js";
+import { OneOfMessage, AssistantMessage, UserMessage } from "./message.js";
 import { GptModelName, ReasoningModelName } from "./model-name.js";
 import { OneOfTool, ToolChoice } from "./tool.js";
 import { OneOfResponseFormat } from "./response-format.js";
@@ -20,7 +20,7 @@ export class ChatCompletionRequest
 
 export class ReasoningRequest
   extends S.Class<ReasoningRequest>("ReasoningRequest")({
-    messages: UserOrSystemMessage.pipe(S.Array),
+    messages: S.Union(AssistantMessage, UserMessage).pipe(S.Array),
     model: ReasoningModelName,
     user: S.String.pipe(S.optional),
     max_tokens: S.Number.pipe(S.optional),

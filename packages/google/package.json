@@ -9,6 +9,21 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/modules/index.d.ts",
+      "default": "./dist/modules/index.js"
+    },
+    "./misc": {
+      "types": "./dist/misc/index.d.ts",
+      "default": "./dist/misc/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
+    }
+  },
   "repository": {
     "url": "https://github.com/kondaurovDev/efkit",
     "directory": "packages/google"
@@ -21,12 +36,13 @@
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "devDependencies": {
-    "effect": "catalog:",
-    "@effect/platform-node": "catalog:",
     "@effect/platform": "catalog:",
-    "@effect/schema": "catalog:"
+    "@effect/platform-node": "catalog:",
+    "@effect/schema": "catalog:",
+    "effect": "catalog:"
   },
   "peerDependencies": {
-    "@efkit/shared": "workspace:^"
+    "@efkit/shared": "workspace:^",
+    "@effect/cli": "catalog:"
   }
 }

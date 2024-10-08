@@ -1,6 +1,7 @@
 import { Schema as S } from "@effect/schema";
 import { randomBytes, scrypt, timingSafeEqual } from "crypto"
-import { Effect, pipe } from "effect";
+import { Effect, pipe, Redacted } from "effect";
+import { UtilError } from "./util-error.js";
 
 export type HashedPassword = typeof HashedPassword.Type; 
 export const HashedPassword = 
@@ -9,10 +10,10 @@ export const HashedPassword =
 const hashPasswordWithSalt = (
   password: string, salt: Buffer,
 ) =>
-  Effect.async<Buffer, Error>((resume) =>
+  Effect.async<Buffer, UtilError>((resume) =>
     scrypt(password, salt.toString("hex"), 64, (error, data) => {
       if (error) {
-        resume(Effect.fail(error))
+        resume(new UtilError({ name: "password", "details": "can't salt passwword", cause: error }))
       } else {
         resume(Effect.succeed(data))
       }
@@ -30,7 +31,7 @@ export const hashPassword = (
 
 export const isPasswordValid = (
   storedHashedPassword: HashedPassword,
-  plainPassword: string
+  plainPassword: Redacted.Redacted<string>
 ) => 
   pipe(
     Effect.Do,
@@ -39,13 +40,13 @@ export const isPasswordValid = (
       Buffer.from(parts[0], "base64")
     ),
     Effect.bind("plainPasswordBuffer", ({ parts }) => 
-      hashPasswordWithSalt(plainPassword, Buffer.from(parts[1], "base64"))
+      hashPasswordWithSalt(Redacted.value(plainPassword), Buffer.from(parts[1], "base64"))
     ),
     Effect.andThen(({ hashedPasswordBuffer, plainPasswordBuffer}) => 
       timingSafeEqual(hashedPasswordBuffer, Buffer.from(plainPasswordBuffer, "base64"))
     ),
     Effect.mapError(error =>
-      new Error("Can't validate password", { cause: error })
+      new UtilError({ name: "password", details: "Can't validate password", cause: error })
     )
   )
 
