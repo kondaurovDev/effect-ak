@@ -1,4 +1,3 @@
-export * from "./token.js"
 export * from "./message-update.js"
 export * from "./message.js"
 export * from "./origin-update-event.js"

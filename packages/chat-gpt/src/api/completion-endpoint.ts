@@ -28,8 +28,7 @@ export class CompletionEndpoint extends
                   ),
                   ChatCompletionResponse
                 )
-              ),
-              Effect.scoped
+              )
             )
 
         return {

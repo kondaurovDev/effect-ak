@@ -3,7 +3,7 @@ import { Effect, pipe } from "effect";
 
 import { ChatId } from "../domain/chat.js";
 import { ParseMode, ReplyParameters } from "../domain/message.js";
-import { TgRestClient } from "../client/tag.js";
+import { TgBotHttpClient } from "../api/index.js";
 import { MessageUpdate } from "../domain/message-update.js";
 
 export const SendVoiceInput = 
@@ -23,9 +23,9 @@ export const sendVoice = (
   input: typeof SendVoiceInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/sendVoice",
         input,
         MessageUpdate

@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema"
 
-import { TgRestClient } from "../client/tag.js"
+import { TgBotHttpClient } from "../api/index.js"
 import { MessageUpdate } from "../domain/message-update.js";
 import { ChatId } from "../domain/chat.js";
 import { ReplyMarkup } from "../domain/reply-markup.js";
@@ -24,9 +24,9 @@ export const sendMessage = (
   input: typeof SendMessageInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/sendMessage",
         input,
         MessageUpdate
@@ -46,9 +46,9 @@ export const editMessageText = (
   input: typeof EditMessageTextInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/editMessageText",
         input,
         MessageUpdate
@@ -67,9 +67,9 @@ export const updateMessageReplyMarkup = (
   input: typeof UpdateMessageReplyMarkupInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/editMessageReplyMarkup",
         input,
         S.Union(

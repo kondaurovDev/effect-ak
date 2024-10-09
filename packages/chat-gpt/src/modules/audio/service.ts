@@ -1,6 +1,5 @@
 import { Config, Context, Effect, Layer, pipe } from "effect";
 import { FileSystem, HttpBody, HttpClientRequest } from "@effect/platform";
-import { Schema as S } from "@effect/schema";
 
 import { TokenProvider, BaseEndpoint } from "../../api/index.js";
 import { CreateSpeechRequest, TranscribeRequest } from "./schema/request.js";
@@ -33,13 +32,13 @@ export class AudioService
                   HttpBody.json(request),
                 ),
                 Effect.bind("fileBytes", ({ requestBody }) =>
-                  baseEndpoint.execute(
+                  baseEndpoint.getBuffer(
                     HttpClientRequest.post(
                       `/v1/audio/speech`, {
                         body: requestBody
                       }
                     )
-                  ).buffer
+                  )
                 ),
                 Effect.andThen(({ fileBytes }) =>
                   fs.writeFile(tmpDir + '/' + `text.${request.response_format}`, new Uint8Array(fileBytes))
@@ -60,15 +59,14 @@ export class AudioService
                   }), 
                   Effect.andThen(({ formData }) =>
                     pipe(
-                      baseEndpoint.execute(
+                      baseEndpoint.getTyped(
                         HttpClientRequest.post(
-                          `/v1/audio/transcriptions`, {
+                          `/v1/audio/transcriptions`, 
+                          {
                             body: formData
-                          }
-                        )
-                      ).json,
-                      Effect.andThen(
-                        S.decodeUnknown(OneOfTranscriptionResponse)
+                          },
+                        ),
+                        OneOfTranscriptionResponse
                       ),
                       Effect.andThen(_ => _.text)
                     )
@@ -78,7 +76,7 @@ export class AudioService
         )
       )
     ).pipe(
-      Layer.provide(BaseEndpoint.live)
+      Layer.provide(BaseEndpoint.Default)
     )
 
 }

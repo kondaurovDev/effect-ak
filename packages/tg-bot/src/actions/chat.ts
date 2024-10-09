@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema"
 
-import { TgRestClient } from "../client/tag.js"
+import { TgBotHttpClient } from "../api/index.js"
 import { ChatInfo, ChatAction } from "../domain/chat.js";
 
 export const GetChatInput = 
@@ -13,9 +13,9 @@ export const getChat = (
   input: typeof GetChatInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/getChat",
         input,
         ChatInfo
@@ -34,9 +34,9 @@ export const setChatAction = (
   input: typeof SetChatAction.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/sendChatAction",
         input,
         S.Boolean

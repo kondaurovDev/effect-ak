@@ -1,15 +1,15 @@
 import { DateTime, Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema"
 
-import { TgRestClient } from "../client/tag.js"
+import { TgBotHttpClient } from "../api/index.js"
 import { UpdateEventType, User } from "../domain/index.js";
 import { BotCommand, CommandScope } from "../domain/bot-command.js";
 
 export const getMe = () =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/getMe",
         {},
         User
@@ -27,9 +27,9 @@ export const setBotName = (
   input: typeof SetBotNameInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/sendMyName",
         input,
         S.Boolean
@@ -48,9 +48,9 @@ export const setBotCommands = (
   input: typeof SetBotCommandsInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/setMyCommands",
         input,
         S.Boolean
@@ -68,9 +68,9 @@ export const getBotCommands = (
   input: typeof GetBotCommandsInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/getMyCommands",
         input,
         S.Array(BotCommand)
@@ -80,25 +80,25 @@ export const getBotCommands = (
 
 export const getWebhook = () =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/getWebhookInfo",
         {},
         S.Struct({
           url: S.String,
           pending_update_count: S.Number,
           last_error_date:
-            S.transform(
-              S.Number,
-              S.DateTimeUtcFromSelf,
-              {
-                strict: true,
-                decode: seconds => DateTime.unsafeMake(seconds * 1000),
-                encode: dt => dt.epochMillis / 1000
-              }
-            ).pipe(
-              S.UndefinedOr
+            S.optional(
+              S.transform(
+                S.Number,
+                S.DateTimeUtcFromSelf,
+                {
+                  strict: true,
+                  decode: seconds => DateTime.unsafeMake(seconds * 1000),
+                  encode: dt => dt.epochMillis / 1000
+                }
+              )
             )
         })
       )
@@ -117,9 +117,9 @@ export const setWebhook = (
   input: typeof SetWebhookInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/setWebhook",
         input,
         S.Boolean

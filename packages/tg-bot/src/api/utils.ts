@@ -1,8 +1,5 @@
-import { Effect, Match, pipe } from "effect";
-import { Schema as S } from "@effect/schema";
+import { Match, pipe } from "effect";
 import { HttpBody } from "@effect/platform";
-
-import { TgBotApiServerError } from "./error.js";
 
 export const getFormData = (
   methodName: `/${string}`,
@@ -26,12 +23,3 @@ export const getFormData = (
   }
   return HttpBody.formData(result);
 }
-
-export const validateResponse = <O, O2>(
-  outputSchema: S.Schema<O, O2>,
-  response: unknown
-) =>
-  pipe(
-    S.decodeUnknown(outputSchema)(response),
-    Effect.mapError((parseError) => new TgBotApiServerError({ cause: parseError }))
-  )

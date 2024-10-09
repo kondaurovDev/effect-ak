@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema";
 
-import { TgRestClient } from "../client/tag.js";
+import { TgBotHttpClient } from "../api/index.js";
 import { MessageUpdate, AnswerPreCheckoutQuery, SendStarsInvoice } from "../domain/index.js"
 
 // https://core.telegram.org/bots/api#sendinvoice
@@ -9,9 +9,9 @@ export const sendStarsInvoice = (
   input: typeof SendStarsInvoice.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/sendInvoice",
         input,
         MessageUpdate
@@ -24,9 +24,9 @@ export const answerPreCheckoutQuery = (
   input: typeof AnswerPreCheckoutQuery.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/answerPreCheckoutQuery",
         input,
         S.Boolean

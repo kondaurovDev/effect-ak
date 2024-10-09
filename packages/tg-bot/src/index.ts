@@ -1,2 +1,2 @@
 export * from "./domain/index.js"
-export * from "./client/index.js"
+export * from "./api/index.js"

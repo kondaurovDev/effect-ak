@@ -16,7 +16,8 @@ export class BaseEndpoint
             pipe(
               httpClient.executeAuthorizedRequest(request),
               Effect.andThen(_ => _.arrayBuffer),
-              Effect.andThen(Buffer.from)
+              Effect.andThen(Buffer.from),
+              Effect.scoped
             )
 
         const getJson =
@@ -29,6 +30,7 @@ export class BaseEndpoint
               Effect.andThen(
                 HttpClientResponse.schemaBodyJson(S.Unknown)
               ),
+              Effect.scoped
             )
 
         const getTyped =
@@ -41,7 +43,8 @@ export class BaseEndpoint
               ),
               Effect.andThen(response =>
                 S.decodeUnknown(S.parseJson(schema))(response)
-              )
+              ),
+              Effect.scoped
             )
 
         return {

@@ -35,13 +35,14 @@ export const createImage = (
       })
     ),
     Effect.andThen(({ baseEndpoint, body } ) =>
-      baseEndpoint.execute(
+      baseEndpoint.getTyped(
         HttpClientRequest.post(
           "/v1/images/generations", {
             body
           }
-        )
-      ).validJson(Response)
+        ),
+        Response
+      ),
     ),
     Effect.andThen(_ =>
       Effect.fromNullable(_.data.at(0)?.b64_json)

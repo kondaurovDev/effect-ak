@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect"
 import { Schema as S } from "@effect/schema"
 
-import { TgRestClient } from "../client/tag.js";
+import { TgBotHttpClient } from "../api/index.js";
 import { FileInfo } from "../domain/index.js";
 
 export const GetFileInfoInput = 
@@ -13,9 +13,9 @@ export const getFileInfo = (
   input: typeof GetFileInfoInput.Type
 ) =>
   pipe(
-    TgRestClient,
+    TgBotHttpClient,
     Effect.andThen(client =>
-      client.execute(
+      client.executeMethod(
         "/getFile",
         input,
         FileInfo
