@@ -1,3 +1,4 @@
+import { HttpBody } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 
 export class CreateSpeechRequest 
@@ -22,4 +23,17 @@ export class TranscribeRequest
     response_format: S.Literal("json", "text", "srt", "verbose_json", "vtt"),
     language: S.NonEmptyString.pipe(S.optional),
     prompt: S.NonEmptyString.pipe(S.optional)
-  }) {}
+  }) {
+  
+    getHttpBody() {
+      const formData = new global.FormData();
+      formData.append("model", this.model);
+      formData.append("response_format", this.response_format);
+      if (this.language) {
+        formData.append("language", this.language)
+      }
+      formData.append("file", this.fileContent, this.fileName);
+      return HttpBody.formData(formData);
+    }
+
+  }

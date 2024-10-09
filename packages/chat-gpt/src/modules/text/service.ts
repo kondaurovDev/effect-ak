@@ -48,9 +48,6 @@ export class TextService
             Effect.andThen(response =>
               pipe(
                 S.decode(S.parseJson(S.Struct({ result: S.Unknown })))(response),
-                Effect.tapError(error =>
-                  Effect.logDebug(error)
-                ),
                 Effect.catchTag("ParseError", () =>
                   new CompletionError({ errorCode: "NoJsonResult" })
                 ),

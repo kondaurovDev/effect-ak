@@ -7,12 +7,12 @@ import {
   UserMessage,
   makeFunctionCallRequest, makeStructuredRequest 
 } from "../../src/modules/text";
-import { TokenProvider } from "../../src/api";
+import { GptTokenProvider } from "../../src/api";
 
 const live =
   Layer.mergeAll(
     TextService.Default,
-    TokenProvider.live,
+    GptTokenProvider.fromEnv,
     Logger.pretty
   )
 

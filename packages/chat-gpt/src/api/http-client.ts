@@ -1,7 +1,7 @@
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
 import { Effect, pipe, Redacted } from "effect";
 
-import { TokenProvider } from "./token.js";
+import { GptTokenProvider } from "./token.js";
 
 export class ChatGptHttpClient
   extends Effect.Service<ChatGptHttpClient>()("ChatGptHttpClient", {
@@ -10,13 +10,13 @@ export class ChatGptHttpClient
 
         const baseUrl = "https://api.openai.com";
 
-        const httpClient = yield* HttpClient.HttpClient;
+        const httpClient = (yield* HttpClient.HttpClient).pipe(HttpClient.filterStatusOk);
 
-        const executeAuthorizedRequest = (
+        const executeRequest = (
           request: HttpClientRequest.HttpClientRequest
         ) =>
           pipe(
-            TokenProvider,
+            GptTokenProvider,
             Effect.andThen(token =>
               pipe(
                 request,
@@ -24,18 +24,23 @@ export class ChatGptHttpClient
                 HttpClientRequest.prependUrl(baseUrl)
               )
             ),
-            Effect.andThen(httpClient.execute)
-          )
+            Effect.andThen(httpClient.execute),
+            Effect.tapErrorTag("ResponseError", error =>
+              pipe(
+                error.response.text,
+                Effect.andThen(_ => Effect.logError("http api bad response", _))
+              )
+            )
+          );
 
         return {
-          executeAuthorizedRequest
+          executeRequest
         } as const;
 
       }),
 
     dependencies: [
-      FetchHttpClient.layer,
-      TokenProvider.live
+      FetchHttpClient.layer
     ]
 
   }) { }

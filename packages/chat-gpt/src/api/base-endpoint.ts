@@ -14,7 +14,7 @@ export class BaseEndpoint
         const getBuffer =
           (request: HttpClientRequest.HttpClientRequest) =>
             pipe(
-              httpClient.executeAuthorizedRequest(request),
+              httpClient.executeRequest(request),
               Effect.andThen(_ => _.arrayBuffer),
               Effect.andThen(Buffer.from),
               Effect.scoped
@@ -23,12 +23,12 @@ export class BaseEndpoint
         const getJson =
           (request: HttpClientRequest.HttpClientRequest) =>
             pipe(
-              httpClient.executeAuthorizedRequest(request),
+              httpClient.executeRequest(request),
+              Effect.andThen(response =>
+                HttpClientResponse.schemaBodyJson(S.Unknown)(response)
+              ),
               Effect.tap(response =>
                 Effect.logDebug("chat gpt response", response)
-              ),
-              Effect.andThen(
-                HttpClientResponse.schemaBodyJson(S.Unknown)
               ),
               Effect.scoped
             )
@@ -36,14 +36,14 @@ export class BaseEndpoint
         const getTyped =
           <I, I2>(request: HttpClientRequest.HttpClientRequest, schema: S.Schema<I, I2>) =>
             pipe(
-              httpClient.executeAuthorizedRequest(request),
-              Effect.andThen(_ => _.text),
+              httpClient.executeRequest(request),
+              Effect.andThen(response =>
+                HttpClientResponse.schemaBodyJson(S.Unknown)(response)
+              ),
               Effect.tap(response =>
                 Effect.logDebug("chat gpt response", response)
               ),
-              Effect.andThen(response =>
-                S.decodeUnknown(S.parseJson(schema))(response)
-              ),
+              Effect.andThen(S.decodeUnknown(schema)),
               Effect.scoped
             )
 

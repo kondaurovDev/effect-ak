@@ -1,18 +1,15 @@
 import { Config, Context, Effect, Layer, pipe, Redacted } from "effect";
 
-export class TokenProvider
-  extends Context.Tag("OpenAi.Token")<TokenProvider, Redacted.Redacted<string>>() {
+export class GptTokenProvider
+  extends Context.Tag("GptTokenProvider")<GptTokenProvider, Redacted.Redacted<string>>() {
 
-  static live =
+  static fromEnv =
     Layer.effect(
-      TokenProvider,
+      GptTokenProvider,
       pipe(
-        Config.string("OPENAI_TOKEN"),
-        Effect.andThen(token =>
-          TokenProvider.of(Redacted.make(token))
-        )
+        Config.string("GPT_TOKEN"),
+        Effect.andThen(Redacted.make)
       )
     )
-};
 
-
+} { };
