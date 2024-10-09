@@ -2,8 +2,7 @@ import { Config, Context, Effect, Layer, pipe } from "effect";
 import { FileSystem, HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 
-import { TokenProvider } from "../api/token.js";
-import { BaseEndpoint } from "../api/base-endpoint.js";
+import { TokenProvider, BaseEndpoint } from "../../api/index.js";
 import { CreateSpeechRequest, TranscribeRequest } from "./schema/request.js";
 import { OneOfTranscriptionResponse } from "./schema/response.js";
 

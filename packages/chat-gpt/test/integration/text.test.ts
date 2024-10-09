@@ -1,21 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { pipe, Effect, Layer, Logger, Exit } from "effect";
-import { LogLevelConfigFromEnv } from "@efkit/shared/misc";
+import { pipe, Effect, Layer, Logger, Exit, LogLevel } from "effect";
 import { Schema as S } from "@effect/schema";
 
 import { 
   ChatCompletionRequest, ReasoningRequest, TextService,
-  UserOrSystemMessage,
+  UserMessage,
   makeFunctionCallRequest, makeStructuredRequest 
-} from "../../src/text";
+} from "../../src/modules/text";
 import { TokenProvider } from "../../src/api";
-import { ChatGptLive } from "../../src/live";
 
 const live =
   Layer.mergeAll(
-    ChatGptLive,
-    LogLevelConfigFromEnv,
-    TokenProvider.live
+    TextService.Default,
+    TokenProvider.live,
+    Logger.pretty
   )
 
 const currencySchema =
@@ -55,7 +53,7 @@ describe("chat completion test suite", () => {
           textService.complete(request),
         ),
         Effect.provide(live),
-        Effect.provide(Logger.pretty),
+        Logger.withMinimumLogLevel(LogLevel.Debug),
         Effect.runPromiseExit
       );
 
@@ -140,7 +138,7 @@ describe("chat completion test suite", () => {
       ReasoningRequest.make({
         model: "o1-mini",
         messages: [
-          UserOrSystemMessage.make({
+          UserMessage.make({
             content: "Hello! How are you? Answer short",
             role: "user"
           })
@@ -157,7 +155,7 @@ describe("chat completion test suite", () => {
         Effect.runPromiseExit
       );
 
-    expect(actual).toEqual(Exit.succeed)
+    expect(actual._tag == "Success").toBeTruthy()
 
   })
 

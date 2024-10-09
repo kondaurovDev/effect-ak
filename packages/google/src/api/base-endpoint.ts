@@ -20,18 +20,18 @@ export class BaseEndpoint
         const httpClient = yield* GoogleApiHttpClient;
         const execute = (
           baseUrl: BaseUrlDomain,
-          request: HttpClientRequest.HttpClientRequest
+          originRequest: HttpClientRequest.HttpClientRequest
         ) =>
           pipe(
             GoogleUserAccessTokenProvider,
             Effect.andThen(token =>
-              httpClient.execute(
-                pipe(
-                  HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)(request),
-                  HttpClientRequest.prependUrl("https://" + baseUrlMap[baseUrl])
-                )
+              pipe(
+                originRequest,
+                HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`),
+                HttpClientRequest.prependUrl("https://" + baseUrlMap[baseUrl])
               )
-            )
+            ),
+            Effect.andThen(httpClient.execute)
           )
           
         return {

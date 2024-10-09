@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema"
 
-import { BaseEndpoint } from "../api/base-endpoint.js";
+import { BaseEndpoint } from "../../api/index.js";
 
 const Response = 
   S.Struct({

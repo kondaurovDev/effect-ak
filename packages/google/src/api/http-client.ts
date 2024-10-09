@@ -1,6 +1,6 @@
 import { Effect, Data, ConfigError, pipe } from "effect";
-import { FetchHttpClient, HttpClient, HttpClientError, HttpClientResponse } from "@effect/platform";
-import { Schema as S, ParseResult } from "@effect/schema";
+import { FetchHttpClient, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
+import { Schema as S, ParseResult, Schema } from "@effect/schema";
 
 export class GoogleClientRestError
   extends Data.TaggedError("Google.RestError")<{
@@ -29,16 +29,25 @@ export class GoogleApiHttpClient
               )
             ),
             HttpClient.filterStatusOk,
-            HttpClient.mapEffect(
-              HttpClientResponse.schemaBodyJson(S.Object)
-            ),
-            HttpClient.scoped,
             HttpClient.catchAll(error =>
               new GoogleClientRestError({ cause: error })
             )
           )
 
-        return tunnedClient;
+        const execute = (
+          request: HttpClientRequest.HttpClientRequest,
+        ) =>
+          pipe(
+            tunnedClient.execute(request),
+            Effect.andThen(
+              HttpClientResponse.schemaBodyJson(S.Unknown)
+            ),
+            Effect.scoped
+          )
+
+        return {
+          execute
+        } as const;
       }),
 
       dependencies: [ FetchHttpClient.layer ]
