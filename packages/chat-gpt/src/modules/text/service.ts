@@ -26,7 +26,7 @@ export class TextService
           )
 
         const completeFunctionCall = <O>(
-          request: ChatCompletionRequest, 
+          request: ChatCompletionRequest,
           schema: S.Schema<O>
         ) =>
           pipe(
@@ -37,7 +37,7 @@ export class TextService
           )
 
         const completeStructured = <O>(
-          request: ChatCompletionRequest, 
+          request: ChatCompletionRequest,
           resultSchema: S.Schema<O>
         ) =>
           pipe(
@@ -72,9 +72,8 @@ export class TextService
 
       }),
 
-      dependencies: [
-        CompletionEndpoint.Default
-      ]
+    dependencies: [
+      CompletionEndpoint.Default
+    ]
 
-
-  }) {}
+  }) { }

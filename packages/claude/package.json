@@ -21,6 +21,17 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/completion/index.d.ts",
+      "default": "./dist/completion/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
+    }
+  },
   "devDependencies": {
     "effect": "catalog:",
     "@effect/platform-node": "catalog:",

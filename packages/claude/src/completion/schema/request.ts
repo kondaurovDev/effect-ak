@@ -12,17 +12,18 @@ export const Message =
     content: S.Array(MessageContent)
   })
 
-export class CreateMessageRequest
-  extends S.Class<CreateMessageRequest>("ChatCompletionRequest")({
-    model: S.String,
+export class Metadata 
+  extends S.Class<Metadata>("Metadata")({
+    user_id: S.String
+  }) {}
+
+export type MessageCompletionRequestInput = typeof MessageCompletionRequest.fields
+export class MessageCompletionRequest
+  extends S.Class<MessageCompletionRequest>("MessageCompletionRequest")({
+    model: S.Literal("claude-3-opus-20240229"),
     messages: S.Array(Message),
     max_tokens: S.Number,
-    metadata:
-      S.optional(
-        S.Struct({
-          user_id: S.String
-        })
-      ),
-    system: S.optional(S.String),
-    temperature: S.optional(S.Number)
+    metadata: Metadata.pipe(S.optional),
+    system: S.String.pipe(S.optional),
+    temperature: S.Number.pipe(S.optional)
   }) { };

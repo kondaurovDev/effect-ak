@@ -3,7 +3,7 @@ import { Config, Effect, pipe, Redacted } from "effect";
 import { Schema as S } from "@effect/schema"
 
 import { TgBotApiClientError, TgBotApiDownloadFileError, TgBotApiServerError } from "./error.js";
-import { TgBotTokenProvider } from "../providers/bot-token.js";
+import { TgBotTokenProvider } from "./token.js";
 import { getFormData } from "./utils.js";
 import { FileExtension, RemoteFilePath } from "../domain/file.js";
 import { TgResponse } from "../domain/tg-response.js";

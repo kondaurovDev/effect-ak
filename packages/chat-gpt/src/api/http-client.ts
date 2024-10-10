@@ -10,7 +10,13 @@ export class ChatGptHttpClient
 
         const baseUrl = "https://api.openai.com";
 
-        const httpClient = (yield* HttpClient.HttpClient).pipe(HttpClient.filterStatusOk);
+        const httpClient = 
+          (yield* HttpClient.HttpClient).pipe(
+            HttpClient.filterStatusOk,
+            HttpClient.mapRequest(
+              HttpClientRequest.prependUrl(baseUrl)
+            )
+          );
 
         const executeRequest = (
           request: HttpClientRequest.HttpClientRequest
@@ -20,8 +26,7 @@ export class ChatGptHttpClient
             Effect.andThen(token =>
               pipe(
                 request,
-                HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`),
-                HttpClientRequest.prependUrl(baseUrl)
+                HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`)
               )
             ),
             Effect.andThen(httpClient.execute),
