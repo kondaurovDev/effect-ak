@@ -24,10 +24,10 @@ describe("chat service integration test", () => {
         Logger.withMinimumLogLevel(LogLevel.Debug),
         Effect.provide([ testEnv, TgChatService.Default ]),
         Effect.runPromiseExit
-      )
+      );
 
     expect(actual).toEqual(Exit.succeed);
     
-  })
+  });
 
 })

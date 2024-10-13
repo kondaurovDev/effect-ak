@@ -2,10 +2,10 @@ import { pipe, Effect, Redacted } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema";
 
-import { ClaudeTokenProvider } from "./token.js"
+import { DeepgramTokenProvider } from "./token.js"
 
-export class ClaudeHttpClient extends
-  Effect.Service<ClaudeHttpClient>()("ClaudeHttpClient", {
+export class DeepgramHttpClient extends
+  Effect.Service<DeepgramHttpClient>()("DeepgramHttpClient", {
     effect:
       Effect.gen(function* () {
 
@@ -14,8 +14,7 @@ export class ClaudeHttpClient extends
             HttpClient.mapRequest(request =>
               pipe(
                 request,
-                HttpClientRequest.setHeader("anthropic-version", "2023-06-01"),
-                HttpClientRequest.prependUrl("https://api.anthropic.com/"),
+                HttpClientRequest.prependUrl("https://api.deepgram.com/v1"),
               )
             ),
             HttpClient.filterStatusOk
@@ -25,10 +24,10 @@ export class ClaudeHttpClient extends
           originRequest: HttpClientRequest.HttpClientRequest
         ) =>
           pipe(
-            ClaudeTokenProvider,
+            DeepgramTokenProvider,
             Effect.andThen(token =>
               originRequest.pipe(
-                HttpClientRequest.setHeader("x-api-key", Redacted.value(token))
+                HttpClientRequest.setHeader("Authorization", Redacted.value(token))
               )
             ),
             Effect.andThen(httpClient.execute),
@@ -41,10 +40,10 @@ export class ClaudeHttpClient extends
           originRequest: HttpClientRequest.HttpClientRequest
         ) =>
           pipe(
-            ClaudeTokenProvider,
+            DeepgramTokenProvider,
             Effect.andThen(token =>
               originRequest.pipe(
-                HttpClientRequest.setHeader("x-api-key", Redacted.value(token))
+                HttpClientRequest.setHeader("Authorization", Redacted.value(token))
               )
             ),
             Effect.andThen(httpClient.execute),
