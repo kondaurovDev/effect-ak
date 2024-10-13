@@ -4,7 +4,7 @@ import { Effect, Exit, Logger, LogLevel, pipe } from "effect"
 import { ChatId, MessageEffectIdCodes, TgChatService } from "../../src/module/chat/index";
 import { testEnv } from "./live";
 
-describe("integration test", () => {
+describe("chat service integration test", () => {
 
   it("send message", async () => {
 
@@ -21,8 +21,8 @@ describe("integration test", () => {
               })
           )
         ),
-        Effect.provide([ testEnv, TgChatService.Default ]),
         Logger.withMinimumLogLevel(LogLevel.Debug),
+        Effect.provide([ testEnv, TgChatService.Default ]),
         Effect.runPromiseExit
       )
 

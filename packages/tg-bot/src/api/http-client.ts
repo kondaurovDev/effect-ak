@@ -27,7 +27,7 @@ export class TgBotHttpClient
                 body: request
               })
             ),
-            HttpClient.filterStatusOk
+            HttpClient.filterStatusOk,
           )
 
         const executeMethod = <O, O2>(
@@ -65,7 +65,16 @@ export class TgBotHttpClient
             Effect.andThen(_ => S.decodeUnknown(resultSchema)(_.result)),
             Effect.catchTags({
               RequestError: cause => new TgBotApiClientError({ cause }),
-              ResponseError: cause => new TgBotApiServerError({ cause }),
+              ResponseError: cause => 
+                pipe(
+                  cause.response.json,
+                  Effect.andThen(response =>
+                    Effect.logDebug("bad response", response)
+                  ),
+                  Effect.andThen(() =>
+                    new TgBotApiServerError({ cause })
+                  )
+                ),
             }),
             Effect.scoped
           )

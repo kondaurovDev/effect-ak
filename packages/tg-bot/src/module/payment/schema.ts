@@ -13,13 +13,14 @@ export const InvoicePrice =
 export const SendStarsInvoice = 
   S.Struct({
     chat_id: ChatId,
-    title: S.String,
-    payload: S.String,
+    title: S.NonEmptyString,
+    payload: S.NonEmptyString,
+    description: S.NonEmptyString,
     provider_token: S.Literal(""),
     currency: S.Literal("XTR"),
     prices: S.NonEmptyArray(InvoicePrice),
-    suggested_tip_amounts: S.Array(S.Positive),
-    start_parameter: S.optional(S.String)
+    suggested_tip_amounts: S.NonEmptyArray(S.Positive).pipe(S.optional),
+    start_parameter: S.String.pipe(S.optional)
   });
 
 export const AnswerPreCheckoutQuery = 
