@@ -1,6 +1,6 @@
 import { Schema as S } from "@effect/schema"
 
-import { ChatId } from "./chat.js"
+import { ChatId } from "../../chat/schema.js"
 
 export const BotCommand =
   S.Struct({

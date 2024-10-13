@@ -1,5 +1,4 @@
 export * from "./date.js"
-export * from "./fake-http.js"
 export * from "./file.js"
 export * from "./json.js"
 export * from "./password.js"

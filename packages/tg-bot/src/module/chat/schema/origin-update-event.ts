@@ -1,7 +1,7 @@
 import { Schema as S } from "@effect/schema";
 
 import { MessageUpdate } from "./message-update.js"
-import { PreCheckoutQuery, SuccessfulPayment } from "./payment.js";
+import { PreCheckoutQuery, SuccessfulPayment } from "../../payment/schema.js";
 
 export type UpdateId = typeof UpdateId.Type
 export const UpdateId = S.Number.pipe(S.brand("UpdateId"))

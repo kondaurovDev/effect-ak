@@ -1,7 +1,18 @@
-import { Brand, Context, Redacted } from "effect";
+import { Schema as S } from "@effect/schema";
+import { Config, Context, Effect, pipe, Redacted } from "effect";
 
-export type TgBotToken = Brand.Branded<Redacted.Redacted<string>, "TgBotToken">;
-export const TgBotToken = Brand.nominal<TgBotToken>();
+export type TgBotToken = typeof TgBotToken.Type;
+export const TgBotToken = S.NonEmptyString.pipe(S.Redacted, S.brand("TgBotToken"));
 
 export class TgBotTokenProvider
-  extends Context.Tag("TgBot.TgBotTokenProvider")<TgBotTokenProvider, TgBotToken>() {};
+  extends Context.Tag("TgBot.TgBotTokenProvider")<TgBotTokenProvider, TgBotToken>() {
+
+    static fromEnv = 
+      pipe(
+        Config.nonEmptyString("TG_BOT_TOKEN"),
+        Effect.andThen(Redacted.make),
+        Effect.andThen(TgBotToken.make),
+        Effect.andThen(TgBotTokenProvider.of)
+      );
+
+  };

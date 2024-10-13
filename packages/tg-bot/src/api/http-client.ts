@@ -1,12 +1,11 @@
-import { FetchHttpClient, FileSystem, HttpClient, HttpClientRequest } from "@effect/platform";
-import { Config, Effect, pipe, Redacted } from "effect";
+import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
+import { Effect, pipe, Redacted } from "effect";
 import { Schema as S } from "@effect/schema"
 
-import { TgBotApiClientError, TgBotApiDownloadFileError, TgBotApiServerError } from "./error.js";
+import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
 import { TgBotTokenProvider } from "./token.js";
 import { getFormData } from "./utils.js";
-import { FileExtension, RemoteFilePath } from "../domain/file.js";
-import { TgResponse } from "../domain/tg-response.js";
+import { TgResponse } from "./response.js";
 
 export class TgBotHttpClient
   extends Effect.Service<TgBotHttpClient>()("TgBotHttpClient", {
@@ -14,7 +13,6 @@ export class TgBotHttpClient
       Effect.gen(function* () {
 
         const originHttpClient = yield* HttpClient.HttpClient;
-        const fs = yield* FileSystem.FileSystem;
         const baseUrl = "https://api.telegram.org";
 
         const httpClient =
@@ -72,47 +70,8 @@ export class TgBotHttpClient
             Effect.scoped
           )
 
-        const downloadFile = (
-          remoteFilePath: RemoteFilePath,
-          fileExtension?: FileExtension
-        ) =>
-          pipe(
-            Effect.Do,
-            Effect.bind("botToken", () => TgBotTokenProvider),
-            Effect.bind("tmpDir", () => 
-              pipe(
-                Config.string("TMP_DIR"),
-                Config.withDefault("/tmp")
-              )
-            ),
-            Effect.let("downloadTo", ({ tmpDir }) => 
-              `${tmpDir}/${remoteFilePath.replaceAll("/", "-")}${fileExtension ?? ""}`
-            ),
-            Effect.bind("cachedFileExists", ({ downloadTo }) =>
-              fs.exists(downloadTo)
-            ),
-            Effect.bind("fileBytes", ({ botToken, downloadTo }) =>
-              httpClient.execute(
-                HttpClientRequest.get(`${baseUrl}/file/bot${Redacted.value(botToken)}/${remoteFilePath}`)
-              ).pipe(
-                Effect.andThen(_ => _.arrayBuffer),
-                Effect.andThen(_ => new Uint8Array(_)),
-                Effect.tap(_ => fs.writeFile(downloadTo, _))
-              ),
-            ),
-            Effect.andThen(({ fileBytes }) =>
-              (fileName: string) =>
-                new File([ fileBytes ], fileName)
-            ),
-            Effect.scoped
-          ).pipe(
-            Effect.mapError(errors =>
-              new TgBotApiDownloadFileError({ cause: errors })
-            )
-          )
-
         return {
-          executeMethod, downloadFile
+          executeMethod, originHttpClient, baseUrl
         } as const
 
       }),

@@ -1,7 +1,7 @@
 import { Schema as S } from "@effect/schema";
 
 import { ReplyMarkup } from "./reply-markup.js";
-import { User } from "./user.js";
+import { User } from "../schema.js";
 
 export class MessageUpdate
   extends S.Class<MessageUpdate>("MessageUpdate")({

@@ -33,13 +33,17 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "effect": "catalog:",
-    "@effect/platform-node": "catalog:",
     "@effect/platform": "catalog:",
+    "@effect/platform-node": "catalog:",
     "@effect/schema": "catalog:",
-    "@efkit/shared": "workspace:^"
+    "@efkit/shared": "workspace:^",
+    "@types/ws": "^8.5.12",
+    "effect": "catalog:"
   },
   "peerDependencies": {
     "@efkit/shared": "workspace:^"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
   }
 }

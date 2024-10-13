@@ -1,10 +1,18 @@
-import { Data } from "effect";
+import { Data, pipe } from "effect";
 
 import { MessageUpdate } from "./message-update.js";
 import { OriginUpdateEvent } from "./origin-update-event.js";
-import { getUserName } from "./user.js";
+import { User } from "../schema.js";
 
 type MessageSource = "channel" | "group";
+
+export const getUserName = (
+  from: typeof User.Type | undefined
+) =>
+  pipe(
+    from?.username ?? from?.first_name ?? "anonym",
+    name => name.toLocaleLowerCase()
+  )
 
 export class MessageUpdateEvent 
   extends Data.TaggedClass("UpdateMessageEvent")<{
