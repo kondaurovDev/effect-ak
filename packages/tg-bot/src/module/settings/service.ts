@@ -33,12 +33,10 @@ export class TgBotSettingsService
         const setBotCommands = (
           input: typeof SetBotCommandsCommand.Type
         ) =>
-          Effect.andThen(client =>
-            httpClient.executeMethod(
-              "/setMyCommands",
-              input,
-              S.Boolean
-            )
+          httpClient.executeMethod(
+            "/setMyCommands",
+            input,
+            S.Boolean
           )
         
         
