@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { pipe, Effect, Layer, Logger, Exit, LogLevel } from "effect";
 import { Schema as S } from "@effect/schema";
 
-import { 
+import {
   ChatCompletionRequest, ReasoningRequest, TextService,
   UserMessage,
-  makeFunctionCallRequest, makeStructuredRequest 
+  makeFunctionCallRequest, makeStructuredRequest
 } from "../../src/modules/text";
 import { GptTokenProvider } from "../../src/api";
 
@@ -13,8 +13,8 @@ const live =
   Layer.mergeAll(
     TextService.Default,
     GptTokenProvider.fromEnv,
-    Logger.pretty
-  )
+    Logger.structured
+  );
 
 const currencySchema =
   S.Struct({
@@ -40,7 +40,7 @@ describe("chat completion test suite", () => {
             response_format: { type: "text" },
             model: "gpt-4o-mini",
             messages: [
-              { role: "system", content: "you are limited to use only one word for answer" },
+              { role: "system", content: "you are limited to use only one word for answer, only letters" },
               {
                 role: "user", content: [
                   { type: "text", text: "what's programming language stands for js?" }
@@ -106,9 +106,13 @@ describe("chat completion test suite", () => {
     const actual =
       await pipe(
         makeStructuredRequest(
-          "currencySchema", currencySchema, "gpt-4o-mini", [
-          "a user might mention countries, you need to understand the ISO currency code from it"
-        ], "convert 3 american dollars to morocco"
+          "currencySchema",
+          currencySchema,
+          "gpt-4o-mini",
+          [
+            "a user might mention countries, you need to understand the ISO currency code from it"
+          ], 
+          "convert 3 american dollars to morocco"
         ),
         Effect.andThen(request =>
           pipe(
@@ -134,7 +138,7 @@ describe("chat completion test suite", () => {
 
   it("complete reasoning request", async () => {
 
-    const request = 
+    const request =
       ReasoningRequest.make({
         model: "o1-mini",
         messages: [

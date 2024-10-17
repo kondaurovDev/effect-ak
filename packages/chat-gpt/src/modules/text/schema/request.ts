@@ -34,3 +34,8 @@ export const OneOfRequest =
     ChatCompletionRequest,
     ReasoningRequest
   )
+
+// export class GetStructuredByReasoningModelRequest
+//   extends S.Class<GetStructuredByReasoningModelRequest>("GetStructuredByReasoningModelRequest")({
+//     instructions: S.
+//   }) { };
