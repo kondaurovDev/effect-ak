@@ -1,0 +1,11 @@
+{
+  "clientId": "916217***********",
+  "clientSecret": "GOCS********",
+  "redirectUri": "http://localhost",
+  "scopes": "drive, userinfo.email, userinfo.profile, tasks",
+  "refreshToken": "1//03djtBN********",
+  "lastRefresh": "2024-10-22T15:14:59.205Z",
+  "authResponse": {
+    "access_token": "ya29.a0AcM6*****"
+  }
+}
