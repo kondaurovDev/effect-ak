@@ -2,9 +2,8 @@ import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Effect, pipe, Redacted } from "effect";
 import * as S from "effect/Schema";
 
-import { AuthResponse, GoogleUserRefreshToken } from "./schema.js";
+import { AuthResponse, OAuth2ClientCredentials } from "./schema.js";
 import { GoogleApiHttpClient } from "./http-client.js";
-import { OAuth2ClientCredentialsProvider } from "./providers.js";
 
 export class OAuth2Service
   extends Effect.Service<OAuth2Service>()("Google.OAuthService", {
@@ -12,16 +11,12 @@ export class OAuth2Service
       Effect.gen(function* () {
 
         const httpClient = yield* GoogleApiHttpClient;
-        const credentials = yield* (
-          OAuth2ClientCredentialsProvider.pipe(
-            Effect.andThen(_ => _.credentials)
-          )
-        )
+        const credentials = yield* OAuth2ClientCredentials.fromConfig();
 
         const authUrl =
           pipe(
             new URLSearchParams({
-              client_id: credentials.clientId.toString(),
+              client_id: credentials.clientId,
               redirect_uri: credentials.redirectUri,
               response_type: "code",
               access_type: "offline",
@@ -32,7 +27,7 @@ export class OAuth2Service
           )
 
         const refreshAccessToken = (
-          token: GoogleUserRefreshToken
+          token: Redacted.Redacted<string>
         ) =>
           pipe(
             Effect.Do,

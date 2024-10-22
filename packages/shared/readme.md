@@ -21,4 +21,3 @@ The Effect Toolkit aims to simplify common tasks and provide powerful abstractio
 This package relies solely on:
 - effect
 - @effect/platform
-- @effect/schema

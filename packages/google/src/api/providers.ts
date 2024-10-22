@@ -3,12 +3,7 @@ import * as S from "effect/Schema";
 import type { PlatformError } from "@effect/platform/Error";
 import { FileSystem, Path } from "@effect/platform";
 
-import { GoogleUserAccessToken, OAuth2ClientCredentials } from "./schema.js";
-
-export class GoogleUserAccessTokenProvider
-  extends Context.Tag("Google.UserAccessTokenProvider")<
-    GoogleUserAccessTokenProvider, GoogleUserAccessToken
-  >() { };
+import { OAuth2ClientCredentials } from "./schema.js";
 
 export class OAuth2ClientCredentialsProviderError
   extends Data.TaggedError("OAuth2ClientCredentialsProviderError")<{

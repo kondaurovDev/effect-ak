@@ -1,11 +1,11 @@
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
-import { Effect, pipe, Redacted } from "effect";
+import { Config, Effect, pipe } from "effect";
 import * as S from "effect/Schema";
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
-import { TgBotTokenProvider } from "./token.js";
 import { getFormData } from "./utils.js";
 import { TgResponse } from "./response.js";
+import { tgBotTokenConfigKey } from "./const.js";
 
 export class TgBotHttpClient
   extends Effect.Service<TgBotHttpClient>()("TgBotHttpClient", {
@@ -35,37 +35,36 @@ export class TgBotHttpClient
           body: Record<string, unknown>,
           resultSchema: S.Schema<O, O2>
         ) =>
-          pipe(
-            Effect.Do,
-            Effect.bind("botToken", () => TgBotTokenProvider),
-            Effect.tap(() =>
-              Effect.logDebug("request body", body)
-            ),
-            Effect.let("formData", () =>
-              Object.keys(body).length != 0 ?
-                getFormData(methodName, body) : undefined
-            ),
-            Effect.let("request", ({ botToken, formData }) =>
-              HttpClientRequest.post(
-                `/bot${Redacted.value(botToken)}${methodName}`, {
-                body: formData
-              })
-            ),
-            Effect.andThen(({ request }) =>
-              httpClient.execute(request),
-            ),
-            Effect.tap(response => 
-              pipe(
-                response.json,
-                Effect.andThen(_ => Effect.logDebug("response", _))
-              )
-            ),
-            Effect.andThen(_ => _.json),
-            Effect.andThen(S.validate(TgResponse)),
-            Effect.andThen(_ => S.decodeUnknown(resultSchema)(_.result)),
+          Effect.gen(function* () {
+
+            const botToken =
+              yield* Config.nonEmptyString(tgBotTokenConfigKey);
+
+            yield* Effect.logDebug("request body", body);
+
+            const formData =
+              Object.keys(body).length != 0 ? getFormData(methodName, body) : undefined
+
+            const result =
+              yield* pipe(
+                HttpClientRequest.post(
+                  `/bot${botToken}${methodName}`, {
+                  body: formData
+                }),
+                httpClient.execute,
+                Effect.andThen(_ => _.json),
+                Effect.tap(_ => 
+                  Effect.logDebug("response", _)
+                ),
+                Effect.andThen(S.validate(TgResponse)),
+                Effect.andThen(_ => S.decodeUnknown(resultSchema)(_.result))
+              );
+
+            return result;
+          }).pipe(
             Effect.catchTags({
               RequestError: cause => new TgBotApiClientError({ cause }),
-              ResponseError: cause => 
+              ResponseError: cause =>
                 pipe(
                   cause.response.json,
                   Effect.andThen(response =>

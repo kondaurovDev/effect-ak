@@ -1,8 +1,8 @@
-import { Effect, pipe, Redacted } from "effect";
+import { Config, Effect, pipe } from "effect";
 import { HttpClientRequest } from "@effect/platform";
 
-import { GoogleUserAccessTokenProvider } from "./providers.js"
 import { GoogleApiHttpClient } from "./http-client.js";
+import { googleUserAccessTokenConfigKey } from "./const.js";
 
 export type BaseUrlDomain = keyof typeof baseUrlMap;
 
@@ -23,11 +23,11 @@ export class BaseEndpoint
           originRequest: HttpClientRequest.HttpClientRequest
         ) =>
           pipe(
-            GoogleUserAccessTokenProvider,
+            Config.nonEmptyString(googleUserAccessTokenConfigKey),
             Effect.andThen(token =>
               pipe(
                 originRequest,
-                HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`),
+                HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
                 HttpClientRequest.prependUrl("https://" + baseUrlMap[baseUrl])
               )
             ),

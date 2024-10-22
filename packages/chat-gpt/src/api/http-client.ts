@@ -2,6 +2,7 @@ import { FetchHttpClient, HttpClientRequest } from "@effect/platform";
 import { Effect } from "effect";
 
 import { makeJsonHttpClient } from "@efkit/shared/misc";
+import { chatGptTokenConfigKey } from "./const.js";
 
 export class ChatGptHttpClient
   extends Effect.Service<ChatGptHttpClient>()("ChatGptHttpClient", {
@@ -14,7 +15,7 @@ export class ChatGptHttpClient
             defaultHeaders: {},
             auth: {
               headerName: "Authorization",
-              tokenConfigName: "chatgptToken",
+              tokenConfigName: chatGptTokenConfigKey,
               isBearer: true,
             }
           })
@@ -29,4 +30,4 @@ export class ChatGptHttpClient
       FetchHttpClient.layer
     ]
 
-  }) { }
+  }) {}

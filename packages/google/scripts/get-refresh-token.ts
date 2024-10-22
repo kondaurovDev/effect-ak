@@ -2,7 +2,7 @@ import { ConfigProvider, Console, Effect, Logger, LogLevel, pipe } from "effect"
 import { Terminal } from "@effect/platform";
 
 import { OAuth2Service } from "../src/api";
-import { AccessTokenFromFile } from "../src/misc";
+import { AccessTokenFromFile, configKeys } from "../src/misc";
 import { live } from "./live";
 
 const program =
@@ -18,7 +18,7 @@ const program =
 
     yield* terminal.display("Enter oauth2 code: ");
 
-    const code = yield* terminal.readLine
+    const code = yield* terminal.readLine;
 
     const response = yield* oauth2Service.exchangeCode(code);
 
@@ -26,16 +26,16 @@ const program =
 
   });
 
-const actual =
-  await pipe(
-    program,
-    Logger.withMinimumLogLevel(LogLevel.Debug),
-    Effect.provide(live),
-    Effect.withConfigProvider(
-      ConfigProvider.fromJson({
-        tokenDir: __dirname + "/../artifacts"
-      })
-    ),
-    Effect.runPromise
-  )
+await pipe(
+  program,
+  Logger.withMinimumLogLevel(LogLevel.Debug),
+  Effect.provide(live),
+  Effect.withConfigProvider(
+    ConfigProvider.fromMap(
+      new Map([
+        [ configKeys.configPath, __dirname + "/../integration-config.json" ]
+      ]))
+  ),
+  Effect.runPromise
+)
 

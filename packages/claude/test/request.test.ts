@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Schema as S, } from "@effect/schema"
+import * as S from "effect/Schema"
 import { Effect, Exit, Logger, pipe } from "effect";
 
 import { Message, MessageContent } from "../src/completion"
