@@ -7,12 +7,10 @@ import {
   UserMessage,
   makeFunctionCallRequest, makeStructuredRequest
 } from "../../src/modules/text";
-import { GptTokenProvider } from "../../src/api";
 
 const live =
   Layer.mergeAll(
     TextService.Default,
-    GptTokenProvider.fromEnv,
     Logger.structured
   );
 
@@ -25,7 +23,6 @@ const currencySchema =
     title: "convertCurrency",
     description: "convert currency from one to another"
   })
-
 
 describe("chat completion test suite", () => {
 
@@ -161,6 +158,6 @@ describe("chat completion test suite", () => {
 
     expect(actual._tag == "Success").toBeTruthy()
 
-  })
+  });
 
 })

@@ -20,17 +20,29 @@ export class ResponseChoice
     message: 
       S.Struct({
         role: S.Literal("system", "user", "assistant"),
-        content: S.NullOr(S.String),
-        tool_calls: S.optional(S.Array(
+        content: S.String.pipe(S.NullOr),
+        tool_calls:
           S.Struct({
             type: S.Literal("function"),
             function: S.Struct({
               arguments: S.String
             })
-          })
-        ))
+          }).pipe(
+            S.Array,
+            S.optional
+          )
       })
   }) {
+
+  get text() {
+    return pipe(
+      Effect.succeed(this.message.content),
+      Effect.filterOrFail(
+        _ => _ != null,
+        () => new CompletionError({ errorCode: "NoContent" })
+      )
+    )
+  }
 
   get functionArgumets() {
     return pipe(

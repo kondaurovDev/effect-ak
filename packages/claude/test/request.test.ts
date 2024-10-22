@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Schema as S, } from "@effect/schema"
-import { Effect, Logger, pipe } from "effect";
+import { Effect, Exit, Logger, pipe } from "effect";
 
 import { Message, MessageContent } from "../src/completion"
 
@@ -10,7 +10,7 @@ describe("request", () => {
 
     const actual = 
       pipe(
-        S.validate(MessageContent)({
+        S.decode(MessageContent)({
           type: "image",
           source: {
             type: "base64",
@@ -24,10 +24,10 @@ describe("request", () => {
         Effect.provide(
           Logger.json,
         ),
-        Effect.runSync
+        Effect.runSyncExit
       )
 
-    expect(actual).toBeUndefined()
+    expect(actual).toEqual(Exit.succeed)
 
   })
 

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
+import { HttpClientRequest } from "@effect/platform";
 
 import { DeepgramHttpClient } from "../../api/http-client.js";
-import { HttpClientRequest } from "@effect/platform";
 
 export class SpeachToTextService
   extends Effect.Service<SpeachToTextService>()("SpeachToTextService", {

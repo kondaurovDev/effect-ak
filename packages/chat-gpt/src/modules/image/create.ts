@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Schema as S } from "@effect/schema"
 
-import { BaseEndpoint } from "../../api/index.js";
+import { ChatGptHttpClient } from "../../api/index.js";
 
 const Response = 
   S.Struct({
@@ -23,7 +23,7 @@ export const createImage = (
     Effect.tap(() =>
       Effect.fail("expensive")
     ),
-    Effect.bind("baseEndpoint", () => BaseEndpoint),
+    Effect.bind("httpClient", () => ChatGptHttpClient),
     Effect.bind("body", () =>
       HttpBody.json({
         model,
@@ -34,8 +34,8 @@ export const createImage = (
         size: "1024x1024"
       })
     ),
-    Effect.andThen(({ baseEndpoint, body } ) =>
-      baseEndpoint.getTyped(
+    Effect.andThen(({ httpClient, body } ) =>
+      httpClient.getTyped(
         HttpClientRequest.post(
           "/v1/images/generations", {
             body

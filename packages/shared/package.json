@@ -24,18 +24,27 @@
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "default": "./dist/utils/index.js"
+    },
+    "./data-format": {
+      "types": "./dist/data-format/index.d.ts",
+      "default": "./dist/data-format/index.js"
+    },
+    "./service": {
+      "types": "./dist/service/index.d.ts",
+      "default": "./dist/service/index.js"
     }
   },
   "devDependencies": {
-    "@effect/platform-node": "catalog:"
+    "@effect/platform-node": "catalog:",
+    "openai": "^4.68.1"
   },
   "scripts": {
     "build": "tsc -b tsconfig.src.json",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "peerDependencies": {
-    "effect": "catalog:",
     "@effect/platform": "catalog:",
-    "@effect/schema": "catalog:"
+    "@effect/schema": "catalog:",
+    "effect": "catalog:"
   }
 }

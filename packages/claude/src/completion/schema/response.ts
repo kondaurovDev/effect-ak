@@ -25,7 +25,7 @@ export class MessageToolResponse
   }) { }
 
 export class MessageTextResponse
-  extends S.Class<MessageToolResponse>("MessageToolResponse")({
+  extends S.Class<MessageTextResponse>("MessageTextResponse")({
     type: S.Literal("text"),
     text: S.String
   }) { }

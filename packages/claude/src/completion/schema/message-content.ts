@@ -1,8 +1,5 @@
 import { Schema as S } from "@effect/schema"
 
-export type MessageContent =
-  typeof MessageContent.Type
-
 export class ImageMessageContent
   extends S.Class<ImageMessageContent>("ImageMessageContent")({
     type: S.Literal("image"),
@@ -14,26 +11,29 @@ export class ImageMessageContent
       })
   }) {
 
-    static makeFromBytes(
-      bytes: Uint8Array
-    ) {
-      return ImageMessageContent.make({
-        type: "image",
-        source: {
-          type: "base64",
-          media_type: "image/jpeg",
-          data: Buffer.from(bytes).toString("base64")
-        }
-      })
-    } 
-
+  static makeFromBytes(
+    bytes: Uint8Array
+  ) {
+    return ImageMessageContent.make({
+      type: "image",
+      source: {
+        type: "base64",
+        media_type: "image/jpeg",
+        data: Buffer.from(bytes).toString("base64")
+      }
+    })
   }
 
-export const TextMessageContent =
-  S.Struct({
+}
+
+export class TextMessageContent
+  extends S.Class<TextMessageContent>("TextMessageContent")({
     type: S.Literal("text"),
     text: S.String
-  })
+  }) { }
+
+export type MessageContent =
+  typeof MessageContent.Type
 
 export const MessageContent =
   S.Union(

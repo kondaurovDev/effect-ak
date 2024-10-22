@@ -17,12 +17,11 @@ export class Metadata
     user_id: S.String
   }) {}
 
-export type MessageCompletionRequestInput = typeof MessageCompletionRequest.fields
 export class MessageCompletionRequest
   extends S.Class<MessageCompletionRequest>("MessageCompletionRequest")({
-    model: S.Literal("claude-3-opus-20240229"),
+    model: S.Literal("claude-3-5-sonnet-20240620"),
     messages: S.Array(Message),
-    max_tokens: S.Number,
+    max_tokens: S.Number.pipe(S.optional),
     metadata: Metadata.pipe(S.optional),
     system: S.String.pipe(S.optional),
     temperature: S.Number.pipe(S.optional)

@@ -1,8 +1,9 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
+import { ChatCompletionService } from "@efkit/shared/service";
 
 import { ClaudeHttpClient } from "../api/http-client.js";
-import { MessageCompletionRequestInput, MessageResponse } from "./schema/index.js";
+import { MessageCompletionRequest, MessageResponse, TextMessageContent } from "./schema/index.js";
 
 export class TextCompletionService
   extends Effect.Service<TextCompletionService>()("TextCompletionService", {
@@ -12,7 +13,7 @@ export class TextCompletionService
         const httpClient = yield* ClaudeHttpClient;
 
         const completeChat = (
-          request: MessageCompletionRequestInput
+          request: MessageCompletionRequest
         ) =>
           pipe(
             Effect.logDebug("complete request", request),
@@ -32,8 +33,40 @@ export class TextCompletionService
             )
           )
 
+        const completeChatImpl =
+          ChatCompletionService.of({
+            complete: (input) =>
+              pipe(
+                Effect.succeed(
+                  MessageCompletionRequest.make({
+                    model: "claude-3-5-sonnet-20240620",
+                    system: input.systemMessage,
+                    messages: [
+                      {
+                        role: "user",
+                        content: [
+                          TextMessageContent.make({
+                            type: "text",
+                            text: input.userMessage
+                          })
+                        ]
+                      }
+                    ]
+                  })
+                ),
+                Effect.andThen(completeChat),
+                Effect.andThen(_ => _.content[0]),
+                Effect.filterOrFail(
+                  _ => _.type == "text",
+                  _ => `Expected text response but got '${_.type}'`
+                ),
+                Effect.andThen(_ => _.text),
+                Effect.runPromise
+              )
+          })
+
         return {
-          completeChat
+          completeChat, ...completeChatImpl
         } as const;
 
       })

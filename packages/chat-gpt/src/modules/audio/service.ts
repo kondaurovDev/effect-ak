@@ -1,7 +1,7 @@
 import { Config, Effect, pipe } from "effect";
 import { FileSystem, HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { BaseEndpoint } from "../../api/index.js";
+import { ChatGptHttpClient } from "../../api/index.js";
 import { CreateSpeechRequest, TranscribeRequest } from "./schema/request.js";
 import { OneOfTranscriptionResponse } from "./schema/response.js";
 
@@ -10,7 +10,7 @@ export class AudioService
     effect:
       Effect.gen(function* () {
 
-        const baseEndpoint = yield* BaseEndpoint;
+        const httpClient = yield* ChatGptHttpClient;
         const fs = yield* FileSystem.FileSystem;
         const tmpDir =
           yield* pipe(
@@ -24,7 +24,7 @@ export class AudioService
           pipe(
             HttpBody.json(request),
             Effect.andThen(requestBody =>
-              baseEndpoint.getBuffer(
+              httpClient.getBuffer(
                 HttpClientRequest.post(
                   `/v1/audio/speech`,
                   {
@@ -42,7 +42,7 @@ export class AudioService
           request: TranscribeRequest
         ) =>
           pipe(
-            baseEndpoint.getTyped(
+            httpClient.getTyped(
               HttpClientRequest.post(
                 `/v1/audio/transcriptions`,
                 {
@@ -61,7 +61,7 @@ export class AudioService
       }),
 
     dependencies: [
-      BaseEndpoint.Default
+      ChatGptHttpClient.Default
     ]
 
   }) { }

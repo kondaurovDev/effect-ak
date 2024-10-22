@@ -1,3 +1,2 @@
-export * from "./base-endpoint.js"
-export * from "./completion-endpoint.js"
-export * from "./token.js"
+export * from "./http-client.js"
+export * from "./chat-completions.js"
