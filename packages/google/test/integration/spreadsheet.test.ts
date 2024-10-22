@@ -1,36 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { ConfigProvider, Console, Effect, Exit, Layer, Logger, LogLevel, pipe } from "effect";
 
-import * as Misc from "../../src/misc"
 import * as Modules from "../../src/modules"
 import * as Api from "../../src/api";
-
-import { live as scriptLive } from "../../scripts/live"
-
-const accessTokenProvider =
-  Layer.effect(
-    Api.GoogleUserAccessTokenProvider,
-    pipe(
-      Misc.AccessTokenFromFile,
-      Effect.andThen(_ => _.accessToken),
-      Effect.withConfigProvider(
-        ConfigProvider.fromJson({
-          tokenDir: `${__dirname}/../../artifacts/`
-        })
-      )
-    )
-  ).pipe(
-    Layer.provide([
-      scriptLive
-    ])
-  )
+import integrationConfig from "../../integration-config.json"
 
 const live =
   Layer.mergeAll(
-    accessTokenProvider,
     Modules.Spreadsheet.SheetValueService.Default,
     Logger.pretty
   ).pipe(
+    Layer.provide(
+      Layer.setConfigProvider(
+        ConfigProvider.fromJson({
+          [Api.googleUserAccessTokenConfigKey]: integrationConfig.authResponse.access_token
+        })
+      )
+    ),  
     Layer.tapError(error =>
       Console.error(error)
     )

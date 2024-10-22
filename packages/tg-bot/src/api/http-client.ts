@@ -1,11 +1,11 @@
-import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
-import { Config, Effect, pipe } from "effect";
+import { FetchHttpClient, HttpBody, HttpClient, HttpClientRequest } from "@effect/platform";
+import { Config, Effect, Match, pipe } from "effect";
 import * as S from "effect/Schema";
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
-import { getFormData } from "./utils.js";
 import { TgResponse } from "./response.js";
 import { tgBotTokenConfigKey } from "./const.js";
+import { MessageFile } from "../module/chat/index.js";
 
 export class TgBotHttpClient
   extends Effect.Service<TgBotHttpClient>()("TgBotHttpClient", {
@@ -28,7 +28,25 @@ export class TgBotHttpClient
               })
             ),
             HttpClient.filterStatusOk,
-          )
+          );
+
+        const transformToFormData = (
+          body: Record<string, unknown>
+        ) => {
+          const result = new FormData();
+          for (const [key, value] of Object.entries(body)) {
+            if (typeof value == "object") {
+              if (S.is(MessageFile)(value)) {
+                result.append(key, new Blob([ value.content ]), value.fileName);
+                continue;
+              }
+              result.append(key, JSON.stringify(value));
+            } else {
+              result.append(key, value)
+            }
+          }
+          return HttpBody.formData(result);
+        }
 
         const executeMethod = <O, O2>(
           methodName: `/${string}`,
@@ -43,7 +61,7 @@ export class TgBotHttpClient
             yield* Effect.logDebug("request body", body);
 
             const formData =
-              Object.keys(body).length != 0 ? getFormData(methodName, body) : undefined
+              Object.keys(body).length != 0 ? transformToFormData(body) : undefined
 
             const result =
               yield* pipe(

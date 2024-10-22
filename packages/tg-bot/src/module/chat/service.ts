@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import * as S from "effect/Schema"
 
 import { TgBotHttpClient } from "../../api/index.js";
-import { EditMessageTextCommand, GetChatCommand, SendChatMessageCommand, SendVoiceCommand, SetChatActionCommand, UpdateMessageReplyMarkupCommand } from "./schema/commands.js";
+import { EditMessageTextCommand, GetChatCommand, SendChatMessageCommand, SendDocument, SendVoiceCommand, SetChatActionCommand, UpdateMessageReplyMarkupCommand } from "./schema/commands.js";
 import { MessageUpdate } from "./schema/message-update.js";
 import { ChatInfo } from "./schema.js";
 
@@ -71,9 +71,18 @@ export class TgChatService
             MessageUpdate
           )
 
+        const sendDocument = (
+          input: typeof SendDocument.Type
+        ) =>
+          httpClient.executeMethod(
+            "/sendDocument",
+            input,
+            MessageUpdate
+          )
+
         return {
           sendMessage, editMessageText, updateMessageReplyMarkup,
-          getChat, setChatAction, sendVoice
+          getChat, setChatAction, sendVoice, sendDocument
         } as const;
       }),
 

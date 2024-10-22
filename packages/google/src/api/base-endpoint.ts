@@ -2,7 +2,8 @@ import { Config, Effect, pipe } from "effect";
 import { HttpClientRequest } from "@effect/platform";
 
 import { GoogleApiHttpClient } from "./http-client.js";
-import { googleUserAccessTokenConfigKey } from "./const.js";
+
+export const googleUserAccessTokenConfigKey = "GOOGLE_USER_ACCESS_TOKEN";
 
 export type BaseUrlDomain = keyof typeof baseUrlMap;
 

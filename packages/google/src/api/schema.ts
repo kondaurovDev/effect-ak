@@ -12,6 +12,8 @@ export class AuthResponse
     id_token: S.String.pipe(S.optional)
   }) { }
 
+const scopePrefix = "https://www.googleapis.com/auth";
+
 export class OAuth2ClientCredentials
   extends S.Class<OAuth2ClientCredentials>("Google.ClientCredentials")({
     clientId: S.NonEmptyString,
@@ -31,7 +33,9 @@ export class OAuth2ClientCredentials
             Config.nonEmptyString("scopes"),
             Config.mapOrFail(_ =>
               pipe(
-                Either.right(_.split(",")),
+                Either.right(
+                  _.split(",").map(_ => `${scopePrefix}/${_}`)
+                ),
                 Either.filterOrLeft(
                   _ => Array.isNonEmptyArray(_),
                   () => InvalidData([ "scopes" ], "scopes must not be empty")
