@@ -1,5 +1,5 @@
 import { pipe } from "effect";
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { MessageContent } from "./message-content.js";
 

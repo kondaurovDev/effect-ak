@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 export type GoogleUserAccessToken = typeof GoogleUserAccessToken.Type
 export const GoogleUserAccessToken = S.NonEmptyString.pipe(S.Redacted, S.brand("GoogleUserAccessToken"))

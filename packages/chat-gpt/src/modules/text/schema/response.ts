@@ -1,5 +1,5 @@
 import { pipe, Effect } from "effect";
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { CompletionError } from "../error.js";
 import { ResponseChoice } from "./response-choice.js";

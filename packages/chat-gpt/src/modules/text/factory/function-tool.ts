@@ -1,5 +1,5 @@
-import { Schema as S, JSONSchema } from "@effect/schema";
-import { Effect, pipe } from "effect";
+import { Effect, pipe, JSONSchema } from "effect";
+import * as S from "effect/Schema";
 
 import { JsonSchema, OneOfTool, ToolChoice } from "../schema/tool.js";
 

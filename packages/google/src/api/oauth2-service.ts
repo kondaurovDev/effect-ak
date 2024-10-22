@@ -1,6 +1,6 @@
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Effect, pipe, Redacted } from "effect";
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { AuthResponse, GoogleUserRefreshToken } from "./schema.js";
 import { GoogleApiHttpClient } from "./http-client.js";

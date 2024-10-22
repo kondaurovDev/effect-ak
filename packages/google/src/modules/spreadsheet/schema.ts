@@ -1,5 +1,5 @@
 import { Context } from "effect";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 export type SpreadsheetId = typeof SpreadsheetId.Type;
 export const SpreadsheetId = S.NonEmptyString.pipe(S.brand("Google.SpreadsheetId"))

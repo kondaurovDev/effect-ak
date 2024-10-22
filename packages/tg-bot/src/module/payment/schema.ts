@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { User, ChatId } from "../chat/schema.js";
 

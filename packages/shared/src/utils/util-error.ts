@@ -1,8 +1,8 @@
-import { Data } from "effect";
+import { TaggedError } from "effect/Data";
 import { packageName } from "../common.js";
 
 export class UtilError
-  extends Data.TaggedError(`${packageName}.SharedError`)<{
+  extends TaggedError(`${packageName}.SharedError`)<{
     name: "text" | "date" | "json" | "password",
     cause?: unknown,
     details?: unknown

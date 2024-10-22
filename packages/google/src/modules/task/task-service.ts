@@ -1,6 +1,6 @@
 import { Effect, pipe } from "effect"
 import { HttpBody, HttpClientRequest } from "@effect/platform"
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { BaseEndpoint } from "../../api/index.js"
 import { SingleTask } from "./schema.js";

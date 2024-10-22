@@ -1,5 +1,5 @@
 import { Effect, pipe } from "effect";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { Column, CsvService, CsvCompatibleObject } from "../data-format/index.js";
 import { ChatCompletionService } from "../context/chat-completion.js";

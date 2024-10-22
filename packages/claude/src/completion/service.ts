@@ -1,6 +1,6 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
-import { ChatCompletionService } from "@efkit/shared/service";
+import { ChatCompletionService } from "@efkit/shared/context";
 
 import { ClaudeHttpClient } from "../api/http-client.js";
 import { MessageCompletionRequest, MessageResponse, TextMessageContent } from "./schema/index.js";

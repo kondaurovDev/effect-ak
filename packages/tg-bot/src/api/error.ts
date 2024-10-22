@@ -1,6 +1,5 @@
 import { HttpClientError } from "@effect/platform"
-import { ParseResult } from "@effect/schema"
-import { ConfigError, Data } from "effect"
+import { ConfigError, Data, ParseResult } from "effect"
 
 export class TgBotApiClientError
   extends Data.TaggedError("TgBotApiClientError")<{

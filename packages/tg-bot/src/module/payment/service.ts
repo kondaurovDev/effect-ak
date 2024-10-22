@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { TgBotHttpClient } from "../../api/http-client.js";
 import { AnswerPreCheckoutQuery, SendStarsInvoice } from "./schema.js";

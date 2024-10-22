@@ -1,5 +1,5 @@
 import { HttpBody } from "@effect/platform";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 export class CreateSpeechRequest 
   extends S.Class<CreateSpeechRequest>("CreateSpeechRequest")({

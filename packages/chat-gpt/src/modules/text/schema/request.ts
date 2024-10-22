@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { OneOfMessage, AssistantMessage, UserMessage } from "./message.js";
 import { GptModelName, ReasoningModelName } from "./model-name.js";

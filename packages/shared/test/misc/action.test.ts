@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { Cause, Effect, Exit, Logger, LogLevel, pipe } from "effect";
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { ActionError, makeAction } from "../../src/misc/index";
 

@@ -1,5 +1,5 @@
 import { Brand } from "effect"
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 export const GetFileInfoCommandInput = 
   S.Struct({

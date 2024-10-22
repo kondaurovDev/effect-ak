@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { pipe, Effect, Layer, Logger, Exit, LogLevel } from "effect";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";;
 
 import {
   ChatCompletionRequest, ReasoningRequest, TextService,

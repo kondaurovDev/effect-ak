@@ -1,6 +1,6 @@
 import { pipe, Effect, Redacted, Config } from "effect";
 import { HttpClient, HttpClientRequest, Headers } from "@effect/platform";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 export const makeJsonHttpClient = (
   input: {

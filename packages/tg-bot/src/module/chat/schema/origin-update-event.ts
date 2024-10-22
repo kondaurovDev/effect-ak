@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { MessageUpdate } from "./message-update.js"
 import { PreCheckoutQuery, SuccessfulPayment } from "../../payment/schema.js";

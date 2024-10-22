@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 export type CalendarId = typeof CalendarId.Type;
 export const CalendarId = S.NonEmptyString.pipe(S.brand("CalendarId"));

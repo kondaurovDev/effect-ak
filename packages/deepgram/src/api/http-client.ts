@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { FetchHttpClient, HttpClientRequest } from "@effect/platform";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";;
 
 import { makeJsonHttpClient } from "@efkit/shared/misc";
 

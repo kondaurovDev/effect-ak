@@ -1,6 +1,6 @@
-import { Effect, Data, ConfigError, pipe } from "effect";
+import { Effect, Data, ConfigError, pipe, ParseResult } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "@effect/platform";
-import { Schema as S, ParseResult, Schema } from "@effect/schema";
+import * as S from "effect/Schema";
 
 export class GoogleClientRestError
   extends Data.TaggedError("Google.RestError")<{

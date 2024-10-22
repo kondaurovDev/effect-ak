@@ -1,5 +1,4 @@
-import { Cause, Data } from "effect"
-import { ParseResult } from "@effect/schema"
+import { Cause, Data, ParseResult } from "effect"
 
 import { packageName } from "../common.js"
 

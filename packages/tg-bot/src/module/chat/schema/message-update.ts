@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { ReplyMarkup } from "./reply-markup.js";
 import { User } from "../schema.js";

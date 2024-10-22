@@ -7,7 +7,6 @@ export type FindFilesCommand = {
   mimeType: string
 }
 
-
 export class DriveService
   extends Effect.Service<DriveService>()(`DriveService`, {
     

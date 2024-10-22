@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 export type GptModelName = typeof GptModelName.Type
 export const GptModelName = S.Literal("gpt-4o", "gpt-4o-mini")

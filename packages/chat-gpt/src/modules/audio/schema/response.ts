@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 export class TextTranscriptionResponse extends 
   S.Class<TextTranscriptionResponse>("TextTranscriptionResponse")({

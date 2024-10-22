@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { ChatAction, ChatId, ParseMode, ReplyParameters } from "../schema.js"
 import { ReplyMarkup } from "./reply-markup.js";

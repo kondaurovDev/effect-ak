@@ -1,5 +1,4 @@
-import { ParseResult } from "@effect/schema";
-import { Data } from "effect";
+import { Data, ParseResult } from "effect";
 
 const errors = {
   NoContent: "Expected to have message with non empty content",

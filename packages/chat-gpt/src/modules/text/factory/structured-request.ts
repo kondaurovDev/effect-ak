@@ -1,5 +1,5 @@
 import { pipe, Effect } from "effect";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { GptModelName } from "../schema/model-name.js";
 import { TextMessageContent } from "../schema/message-content.js";

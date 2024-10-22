@@ -1,4 +1,4 @@
-import { pipe, Effect } from "effect";
+import { Effect } from "effect";
 import { FetchHttpClient, HttpClientRequest } from "@effect/platform";
 import { makeJsonHttpClient } from "@efkit/shared/misc";
 

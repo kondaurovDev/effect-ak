@@ -1,6 +1,6 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
-import { ChatCompletionService } from "@efkit/shared/service";
+import { ChatCompletionService } from "@efkit/shared/context";
 
 import { ChatCompletionRequest, ChatCompletionResponse, OneOfRequest, SystemMessage, UserMessage } from "../modules/text/schema/index.js"
 import { ChatGptHttpClient } from "./http-client.js";

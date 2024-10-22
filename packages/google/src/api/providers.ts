@@ -1,5 +1,5 @@
-import { Context, Data, Effect, pipe } from "effect";
-import { ParseResult, Schema as S } from "@effect/schema"
+import { Context, Data, Effect, pipe, ParseResult } from "effect";
+import * as S from "effect/Schema";
 import type { PlatformError } from "@effect/platform/Error";
 import { FileSystem, Path } from "@effect/platform";
 

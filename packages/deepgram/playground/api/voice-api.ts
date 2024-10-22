@@ -1,5 +1,5 @@
 import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform"
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 export class VoiceApi extends
   HttpApiGroup.make("voiceApi").pipe(

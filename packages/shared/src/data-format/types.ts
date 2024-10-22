@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema"
 
 export type DecodedFromJson = typeof DecodedFromJson.Type;
 export const DecodedFromJson = S.Unknown.pipe(S.brand("DecodedFromJson"));

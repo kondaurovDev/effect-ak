@@ -1,5 +1,5 @@
 import { Effect, pipe } from "effect";
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { CompletionEndpoint } from "../../api/index.js";
 import { CompletionError } from "./error.js";

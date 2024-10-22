@@ -35,7 +35,6 @@
     "effect": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
-    "@effect/schema": "catalog:",
     "@efkit/shared": "workspace:^"
   },
   "peerDependencies": {

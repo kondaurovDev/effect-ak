@@ -1,6 +1,8 @@
-import { Schema as S } from "@effect/schema";
-import { randomBytes, scrypt, timingSafeEqual } from "crypto"
+import * as S from "effect/Schema";
 import { Effect, pipe, Redacted } from "effect";
+
+import { randomBytes, scrypt, timingSafeEqual } from "crypto"
+
 import { UtilError } from "./util-error.js";
 
 export type HashedPassword = typeof HashedPassword.Type; 

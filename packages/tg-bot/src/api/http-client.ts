@@ -1,6 +1,6 @@
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
 import { Effect, pipe, Redacted } from "effect";
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
 import { TgBotTokenProvider } from "./token.js";

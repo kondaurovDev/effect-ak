@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 import { Config, DateTime, Effect, Match, pipe, Redacted } from "effect";
 import { FileSystem, Path } from "@effect/platform";

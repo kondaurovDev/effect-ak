@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema"
+import * as S from "effect/Schema";
 
 import { BotCommand, CommandScope } from "./bot-command.js";
 import { UpdateEventType } from "../../chat/schema/origin-update-event.js";

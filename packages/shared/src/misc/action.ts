@@ -1,6 +1,5 @@
 import { Effect, pipe, Context, Layer, Cause, identity, Logger, Data } from "effect";
-import { Schema as S } from "@effect/schema";
-
+import * as S from "effect/Schema"
 import { ActionError, ActionIOError, ActionLog } from "./action-error.js";
 import { packageName } from "../common.js";
 

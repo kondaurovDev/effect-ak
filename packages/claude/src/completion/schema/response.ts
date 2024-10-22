@@ -1,5 +1,4 @@
-import { Brand } from "effect";
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 
 export type StopReason =
   typeof StopReason.Type
@@ -30,8 +29,9 @@ export class MessageTextResponse
     text: S.String
   }) { }
 
-export type MessageResponseErrorCode = Brand.Branded<typeof messageResponseErrorCodes[number], "MessageResponseErrorCode">;
-export const MessageResponseErrorCode = Brand.nominal<MessageResponseErrorCode>();
+export type MessageResponseErrorCode = typeof MessageResponseErrorCode.Type;
+export const MessageResponseErrorCode = 
+  S.Literal(...messageResponseErrorCodes).pipe(S.brand("MessageResponseErrorCode"));
 
 export type MessageResponseOutput = typeof MessageResponse.fields
 export class MessageResponse

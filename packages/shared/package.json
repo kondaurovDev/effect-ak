@@ -29,9 +29,9 @@
       "types": "./dist/data-format/index.d.ts",
       "default": "./dist/data-format/index.js"
     },
-    "./service": {
-      "types": "./dist/service/index.d.ts",
-      "default": "./dist/service/index.js"
+    "./context": {
+      "types": "./dist/context/index.d.ts",
+      "default": "./dist/context/index.js"
     }
   },
   "devDependencies": {
@@ -39,12 +39,11 @@
     "openai": "^4.68.1"
   },
   "scripts": {
-    "build": "tsc -b tsconfig.src.json",
+    "compile": "tsc -b tsconfig.src.json",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "peerDependencies": {
     "@effect/platform": "catalog:",
-    "@effect/schema": "catalog:",
     "effect": "catalog:"
   }
 }

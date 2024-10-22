@@ -1,4 +1,4 @@
-import { Schema as S } from "@effect/schema";
+import * as S from "effect/Schema";
 import { Config, Context, Effect, pipe, Redacted } from "effect";
 
 export type TgBotToken = typeof TgBotToken.Type;
