@@ -44,7 +44,7 @@ export const CommonOptionalFieldsWhenSending =
     S.partialWith({ exact: true })
   );
 
-export const MessageFile = 
+export const FileWithContent = 
   S.Struct({
     content: S.Uint8Array,
     fileName: S.NonEmptyString
@@ -62,7 +62,7 @@ export const SendVoiceCommand =
   S.Struct({
     chat_id: ChatId,
     caption: S.UndefinedOr(S.String),
-    voice: S.Union(MessageFile, S.String)
+    voice: S.Union(FileWithContent, S.String)
   }).pipe(
     S.extend(CommonOptionalFieldsWhenSending)
   )
@@ -71,7 +71,7 @@ export const SendDocument =
   S.Struct({
     chat_id: ChatId,
     caption: S.UndefinedOr(S.String),
-    document: S.Union(MessageFile, S.String)
+    document: S.Union(FileWithContent, S.String)
   }).pipe(
     S.extend(CommonOptionalFieldsWhenSending)
   );

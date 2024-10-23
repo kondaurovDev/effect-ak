@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as S from "effect/Schema"
 
-import { TgBotHttpClient } from "../../api/index.js";
+import { TgBotHttpClient } from "../../api/http-client.js";
 import { EditMessageTextCommand, GetChatCommand, SendChatMessageCommand, SendDocument, SendVoiceCommand, SetChatActionCommand, UpdateMessageReplyMarkupCommand } from "./schema/commands.js";
 import { MessageUpdate } from "./schema/message-update.js";
 import { ChatInfo } from "./schema.js";

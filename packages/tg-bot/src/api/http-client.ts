@@ -1,11 +1,11 @@
 import { FetchHttpClient, HttpBody, HttpClient, HttpClientRequest } from "@effect/platform";
-import { Config, Effect, Match, pipe } from "effect";
+import { Config, Effect, pipe } from "effect";
 import * as S from "effect/Schema";
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
 import { TgResponse } from "./response.js";
 import { tgBotTokenConfigKey } from "./const.js";
-import { MessageFile } from "../module/chat/index.js";
+import { FileWithContent } from "../module/chat/schema/commands.js";
 
 export class TgBotHttpClient
   extends Effect.Service<TgBotHttpClient>()("TgBotHttpClient", {
@@ -36,7 +36,7 @@ export class TgBotHttpClient
           const result = new FormData();
           for (const [key, value] of Object.entries(body)) {
             if (typeof value == "object") {
-              if (S.is(MessageFile)(value)) {
+              if (S.is(FileWithContent)(value)) {
                 result.append(key, new Blob([ value.content ]), value.fileName);
                 continue;
               }
