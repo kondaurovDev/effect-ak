@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import * as S from "effect/Schema";
 
-import { CompletionEndpoint } from "../../api/index.js";
+import { ChatCompletionEndpoint } from "../../api/index.js";
 import { CompletionError } from "./error.js";
 import { ChatCompletionRequest, OneOfRequest } from "./schema/request.js";
 import { MissingInputFieldsError } from "./schema/error.js";
@@ -12,7 +12,7 @@ export class TextService
     effect:
       Effect.gen(function* () {
 
-        const completionEndpoint = yield* CompletionEndpoint;
+        const completionEndpoint = yield* ChatCompletionEndpoint;
 
         const complete = (
           request: OneOfRequest
@@ -64,16 +64,16 @@ export class TextService
                   )
                 )
               ))
-          )
+          );
 
         return {
-          complete, completeFunctionCall, completeStructured
+          complete, completeFunctionCall, completeStructured,
         } as const;
 
       }),
 
     dependencies: [
-      CompletionEndpoint.Default
+      ChatCompletionEndpoint.Default
     ]
 
   }) { }

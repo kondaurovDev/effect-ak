@@ -4,7 +4,6 @@ import OpenAI from "openai"
 
 import { DataStructureService } from "../src/misc/data-structure";
 import { ChatCompletionService } from "../src/context";
-import { CsvService } from "../src/data-format";
 
 import { GPT_TOKEN } from "../integration-config.json"
 
@@ -13,7 +12,7 @@ const openAiClient =
     apiKey: GPT_TOKEN
   })
 
-const chatGptService =
+const chatGptCompletionService =
   Layer.succeed(
     ChatCompletionService,
     ChatCompletionService.of({
@@ -35,12 +34,7 @@ const chatGptService =
   )
 
 const live =
-  DataStructureService.Default.pipe(
-    Layer.provide([
-      chatGptService,
-      CsvService.Default
-    ])
-  )
+  DataStructureService.Default
 
 describe("data structure service", () => {
 
@@ -67,7 +61,7 @@ describe("data structure service", () => {
                 description: "User's phrase"
               }
             ],
-            ouputColumns: [
+            outputColumns: [
               {
                 columnName: "price",
                 description: "price for thing",
@@ -88,7 +82,10 @@ describe("data structure service", () => {
         return result;
       }).pipe(
         Logger.withMinimumLogLevel(LogLevel.Debug),
-        Effect.provide(live),
+        Effect.provide([
+          live,
+          chatGptCompletionService
+        ]),
         Effect.runPromiseExit
       );
 

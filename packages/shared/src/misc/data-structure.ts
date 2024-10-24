@@ -9,7 +9,7 @@ export class DataStructureCommand
     instruction: S.NonEmptyString,
     objects: CsvCompatibleObject.pipe(S.NonEmptyArray),
     inputColumns: Column.pipe(S.NonEmptyArray),
-    ouputColumns: Column.pipe(S.NonEmptyArray),
+    outputColumns: Column.pipe(S.NonEmptyArray),
   }) { };
 
 export class DataStructureService
@@ -17,7 +17,6 @@ export class DataStructureService
     effect:
       Effect.gen(function* () {
 
-        const chatCompletionService = yield* ChatCompletionService;
         const csvService = yield* CsvService;
 
         const makeSystemMessage = (
@@ -36,7 +35,7 @@ export class DataStructureService
             - Column separator is '${csvService.defaultSeparator}'
 
             ## CSV columns:
-            ${command.ouputColumns.map((column, index) =>
+            ${command.outputColumns.map((column, index) =>
             `${index + 1} - ${column.columnName} - ${column.description}`
           ).join("\n")}
           `
@@ -44,25 +43,43 @@ export class DataStructureService
         const getStructured = (
           command: DataStructureCommand
         ) =>
-          pipe(
-            Effect.succeed({
+          Effect.gen(function* () {
+
+            const chatCompletion = yield* ChatCompletionService;
+
+            const request = {
               systemMessage: makeSystemMessage(command),
               userMessage:
                 csvService.encode({
                   columns: command.inputColumns, objects: command.objects
                 })
-            }),
-            Effect.tap(Effect.logDebug),
-            Effect.andThen(input =>
-              Effect.tryPromise(() => chatCompletionService.complete(input))
-            ),
-            Effect.andThen(_ => csvService.decode({ columns: command.ouputColumns, lines: _.split("\n") }))
-          );
+            }
+
+            yield* Effect.logDebug(request);
+
+            const result =
+              yield* pipe(
+                Effect.tryPromise(() => chatCompletion.complete(request)),
+                Effect.andThen(response =>
+                  csvService.decode({
+                    lines: response.split("\n"),
+                    columns: command.outputColumns
+                  })
+                )
+              )
+
+            return result;
+            
+          })
 
         return {
           getStructured
         } as const;
 
-      })
+      }),
+
+      dependencies: [
+        CsvService.Default
+      ]
 
   }) { }

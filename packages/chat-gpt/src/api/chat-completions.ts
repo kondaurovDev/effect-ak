@@ -2,11 +2,13 @@ import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { ChatCompletionService } from "@efkit/shared/context";
 
-import { ChatCompletionRequest, ChatCompletionResponse, OneOfRequest, SystemMessage, UserMessage } from "../modules/text/schema/index.js"
+import { 
+  ChatCompletionRequest, ChatCompletionResponse, OneOfRequest, SystemMessage, UserMessage 
+} from "../modules/text/schema/index.js"
 import { ChatGptHttpClient } from "./http-client.js";
 
-export class CompletionEndpoint extends
-  Effect.Service<CompletionEndpoint>()("ChatGpt.ChatCompetionEndpoint", {
+export class ChatCompletionEndpoint extends
+  Effect.Service<ChatCompletionEndpoint>()("ChatGpt.ChatCompetionEndpoint", {
     effect:
       Effect.gen(function* () {
 

@@ -63,7 +63,7 @@ export class TextCompletionService
                 Effect.andThen(_ => _.text),
                 Effect.runPromise
               )
-          })
+          });
 
         return {
           completeChat, ...completeChatImpl
