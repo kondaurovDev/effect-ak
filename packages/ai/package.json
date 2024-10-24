@@ -1,46 +1,44 @@
 {
-  "name": "@effect-ak/tg-bot",
-  "version": "0.0.1",
-  "description": "telegram bot client with help of Effect",
-  "license": "MIT",
+  "name": "@efkit/chat-gpt",
   "type": "module",
-  "publishConfig": {
-    "access": "public"
-  },
+  "version": "0.0.1",
   "author": {
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
   },
   "repository": {
     "url": "https://github.com/kondaurovDev/efkit",
-    "directory": "packages/tg-bot"
+    "directory": "packages/ai"
   },
+  "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/module/index.d.ts",
-      "default": "./dist/module/index.js"
+      "types": "./dist/modules/index.d.ts",
+      "default": "./dist/modules/index.js"
     },
     "./api": {
       "types": "./dist/api/index.d.ts",
       "default": "./dist/api/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "compile": "tsc -b tsconfig.src.json",
-    "pack-tar": "pnpm pack --pack-destination ../../dist"
+    "test": "vitest run",
+    "pack-tar": "pnpm pack --pack-destination ../../dist",
+    "build": "tsc"
   },
   "devDependencies": {
-    "effect": "catalog:",
     "@effect/platform": "catalog:",
-    "@effect/platform-node": "catalog:"
+    "@effect/platform-node": "catalog:",
+    "effect": "catalog:"
   },
   "peerDependencies": {
+    "@effect/platform": "catalog:",
     "effect": "catalog:"
   }
 }

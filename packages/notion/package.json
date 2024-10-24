@@ -18,9 +18,9 @@
     "effect": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
-    "@efkit/shared": "workspace:^"
+    "@kondaurovdev/misc": "workspace:^"
   },
   "peerDependencies": {
-    "@efkit/shared": "workspace:^"
+    "@kondaurovdev/misc": "workspace:^"
   }
 }

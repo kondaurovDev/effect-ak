@@ -1,6 +1,6 @@
 {
   "private": "true",
-  "name": "efkit",
+  "name": "monorepo",
   "type": "module",
   "scripts": {
     "clean": "node scripts/clean.mjs",

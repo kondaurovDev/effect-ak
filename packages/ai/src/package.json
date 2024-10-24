@@ -1,0 +1,49 @@
+{
+  "name": "@kondaurovdev/ai",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "repository": {
+    "url": "https://github.com/kondaurovDev/effkit",
+    "directory": "packages/ai"
+  },
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/modules/index.d.ts",
+      "default": "./dist/modules/index.js"
+    },
+    "./gpt": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "pack-tar": "pnpm pack --pack-destination ../../dist",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@effect/platform": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "@efkit/shared": "workspace:^",
+    "@types/ws": "^8.5.12",
+    "effect": "catalog:"
+  },
+  "peerDependencies": {
+    "@efkit/shared": "workspace:^"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

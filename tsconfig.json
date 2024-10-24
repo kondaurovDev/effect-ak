@@ -2,10 +2,9 @@
   "extends": "./tsconfig.base.json",
   "include": [],
   "references": [
-    { "path": "packages/shared" },
-    { "path": "packages/claude" },
-    { "path": "packages/chat-gpt" },
+    { "path": "packages/misc" },
+    { "path": "packages/ai" },
     { "path": "packages/tg-bot" },
-    { "path": "packages/google" },
+    { "path": "packages/google-api" },
   ]
 }

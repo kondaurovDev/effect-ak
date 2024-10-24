@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect, Exit, Logger, LogLevel, pipe } from "effect"
 
-import { ChatId, MessageEffectIdCodes, MessageFile, TgChatService } from "../../src/module/chat/index";
+import { ChatId, FileWithContent, MessageEffectIdCodes, TgChatService } from "../../src/module/chat/index";
 import { testEnv } from "./live";
 
 describe("chat service integration test", () => {
@@ -41,7 +41,7 @@ describe("chat service integration test", () => {
               _.sendDocument({
                 chat_id: ChatId.make(270501423),
                 document: 
-                  MessageFile.make({
+                  FileWithContent.make({
                     content: Buffer.from("Hello!"),
                     fileName: "hey.txt"
                   }),
