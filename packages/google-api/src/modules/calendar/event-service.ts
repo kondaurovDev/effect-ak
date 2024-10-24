@@ -1,6 +1,5 @@
-import { Effect, pipe } from "effect";
+import { Effect, DateTime } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
-import { parseDateWithTime } from "@efkit/shared/utils";
 
 import { BaseEndpoint } from "../../api/index.js";
 import { calendarUrlV3Prefix } from "./const.js";
@@ -15,44 +14,47 @@ export class CalendarEventService
         const insert = (
           command: InsertEventCommandInput
         ) =>
-          pipe(
-            Effect.Do,
-            Effect.bind("startDate", () => parseDateWithTime(command.start.dateTime)),
-            Effect.bind("endDate", () => parseDateWithTime(command.end.dateTime)),
-            Effect.let("httpBody", ({ startDate, endDate }) =>
-              HttpBody.unsafeJson({
+          Effect.gen(function* () {
+
+            const startDate = yield* DateTime.make(command.start.dateTime);
+            const endDate = yield* DateTime.make(command.end.dateTime);
+
+            const httpBody =
+              yield* HttpBody.json({
                 end: {
-                  dateTime: endDate.toISOString()
+                  dateTime: DateTime.formatIso(endDate)
                 },
                 start: {
-                  dateTime: startDate.toISOString()
+                  dateTime: DateTime.formatIso(startDate)
                 },
                 description: command.description,
                 summary: command.summary
               })
-            ),
-            Effect.andThen(({ httpBody }) =>
-              baseEndpoint.execute(
+
+            const result =
+              yield* baseEndpoint.execute(
                 "apis",
                 HttpClientRequest.post(
-                  `${calendarUrlV3Prefix}/users/me/calendarList`, 
+                  `${calendarUrlV3Prefix}/users/me/calendarList`,
                   {
                     body: httpBody
                   }
                 )
               )
-            )
-          )
+
+            return result;
+
+          })
 
         return {
           insert
         } as const;
       }),
 
-      dependencies: [
-        BaseEndpoint.Default
-      ]
+    dependencies: [
+      BaseEndpoint.Default
+    ]
 
-  }) {};
+  }) { };
 
 

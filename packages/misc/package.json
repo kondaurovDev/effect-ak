@@ -18,6 +18,10 @@
   "files": [
     "dist"
   ],
+  "scripts": {
+    "compile": "tsc -b tsconfig.src.json",
+    "pack-tar": "pnpm pack --pack-destination ../../dist"
+  },
   "exports": {
     "./package.json": "./package.json",
     "./misc": {
@@ -34,12 +38,7 @@
     }
   },
   "devDependencies": {
-    "@effect/platform-node": "catalog:",
-    "openai": "^4.68.1"
-  },
-  "scripts": {
-    "compile": "tsc -b tsconfig.src.json",
-    "pack-tar": "pnpm pack --pack-destination ../../dist"
+    "@effect/platform-node": "catalog:"
   },
   "peerDependencies": {
     "@effect/platform": "catalog:",

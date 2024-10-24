@@ -1,5 +1,5 @@
 {
-  "name": "@efkit/google",
+  "name": "@effect-ak/google-api",
   "version": "0.0.1",
   "type": "module",
   "author": {
@@ -41,7 +41,6 @@
     "effect": "catalog:"
   },
   "peerDependencies": {
-    "@kondaurovdev/misc": "workspace:^",
     "@effect/cli": "catalog:"
   }
 }
