@@ -27,7 +27,7 @@ describe("data structure service", () => {
                 phrase: "20 dollars spent for a chair, two days ago"
               },
             ],
-            instruction: `today is ${DateTime.unsafeNow()}`,
+            instruction: `today is ${DateTime.formatIsoOffset(DateTime.unsafeNow())}`,
             inputColumns: [
               {
                 columnName: "phrase",

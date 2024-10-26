@@ -22,7 +22,7 @@ const currencySchema =
   }).annotations({
     title: "convertCurrency",
     description: "convert currency from one to another"
-  })
+  });
 
 describe("chat completion test suite", () => {
 

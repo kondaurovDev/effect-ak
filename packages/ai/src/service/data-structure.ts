@@ -4,7 +4,6 @@ import { Column, CsvService, CsvCompatibleObject } from "@effect-ak/misc/data-fo
 
 import { Anthropik, Openai } from "../vendor/index.js";
 import { GenerativeModelName } from "../interface/chat-completion.js";
-import { AIConfig } from "../internal/configuration.js";
 
 export class DataStructureCommand
   extends S.Class<DataStructureCommand>("DataStructureCommand")({
@@ -21,7 +20,6 @@ export class DataStructureService
       Effect.gen(function* () {
 
         const csvService = yield* CsvService;
-        const config = yield* AIConfig.getConfig();
 
         const completion = {
           anthropic: yield* Anthropik.AnthropicCompletionService,

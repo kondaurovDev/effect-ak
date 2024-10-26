@@ -1,7 +1,6 @@
 import { Service, gen } from "effect/Effect";
 
 import { makeJsonHttpClient } from "../../../internal/json-http-client.js";
-import { chatGptTokenConfigKey } from "./const.js";
 
 export class OpenaiHttpClient
   extends Service<OpenaiHttpClient>()("OpenaiHttpClient", {
@@ -14,7 +13,7 @@ export class OpenaiHttpClient
             defaultHeaders: {},
             auth: {
               headerName: "Authorization",
-              tokenConfigName: chatGptTokenConfigKey,
+              tokenContainerName: "openai",
               isBearer: true,
             }
           })

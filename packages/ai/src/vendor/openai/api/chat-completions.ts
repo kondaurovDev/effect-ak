@@ -55,8 +55,7 @@ export class OpenaiChatCompletionEndpoint extends
               ),
               Effect.andThen(completeChat),
               Effect.andThen(_ => _.firstChoice),
-              Effect.andThen(_ => _.text),
-              Effect.runPromise
+              Effect.andThen(_ => _.text)
             )
         } as const;
 
