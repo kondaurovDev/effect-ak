@@ -1,6 +1,6 @@
 import * as S from "effect/Schema";
 
-export type c = typeof GptModelName.Type
+export type GptModelName = typeof GptModelName.Type
 export const GptModelName = S.Literal("gpt-4o", "gpt-4o-mini")
 
 export type ReasoningModelName = typeof ReasoningModelName.Type

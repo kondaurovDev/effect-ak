@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 import * as S from "effect/Schema";
 
-import { ChatGptHttpClient } from "../../api/index.js";
+import { OpenaiHttpClient } from "../../api/index.js";
 
 const Response = 
   S.Struct({
@@ -23,7 +23,7 @@ export const createImage = (
     Effect.tap(() =>
       Effect.fail("expensive")
     ),
-    Effect.bind("httpClient", () => ChatGptHttpClient),
+    Effect.bind("httpClient", () => OpenaiHttpClient),
     Effect.bind("body", () =>
       HttpBody.json({
         model,

@@ -1,7 +1,7 @@
 import { Config, Effect, pipe } from "effect";
 import { FileSystem, HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { ChatGptHttpClient } from "../../api/index.js";
+import { OpenaiHttpClient } from "../../api/index.js";
 import { CreateSpeechRequest, TranscribeRequest } from "./schema/request.js";
 import { OneOfTranscriptionResponse } from "./schema/response.js";
 
@@ -10,7 +10,7 @@ export class AudioService
     effect:
       Effect.gen(function* () {
 
-        const httpClient = yield* ChatGptHttpClient;
+        const httpClient = yield* OpenaiHttpClient;
         const fs = yield* FileSystem.FileSystem;
         const tmpDir =
           yield* pipe(
@@ -61,7 +61,7 @@ export class AudioService
       }),
 
     dependencies: [
-      ChatGptHttpClient.Default
+      OpenaiHttpClient.Default
     ]
 
   }) { }

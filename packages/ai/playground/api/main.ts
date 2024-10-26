@@ -1,10 +1,10 @@
-import { HttpApi, HttpApiBuilder, FileSystem, Path } from "@effect/platform";
+import { HttpApi, HttpApiBuilder, FileSystem, Path, HttpApiGroup } from "@effect/platform";
 import { Effect, Layer, pipe } from "effect";
 
 import { VoiceApi } from "./voice-api";
 
 export class BackendApi
-  extends HttpApi.empty.pipe(HttpApi.addGroup(VoiceApi)) {
+  extends HttpApi.empty.add(VoiceApi) {
 
   static live =
     HttpApiBuilder.api(
@@ -12,26 +12,11 @@ export class BackendApi
     ).pipe(
       Layer.provide(
         HttpApiBuilder.group(BackendApi, "voiceApi", handlers =>
-          Effect.gen(function* () {
-            return handlers.pipe(
-              HttpApiBuilder.handle("transcribe", () =>
-                Effect.succeed(1)
-              ),
-              HttpApiBuilder.handle("echo", () =>
-                Effect.succeed(
-                  "echo :)"
-                )
-              ),
-              HttpApiBuilder.handle("getTranscribe", () =>
-                Effect.succeed(
-                  "send post request"
-                )
-              ),
-              HttpApiBuilder.handle("root", () =>
-                Effect.succeed(1)
-              )
-            )
-          }),
+          handlers
+              .handle("transcribe", () => Effect.succeed(1))
+              .handle("echo", () => Effect.succeed("echo :)"))
+              .handle("getTranscribe", () => Effect.succeed("send post request"))
+              .handle("root", () => Effect.succeed(1))
         )
       )
     )
