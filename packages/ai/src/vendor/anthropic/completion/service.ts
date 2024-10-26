@@ -1,16 +1,16 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { ClaudeHttpClient } from "../api/http-client.js";
-import { ChatCompletionService } from "../../../service/chat-completion.js";
+import { AnthropicHttpClient } from "../api/http-client.js";
+import { ChatCompletionInterface, ProviderName } from "../../../interface/chat-completion.js";
 import { MessageCompletionRequest, MessageResponse, TextMessageContent } from "./schema/index.js";
 
-export class TextCompletionService
-  extends Effect.Service<TextCompletionService>()("TextCompletionService", {
+export class AnthropicCompletionService
+  extends Effect.Service<AnthropicCompletionService>()("AnthropicCompletionService", {
     effect:
       Effect.gen(function* () {
 
-        const httpClient = yield* ClaudeHttpClient;
+        const httpClient = yield* AnthropicHttpClient;
 
         const completeChat = (
           request: MessageCompletionRequest
@@ -18,7 +18,7 @@ export class TextCompletionService
           pipe(
             Effect.logDebug("complete request", request),
             Effect.andThen(
-              HttpBody.json(request),
+              HttpBody.json(request)
             ),
             Effect.andThen(requestBody =>
               httpClient.getTyped(
@@ -33,41 +33,45 @@ export class TextCompletionService
             )
           )
 
-        const completeChatImpl =
-          ChatCompletionService.of({
-            complete: (input) =>
-              pipe(
-                Effect.succeed(
-                  MessageCompletionRequest.make({
-                    model: "claude-3-5-sonnet-20240620",
-                    system: input.systemMessage,
-                    messages: [
-                      {
-                        role: "user",
-                        content: [
-                          TextMessageContent.make({
-                            type: "text",
-                            text: input.userMessage
-                          })
-                        ]
-                      }
-                    ]
-                  })
-                ),
-                Effect.andThen(completeChat),
-                Effect.andThen(_ => _.content[0]),
-                Effect.filterOrFail(
-                  _ => _.type == "text",
-                  _ => `Expected text response but got '${_.type}'`
-                ),
-                Effect.andThen(_ => _.text),
-                Effect.runPromise
-              )
-          });
+        const completeChatImpl: ChatCompletionInterface = {
+          provider: ProviderName.make("anthropic"),
+          complete: (input) =>
+            pipe(
+              Effect.succeed(
+                MessageCompletionRequest.make({
+                  model: "claude-3-5-sonnet-20241022",
+                  system: input.systemMessage,
+                  max_tokens: 1000,
+                  messages: [
+                    {
+                      role: "user",
+                      content: [
+                        TextMessageContent.make({
+                          type: "text",
+                          text: input.userMessage
+                        })
+                      ]
+                    }
+                  ]
+                })
+              ),
+              Effect.andThen(completeChat),
+              Effect.andThen(_ => _.content[0]),
+              Effect.filterOrFail(
+                _ => _.type == "text",
+                _ => `Expected text response but got '${_.type}'`
+              ),
+              Effect.andThen(_ => _.text)
+            )
+        }
 
         return {
           completeChat, ...completeChatImpl
         } as const;
 
-      })
+      }),
+
+      dependencies: [
+        AnthropicHttpClient.Default
+      ]
   }) { }

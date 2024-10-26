@@ -3,8 +3,8 @@ import { Service, gen } from "effect/Effect";
 import { makeJsonHttpClient } from "../../../internal/json-http-client.js";
 import { chatGptTokenConfigKey } from "./const.js";
 
-export class ChatGptHttpClient
-  extends Service<ChatGptHttpClient>()("ChatGptHttpClient", {
+export class OpenaiHttpClient
+  extends Service<OpenaiHttpClient>()("OpenaiHttpClient", {
     effect:
       gen(function* () {
 

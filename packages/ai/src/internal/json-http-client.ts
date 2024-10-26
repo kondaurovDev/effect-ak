@@ -1,4 +1,4 @@
-import { pipe, Effect, Redacted, Config, Layer } from "effect";
+import { pipe, Effect, Config } from "effect";
 import { HttpClient, HttpClientRequest, FetchHttpClient } from "@effect/platform";
 import * as S from "effect/Schema";
 
@@ -9,7 +9,7 @@ export class MakeHttpClientInput
     auth:
       S.Struct({
         headerName: S.NonEmptyString,
-        tokenConfigName: S.NonEmptyString,
+        tokenContainerName: S.NonEmptyString,
         isBearer: S.Boolean
       })
   }) { }
@@ -33,9 +33,9 @@ export const makeJsonHttpClient = (
 
     const tokenHeaderValueEffect =
       pipe(
-        Config.redacted(input.auth.tokenConfigName),
+        Config.nonEmptyString("token").pipe(Config.nested(input.auth.tokenContainerName)),
         Effect.andThen(token =>
-          input.auth.isBearer ? `Bearer ${Redacted.value(token)}` : Redacted.value(token)
+          input.auth.isBearer ? `Bearer ${token}` : token
         )
       )
 
@@ -56,12 +56,13 @@ export const makeJsonHttpClient = (
       )
 
     const getJson = (
-      originRequest: HttpClientRequest.HttpClientRequest
+      request: HttpClientRequest.HttpClientRequest
     ) =>
       pipe(
-        tokenHeaderValueEffect,
+        Effect.logDebug(`request to ${input.baseUrl}`, request),
+        Effect.andThen(tokenHeaderValueEffect),
         Effect.andThen(tokenHeaderValue =>
-          originRequest.pipe(
+          request.pipe(
             HttpClientRequest.setHeader(input.auth.headerName, tokenHeaderValue)
           )
         ),
@@ -69,7 +70,7 @@ export const makeJsonHttpClient = (
         Effect.tapErrorTag("ResponseError", error =>
           pipe(
             error.response.text,
-            Effect.andThen(_ => Effect.logError("basic http-client, bad response", _))
+            Effect.andThen(_ => Effect.logError("HTTP client, bad response =>", _))
           )
         ),
         Effect.andThen(_ => _.json),

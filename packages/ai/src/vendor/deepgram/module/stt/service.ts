@@ -14,14 +14,10 @@ export class SpeachToTextService
           file: File
         ) =>
           httpClient.getJson(
-            HttpClientRequest.post("/listen", 
-              {
-                body: HttpClientRequest.bodyFile()
-              }
-            ),
-
+            HttpClientRequest.post("/listen")
           )
 
 
+        return {} as const;
       })
   }) { }

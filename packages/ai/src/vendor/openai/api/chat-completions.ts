@@ -1,19 +1,18 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { ChatCompletionService } from "../../../service/chat-completion.js";
-
+import { ChatCompletionInterface, ProviderName } from "../../../interface/chat-completion.js";
 import { 
   ChatCompletionRequest, ChatCompletionResponse, OneOfRequest, SystemMessage, UserMessage 
 } from "../modules/text/schema/index.js"
-import { ChatGptHttpClient } from "./http-client.js";
+import { OpenaiHttpClient } from "./http-client.js";
 
-export class ChatCompletionEndpoint extends
-  Effect.Service<ChatCompletionEndpoint>()("ChatGpt.ChatCompetionEndpoint", {
+export class OpenaiChatCompletionEndpoint extends
+  Effect.Service<OpenaiChatCompletionEndpoint>()("OpenaiChatCompletionEndpoint", {
     effect:
       Effect.gen(function* () {
 
-        const httpClient = yield* ChatGptHttpClient;
+        const httpClient = yield* OpenaiHttpClient;
 
         const completeChat =
           (request: OneOfRequest) =>
@@ -35,31 +34,31 @@ export class ChatCompletionEndpoint extends
               )
             )
 
-        const chatCompletionService =
-          ChatCompletionService.of({
-            complete: input =>
-              pipe(
-                Effect.succeed(
-                  ChatCompletionRequest.make({
-                    model: "gpt-4o",
-                    messages: [
-                      SystemMessage.make({
-                        role: "system",
-                        content: input.systemMessage
-                      }),
-                      UserMessage.make({
-                        role: "user",
-                        content: input.userMessage
-                      }),
-                    ]
-                  })
-                ),
-                Effect.andThen(completeChat),
-                Effect.andThen(_ => _.firstChoice),
-                Effect.andThen(_ => _.text),
-                Effect.runPromise
-              )
-          })
+        const chatCompletionService: ChatCompletionInterface = {
+          provider: ProviderName.make("openai"),
+          complete: input =>
+            pipe(
+              Effect.succeed(
+                ChatCompletionRequest.make({
+                  model: "gpt-4o",
+                  messages: [
+                    SystemMessage.make({
+                      role: "system",
+                      content: input.systemMessage
+                    }),
+                    UserMessage.make({
+                      role: "user",
+                      content: input.userMessage
+                    }),
+                  ]
+                })
+              ),
+              Effect.andThen(completeChat),
+              Effect.andThen(_ => _.firstChoice),
+              Effect.andThen(_ => _.text),
+              Effect.runPromise
+            )
+        } as const;
 
         return {
           completeChat, ...chatCompletionService
@@ -68,7 +67,7 @@ export class ChatCompletionEndpoint extends
       }),
 
     dependencies: [
-      ChatGptHttpClient.Default
+      OpenaiHttpClient.Default
     ]
 
   }) { };

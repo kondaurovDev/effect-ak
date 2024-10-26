@@ -17,10 +17,6 @@
   "devDependencies": {
     "effect": "catalog:",
     "@effect/platform": "catalog:",
-    "@effect/platform-node": "catalog:",
-    "@kondaurovdev/misc": "workspace:^"
-  },
-  "peerDependencies": {
-    "@kondaurovdev/misc": "workspace:^"
+    "@effect/platform-node": "catalog:"
   }
 }

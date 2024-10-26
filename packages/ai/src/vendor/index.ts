@@ -1,1 +1,2 @@
-export * from "./anthropic/completion/service.js"
+export * as Anthropik from "./anthropic/index.js"
+export * as Openai from "./openai/index.js"

@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import * as S from "effect/Schema";
 
-import { ChatCompletionEndpoint } from "../../api/index.js";
+import { OpenaiChatCompletionEndpoint } from "../../api/index.js";
 import { CompletionError } from "./error.js";
 import { ChatCompletionRequest, OneOfRequest } from "./schema/request.js";
 import { MissingInputFieldsError } from "./schema/error.js";
@@ -12,7 +12,7 @@ export class TextService
     effect:
       Effect.gen(function* () {
 
-        const completionEndpoint = yield* ChatCompletionEndpoint;
+        const completionEndpoint = yield* OpenaiChatCompletionEndpoint;
 
         const complete = (
           request: OneOfRequest
@@ -73,7 +73,7 @@ export class TextService
       }),
 
     dependencies: [
-      ChatCompletionEndpoint.Default
+      OpenaiChatCompletionEndpoint.Default
     ]
 
   }) { }

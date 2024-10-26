@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { FetchHttpClient, HttpClientRequest } from "@effect/platform";
 import * as S from "effect/Schema";;
 
-import { makeJsonHttpClient } from "@efkit/shared/misc";
+import { makeJsonHttpClient } from "../../../internal/json-http-client.js";
 
 export class DeepgramHttpClient extends
   Effect.Service<DeepgramHttpClient>()("DeepgramHttpClient", {

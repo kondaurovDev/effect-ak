@@ -19,9 +19,9 @@ export class Metadata
 
 export class MessageCompletionRequest
   extends S.Class<MessageCompletionRequest>("MessageCompletionRequest")({
-    model: S.Literal("claude-3-5-sonnet-20240620"),
+    model: S.Literal("claude-3-5-sonnet-20240620", "claude-3-5-sonnet-20241022"),
     messages: S.Array(Message),
-    max_tokens: S.Number.pipe(S.optional),
+    max_tokens: S.Number,
     metadata: Metadata.pipe(S.optional),
     system: S.String.pipe(S.optional),
     temperature: S.Number.pipe(S.optional)

@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "include": ["src", "src/vendor/openai/modules", "src/vendor/openai/api"],
   "references": [
-    { "path": "../shared/tsconfig.src.json" }
+    { "path": "../misc/tsconfig.src.json" }
   ],
   "compilerOptions": {
     "types": ["node"],

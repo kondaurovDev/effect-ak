@@ -1,8 +1,10 @@
-import { Effect, pipe } from "effect";
+import { Effect, Match, pipe } from "effect";
 import * as S from "effect/Schema";
+import { Column, CsvService, CsvCompatibleObject } from "@effect-ak/misc/data-format";
 
-import { Column, CsvService, CsvCompatibleObject } from "@kondaurovdev/shared";
-import { ChatCompletionService, GenerativeModelName } from "./chat-completion.js";
+import { Anthropik, Openai } from "../vendor/index.js";
+import { GenerativeModelName } from "../interface/chat-completion.js";
+import { AIConfig } from "../internal/configuration.js";
 
 export class DataStructureCommand
   extends S.Class<DataStructureCommand>("DataStructureCommand")({
@@ -19,7 +21,13 @@ export class DataStructureService
       Effect.gen(function* () {
 
         const csvService = yield* CsvService;
+        const config = yield* AIConfig.getConfig();
 
+        const completion = {
+          anthropic: yield* Anthropik.AnthropicCompletionService,
+          openai: yield* Openai.OpenaiChatCompletionEndpoint
+        }
+        
         const makeSystemMessage = (
           command: DataStructureCommand
         ) =>
@@ -46,22 +54,33 @@ export class DataStructureService
         ) =>
           Effect.gen(function* () {
 
-            const chatCompletion = yield* ChatCompletionService;
+            yield* Effect.logDebug("starting =>");
+
+            const csvUserInput =
+              csvService.encode({
+                columns: command.inputColumns, objects: command.objects
+              })
 
             const request = {
               model: command.model,
               systemMessage: makeSystemMessage(command),
-              userMessage:
-                csvService.encode({
-                  columns: command.inputColumns, objects: command.objects
-                })
+              userMessage: csvUserInput
             }
 
-            yield* Effect.logDebug(request);
+            yield* Effect.logDebug("data structure request =>", request);
 
             const result =
               yield* pipe(
-                Effect.tryPromise(() => chatCompletion.complete(request)),
+                pipe(
+                  Match.value(command.model),
+                  Match.when(({ provider: "openai" }), () =>
+                    completion.openai.complete(request)
+                  ),
+                  Match.when(({ provider: "anthropic" }), () =>
+                    completion.anthropic.complete(request)
+                  ),
+                  Match.exhaustive
+                ),
                 Effect.andThen(response =>
                   csvService.decode({
                     lines: response.split("\n"),
@@ -71,7 +90,7 @@ export class DataStructureService
               )
 
             return result;
-            
+
           })
 
         return {
@@ -80,8 +99,10 @@ export class DataStructureService
 
       }),
 
-      dependencies: [
-        CsvService.Default
-      ]
+    dependencies: [
+      CsvService.Default,
+      Openai.OpenaiChatCompletionEndpoint.Default,
+      Anthropik.AnthropicCompletionService.Default
+    ]
 
   }) { }

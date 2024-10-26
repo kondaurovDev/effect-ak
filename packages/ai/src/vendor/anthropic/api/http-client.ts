@@ -3,8 +3,8 @@ import { FetchHttpClient, HttpClientRequest } from "@effect/platform";
 
 import { makeJsonHttpClient } from "../../../internal/json-http-client.js";
 
-export class ClaudeHttpClient extends
-  Effect.Service<ClaudeHttpClient>()("ClaudeHttpClient", {
+export class AnthropicHttpClient extends
+  Effect.Service<AnthropicHttpClient>()("AnthropicHttpClient", {
     effect:
       Effect.gen(function* () {
 
@@ -16,7 +16,7 @@ export class ClaudeHttpClient extends
             },
             auth: {
               headerName: "x-api-key",
-              tokenConfigName: "claudeToken",
+              tokenContainerName: "anthropic",
               isBearer: false
             }
           })
