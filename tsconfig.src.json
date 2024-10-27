@@ -5,6 +5,7 @@
     { "path": "packages/ai/tsconfig.src.json" },
     { "path": "packages/misc/tsconfig.src.json" },
     { "path": "packages/google-api/tsconfig.src.json" },
-    { "path": "packages/tg-bot/tsconfig.src.json" }
+    { "path": "packages/tg-bot/tsconfig.src.json" },
+    { "path": "playground/tsconfig.src.json" }
   ]
 }

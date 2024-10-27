@@ -1,0 +1,23 @@
+{
+  "name": "@effect-ak/google-api",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "compile": "tsc -b tsconfig.src.json",
+    "pack-tar": "pnpm pack --pack-destination ../../dist"
+  },
+  "devDependencies": {
+    "@effect/platform": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "effect": "catalog:",
+    "vue": "^3.5.12"
+  }
+}

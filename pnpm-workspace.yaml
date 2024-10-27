@@ -1,5 +1,6 @@
 packages:
   - 'packages/*'
+  - 'playground'
 
 catalog:
   effect: ^3.10.0
