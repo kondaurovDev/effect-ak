@@ -34,10 +34,32 @@ export class BackendApi
                 Effect.succeed(htmlPage("transcribe"))
               )
               .handle("vue-component", (params) =>
-                readFileEffect(`.out/${params.path.path}.js`)
+                params.path.path.endsWith(".map") ?
+                  pipe(
+                    readFileEffect(`.out/${params.path.path}.js.map`),
+                    Effect.andThen(input =>
+                      Effect.try(() => JSON.parse(input))
+                    ),
+                    Effect.die
+                  ) :
+                  readFileEffect(`.out/${params.path.path}.js`)
+              )
+              .handle("vue-component-style", (params) =>
+                readFileEffect(`.out/${params.path.path}.css`)
               )
               .handle("vendorJs", (params) =>
-                readFileEffect(`node_modules/${params.path.path.join("/")}.js`)
+                params.path.path.at(-1)?.endsWith(".js.map") ?
+                  pipe(
+                    Effect.logInfo("reading vendor js source map file"),
+                    Effect.andThen(
+                      readFileEffect(`node_modules/${params.path.path.join("/")}`)
+                    ),
+                    Effect.andThen(input =>
+                      Effect.try(() => JSON.parse(input))
+                    ),
+                    Effect.die
+                  ) :
+                  readFileEffect(`node_modules/${params.path.path.join("/")}`)
               )
               .handle("vendorCss", (params) =>
                 readFileEffect(`node_modules/${params.path.path.join("/")}.css`)

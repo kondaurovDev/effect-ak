@@ -22,7 +22,7 @@ const assetPath =
           )
         }
       },
-      encode: input => ParseResult.succeed(input.join("-"))
+      encode: input => ParseResult.succeed(input.join(":"))
     }
   )
 
@@ -41,6 +41,18 @@ export class Endpoints extends
     .add(
       HttpApiEndpoint
         .get("vue-component", "/js/:path")
+        .setPath(S.Struct({
+          path: S.NonEmptyString
+        }))
+        .addSuccess(
+          S.Union(
+            HttpApiSchema.Text({ contentType: "text/javascript" })
+          )
+        )
+    )
+    .add(
+      HttpApiEndpoint
+        .get("vue-component-style", "/css/:path")
         .setPath(S.Struct({
           path: S.NonEmptyString
         }))

@@ -8,6 +8,7 @@ export const htmlPage = (
     <meta charset="UTF-8">
     <title>Effect-ak playground</title>
     <link href="./vendor/css/vuetify:dist:vuetify.min" rel="stylesheet">
+    <link href="./css/${componentPath}" rel="stylesheet">
   </head>
   <body>
   <script type="importmap">
