@@ -1,0 +1,65 @@
+import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from "@effect/platform"
+import { Array, ParseResult } from "effect";
+import * as S from "effect/Schema";
+
+const assetPath =
+  S.transformOrFail(
+    S.NonEmptyString,
+    S.NonEmptyArray(S.NonEmptyString),
+    {
+      strict: true,
+      decode: (input, options, ast) => {
+        const arr = input.split(":")
+        if (Array.isNonEmptyArray(arr)) {
+          return ParseResult.succeed(arr)
+        } else {
+          return ParseResult.fail(
+            new ParseResult.Type(
+              ast,
+              input,
+              "Failed to convert string to asset path"
+            )
+          )
+        }
+      },
+      encode: input => ParseResult.succeed(input.join("-"))
+    }
+  )
+
+export class Endpoints extends
+  HttpApiGroup.make("endpoints")
+    .add(
+      HttpApiEndpoint
+        .get("rootPage", "/")
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
+    )
+    .add(
+      HttpApiEndpoint
+        .get("transcribeHtmlPage", "/transcribe")
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
+    )
+    .add(
+      HttpApiEndpoint
+        .get("vue-component", "/js/:path")
+        .setPath(S.Struct({
+          path: S.NonEmptyString
+        }))
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/javascript" }))
+    )
+    .add(
+      HttpApiEndpoint
+        .get("vendorJs", "/vendor/js/:path")
+        .setPath(S.Struct({
+          path: assetPath
+        }))
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/javascript" }))
+    )
+    .add(
+      HttpApiEndpoint
+        .get("vendorCss", "/vendor/css/:path")
+        .setPath(S.Struct({
+          path: assetPath
+        }))
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/css" }))
+    )
+{ }

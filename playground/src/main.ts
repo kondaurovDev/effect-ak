@@ -3,7 +3,7 @@ import { NodeHttpServer, NodeRuntime } from "@effect/platform-node"
 import { Layer } from "effect"
 import { createServer } from "node:http"
 
-import { BackendApi } from "./api/main.js"
+import { BackendApi } from "./api/implementation.js"
 
 const nodeHttpServer = (
   port: number
