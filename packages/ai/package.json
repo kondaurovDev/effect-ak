@@ -41,6 +41,10 @@
     "./api": {
       "types": "./dist/api/index.d.ts",
       "default": "./dist/api/index.js"
+    },
+    "./vendor": {
+      "types": "./dist/vendor/index.d.ts",
+      "default": "./dist/vendor/index.js"
     }
   }
 }

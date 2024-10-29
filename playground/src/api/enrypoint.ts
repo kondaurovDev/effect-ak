@@ -14,8 +14,8 @@ export const htmlPage = (
   <script type="importmap">
     {
       "imports": {
-        "vue": "./vendor/js/vue:dist:vue.esm-browser",
-        "vuetify": "./vendor/js/vuetify:dist:vuetify.esm"
+        "vue": "./vendor/js/vue:dist:vue.esm-browser.js",
+        "vuetify": "./vendor/js/vuetify:dist:vuetify.esm.js"
       }
     }
   </script>

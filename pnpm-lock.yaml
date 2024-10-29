@@ -7,17 +7,17 @@ settings:
 catalogs:
   default:
     '@effect/cli':
-      specifier: ^0.48.2
-      version: 0.48.2
+      specifier: ^0.48.9
+      version: 0.48.9
     '@effect/platform':
-      specifier: ^0.69.2
-      version: 0.69.2
+      specifier: ^0.69.9
+      version: 0.69.9
     '@effect/platform-node':
-      specifier: ^0.64.3
-      version: 0.64.3
+      specifier: ^0.64.10
+      version: 0.64.10
     effect:
-      specifier: ^3.10.0
-      version: 3.10.0
+      specifier: ^3.10.4
+      version: 3.10.4
 
 importers:
 
@@ -46,78 +46,82 @@ importers:
         version: link:../misc
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.69.2(effect@3.10.0)
+        version: 0.69.9(effect@3.10.4)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.64.3(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)
+        version: 0.64.10(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)
       effect:
         specifier: 'catalog:'
-        version: 3.10.0
+        version: 3.10.4
 
   packages/google-api:
     dependencies:
       '@effect/cli':
         specifier: 'catalog:'
-        version: 0.48.2(@effect/platform@0.69.2(effect@3.10.0))(@effect/printer-ansi@0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0))(@effect/printer@0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0))(effect@3.10.0)
+        version: 0.48.9(@effect/platform@0.69.9(effect@3.10.4))(@effect/printer-ansi@0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4))(@effect/printer@0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4))(effect@3.10.4)
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.69.2(effect@3.10.0)
+        version: 0.69.9(effect@3.10.4)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.64.3(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)
+        version: 0.64.10(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)
       effect:
         specifier: 'catalog:'
-        version: 3.10.0
+        version: 3.10.4
 
   packages/misc:
     dependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.69.2(effect@3.10.0)
+        version: 0.69.9(effect@3.10.4)
       effect:
         specifier: 'catalog:'
-        version: 3.10.0
+        version: 3.10.4
     devDependencies:
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.64.3(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)
+        version: 0.64.10(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)
 
   packages/notion:
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.69.2(effect@3.10.0)
+        version: 0.69.9(effect@3.10.4)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.64.3(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)
+        version: 0.64.10(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)
       effect:
         specifier: 'catalog:'
-        version: 3.10.0
+        version: 3.10.4
 
   packages/tg-bot:
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.69.2(effect@3.10.0)
+        version: 0.69.9(effect@3.10.4)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.64.3(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)
+        version: 0.64.10(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)
       effect:
         specifier: 'catalog:'
-        version: 3.10.0
+        version: 3.10.4
 
   playground:
+    dependencies:
+      '@effect-ak/ai':
+        specifier: workspace:^
+        version: link:../packages/ai
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
-        version: 0.69.2(effect@3.10.0)
+        version: 0.69.9(effect@3.10.4)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 0.64.3(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)
+        version: 0.64.10(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)
       effect:
         specifier: 'catalog:'
-        version: 3.10.0
+        version: 3.10.4
       vue:
         specifier: ^3.5.12
         version: 3.5.12(typescript@5.5.4)
@@ -156,30 +160,30 @@ packages:
     resolution: {integrity: sha512-Z/yiTPj+lDVnF7lWeKCIJzaIkI0vYO87dMpZ4bg4TDrFe4XXLFWL1TbXU27gBP3QccxV9mZICCrnjnYlJjXHOA==, tarball: https://registry.npmjs.org/@babel/types/-/types-7.26.0.tgz}
     engines: {node: '>=6.9.0'}
 
-  '@effect/cli@0.48.2':
-    resolution: {integrity: sha512-ET63MGlL0EV3kDP037fVqbCLgXao4qj4qtE7YDB/Cz7fDVkUewveCBmtOvDGNyWpxfsE7Jjvf9irx4Pk5WiIdA==, tarball: https://registry.npmjs.org/@effect/cli/-/cli-0.48.2.tgz}
+  '@effect/cli@0.48.9':
+    resolution: {integrity: sha512-zBnagG/qw85mBuC5SkeNMbuCrLAz7nFVbrFPnrBL3GCGneaQUjBkowFG2yO/2tpZA7ZmFINnbN3Tk5PN4+dMHg==, tarball: https://registry.npmjs.org/@effect/cli/-/cli-0.48.9.tgz}
     peerDependencies:
-      '@effect/platform': ^0.69.2
-      '@effect/printer': ^0.38.0
-      '@effect/printer-ansi': ^0.38.0
-      effect: ^3.10.0
+      '@effect/platform': ^0.69.9
+      '@effect/printer': ^0.38.4
+      '@effect/printer-ansi': ^0.38.4
+      effect: ^3.10.4
 
-  '@effect/platform-node-shared@0.19.2':
-    resolution: {integrity: sha512-k+3bDtFXHkN21cQ4Hp6rQs/yoEjmSX4voWkftK1PsDK3iJRG+wlumwxcdnjJ9U+CU9TseXYeBt6hS5yZMw8/Fg==, tarball: https://registry.npmjs.org/@effect/platform-node-shared/-/platform-node-shared-0.19.2.tgz}
+  '@effect/platform-node-shared@0.19.9':
+    resolution: {integrity: sha512-XR5EraZRIJ9Uhgh/A6u3cuOH0uVfKdD7DhpStpjJAw8ShntDLjRwI0QKWrJTL3Z3zDqVkGvdZoFSxBeF4cOcxA==, tarball: https://registry.npmjs.org/@effect/platform-node-shared/-/platform-node-shared-0.19.9.tgz}
     peerDependencies:
-      '@effect/platform': ^0.69.2
-      effect: ^3.10.0
+      '@effect/platform': ^0.69.9
+      effect: ^3.10.4
 
-  '@effect/platform-node@0.64.3':
-    resolution: {integrity: sha512-p+pPYKw5urWsBwynEVVGQNFW4URO5SlHDj1m8yZmAZCwt/nDdDnlIjipxzpen0IL8hYlbD03q7pleg4yKjGavQ==, tarball: https://registry.npmjs.org/@effect/platform-node/-/platform-node-0.64.3.tgz}
+  '@effect/platform-node@0.64.10':
+    resolution: {integrity: sha512-V8dC6GGxC5VBGEoTApSX5+MJTKDNPeSFzdQiZroDvAulOoA18hTj3jVz2pgtP9DjlJ8EIUEW8lMETD149FMbWA==, tarball: https://registry.npmjs.org/@effect/platform-node/-/platform-node-0.64.10.tgz}
     peerDependencies:
-      '@effect/platform': ^0.69.2
-      effect: ^3.10.0
+      '@effect/platform': ^0.69.9
+      effect: ^3.10.4
 
-  '@effect/platform@0.69.2':
-    resolution: {integrity: sha512-2hUmLDyXeeRv4icjQQ2t50JCYVdg2vxmsb9A5hxVUelEvPP0X/UF9oqMdP9W+c5x19TEVXDrdyGIg4lN8srKsA==, tarball: https://registry.npmjs.org/@effect/platform/-/platform-0.69.2.tgz}
+  '@effect/platform@0.69.9':
+    resolution: {integrity: sha512-gdp5rLxKLBBI895ycBRkuwCQHnYf8g6+Sdg5tFhuH+axIdgP4J8dGzIvYBGAkRMw/4k2BYeSKKf8ZONYnNWcWg==, tarball: https://registry.npmjs.org/@effect/platform/-/platform-0.69.9.tgz}
     peerDependencies:
-      effect: ^3.10.0
+      effect: ^3.10.4
 
   '@effect/printer-ansi@0.37.1':
     resolution: {integrity: sha512-ol0Qr60xP+eM8UsR9W/+JDM2JoDb4yb2xQJcbfHBNS15L37Z7fG1cImmQktl6L5/bQ1DXcjnH3UQ1uLpOoc71A==, tarball: https://registry.npmjs.org/@effect/printer-ansi/-/printer-ansi-0.37.1.tgz}
@@ -689,8 +693,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==, tarball: https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz}
 
-  effect@3.10.0:
-    resolution: {integrity: sha512-J9rsJBXNHZxklJTbHriY8D9wIHhmvXDamExW4pPZ2kPNZ+XRfstXeHBqpXAIK+B42ASVbuDswAXyup5WHWK6jg==, tarball: https://registry.npmjs.org/effect/-/effect-3.10.0.tgz}
+  effect@3.10.4:
+    resolution: {integrity: sha512-D7Mryq8jylT0fIGrgXEn2TublO/BhduRwzlqV5z1l/QFY6grs7UOyyomlAOFMK9ArSYiLgrOSMQ/Cr/cIOeU2Q==, tarball: https://registry.npmjs.org/effect/-/effect-3.10.4.tgz}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==, tarball: https://registry.npmjs.org/emoji-regex/-/emoji-regex-8.0.0.tgz}
@@ -1252,28 +1256,28 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@effect/cli@0.48.2(@effect/platform@0.69.2(effect@3.10.0))(@effect/printer-ansi@0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0))(@effect/printer@0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0))(effect@3.10.0)':
+  '@effect/cli@0.48.9(@effect/platform@0.69.9(effect@3.10.4))(@effect/printer-ansi@0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4))(@effect/printer@0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4))(effect@3.10.4)':
     dependencies:
-      '@effect/platform': 0.69.2(effect@3.10.0)
-      '@effect/printer': 0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0)
-      '@effect/printer-ansi': 0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0)
-      effect: 3.10.0
+      '@effect/platform': 0.69.9(effect@3.10.4)
+      '@effect/printer': 0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4)
+      '@effect/printer-ansi': 0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4)
+      effect: 3.10.4
       ini: 4.1.3
       toml: 3.0.0
       yaml: 2.5.1
 
-  '@effect/platform-node-shared@0.19.2(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)':
+  '@effect/platform-node-shared@0.19.9(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)':
     dependencies:
-      '@effect/platform': 0.69.2(effect@3.10.0)
+      '@effect/platform': 0.69.9(effect@3.10.4)
       '@parcel/watcher': 2.4.1
-      effect: 3.10.0
+      effect: 3.10.4
       multipasta: 0.2.5
 
-  '@effect/platform-node@0.64.3(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)':
+  '@effect/platform-node@0.64.10(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)':
     dependencies:
-      '@effect/platform': 0.69.2(effect@3.10.0)
-      '@effect/platform-node-shared': 0.19.2(@effect/platform@0.69.2(effect@3.10.0))(effect@3.10.0)
-      effect: 3.10.0
+      '@effect/platform': 0.69.9(effect@3.10.4)
+      '@effect/platform-node-shared': 0.19.9(@effect/platform@0.69.9(effect@3.10.4))(effect@3.10.4)
+      effect: 3.10.4
       mime: 3.0.0
       undici: 6.19.8
       ws: 8.18.0
@@ -1281,26 +1285,26 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform@0.69.2(effect@3.10.0)':
+  '@effect/platform@0.69.9(effect@3.10.4)':
     dependencies:
-      effect: 3.10.0
+      effect: 3.10.4
       find-my-way-ts: 0.1.5
       multipasta: 0.2.5
 
-  '@effect/printer-ansi@0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0)':
+  '@effect/printer-ansi@0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4)':
     dependencies:
-      '@effect/printer': 0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0)
-      '@effect/typeclass': 0.28.1(effect@3.10.0)
-      effect: 3.10.0
+      '@effect/printer': 0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4)
+      '@effect/typeclass': 0.28.1(effect@3.10.4)
+      effect: 3.10.4
 
-  '@effect/printer@0.37.1(@effect/typeclass@0.28.1(effect@3.10.0))(effect@3.10.0)':
+  '@effect/printer@0.37.1(@effect/typeclass@0.28.1(effect@3.10.4))(effect@3.10.4)':
     dependencies:
-      '@effect/typeclass': 0.28.1(effect@3.10.0)
-      effect: 3.10.0
+      '@effect/typeclass': 0.28.1(effect@3.10.4)
+      effect: 3.10.4
 
-  '@effect/typeclass@0.28.1(effect@3.10.0)':
+  '@effect/typeclass@0.28.1(effect@3.10.4)':
     dependencies:
-      effect: 3.10.0
+      effect: 3.10.4
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
@@ -1713,7 +1717,7 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@3.10.0:
+  effect@3.10.4:
     dependencies:
       fast-check: 3.21.0
 

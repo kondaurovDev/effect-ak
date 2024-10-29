@@ -25,14 +25,14 @@ export class TranscribeRequest
     prompt: S.NonEmptyString.pipe(S.optional)
   }) {
   
-    getHttpBody() {
+    static getHttpBody(request: TranscribeRequest) {
       const formData = new global.FormData();
-      formData.append("model", this.model);
-      formData.append("response_format", this.response_format);
-      if (this.language) {
-        formData.append("language", this.language)
+      formData.append("model", request.model);
+      formData.append("response_format", request.response_format);
+      if (request.language) {
+        formData.append("language", request.language)
       }
-      formData.append("file", this.fileContent, this.fileName);
+      formData.append("file", new Blob([request.fileContent]), request.fileName);
       return HttpBody.formData(formData);
     }
 

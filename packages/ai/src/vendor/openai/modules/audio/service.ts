@@ -46,7 +46,7 @@ export class AudioService
               HttpClientRequest.post(
                 `/v1/audio/transcriptions`,
                 {
-                  body: request.getHttpBody()
+                  body: TranscribeRequest.getHttpBody(request)
                 },
               ),
               OneOfTranscriptionResponse

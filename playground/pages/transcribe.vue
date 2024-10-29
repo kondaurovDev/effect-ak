@@ -1,58 +1,44 @@
 <template>
   <v-container>
-    <v-row justify="center" align="center">
+    <v-row justify="center">
       <v-col cols="12" sm="8" md="6">
-        <v-card class="pa-4">
-          <div class="d-flex align-center justify-space-between">
-            <!-- Индикатор записи -->
-            <v-fade-transition>
-              <div v-if="isRecording" class="d-flex align-center">
-                <v-progress-circular
-                  indeterminate
-                  color="red"
-                  size="20"
-                  class="mr-2"
-                />
-                <span class="text-red">{{ formattedTime }}</span>
-              </div>
-            </v-fade-transition>
+        <v-card>
+          <v-card-title class="text-center">
+            Запись голоса
+          </v-card-title>
 
-            <!-- Кнопка записи -->
+          <v-card-text class="text-center">
+            <div class="text-h2 my-4">
+              {{ formattedTime }}
+            </div>
+
             <v-btn
-              :color="isRecording ? 'red' : 'primary'"
-              :icon="true"
-              size="large"
-              @click="startRecording"
-              :disabled="isUploading"
+              :color="isRecording ? 'error' : 'primary'"
+              @click="toggleRecording"
+              :loading="isInitializing"
+              rounded="pill"
+              size="x-large"
             >
-              <v-icon>
-                {{ isRecording ? 'mdi-stop' : 'mdi-microphone' }}
-              </v-icon>
+              <v-icon :icon="isRecording ? 'mdi-stop' : 'mdi-microphone'" class="mr-2" />
+              {{ isRecording ? 'Остановить запись' : 'Начать запись' }}
             </v-btn>
-          </div>
 
-          <!-- Сообщение об ошибке -->
-          <v-alert
-            v-if="error"
-            type="error"
-            variant="tonal"
-            class="mt-4"
-            dismissible
-            @input="error = null"
-          >
-            {{ error }}
-          </v-alert>
-
-          <!-- Индикатор загрузки -->
-          <v-overlay
-            v-model="isUploading"
-            class="align-center justify-center"
-          >
-            <v-progress-circular
-              indeterminate
-              size="64"
-            />
-          </v-overlay>
+            <!-- last record -->
+            <v-expand-transition>
+              <div v-if="audioUrl != null" class="mt-6">
+                <h3 class="text-subtitle-1 mb-2">The last record:</h3>
+                <audio :src="audioUrl" controls></audio>
+                <v-btn
+                  color="secondary"
+                  variant="outlined"
+                  class="mt-2"
+                  @click="transcribe"
+                >
+                  Get text version
+                </v-btn>
+              </div>
+            </v-expand-transition>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -60,132 +46,85 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 
-// Состояния
 const isRecording = ref(false)
-const recordingTime = ref(0)
-const error = ref<string | null>(null)
-const isUploading = ref(false)
+const isInitializing = ref(false)
+const audioUrl = ref<string | null>(null)
+const mediaRecorder = ref<MediaRecorder | null>(null)
+const startTime = ref<number>(0)
+const currentTime = ref<number>(0)
+const timer = ref<number | null>(null)
+const chunks: BlobPart[] = [];
 
-// Переменные для записи
-let mediaRecorder: MediaRecorder | null = null
-let audioChunks: Blob[] = []
-let timer: number | null = null
-
-// Форматированное время
 const formattedTime = computed(() => {
-  const minutes = Math.floor(recordingTime.value / 60)
-  const seconds = recordingTime.value % 60
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  const totalSeconds = Math.floor(currentTime.value / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 })
 
-// Форматирование времени записи (на случай, если понадобится отдельно)
-const formatTime = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-}
+const getBlob = () =>
+  new Blob(chunks, { type: 'audio/webm' })
 
-// Начало записи
-const startRecording = async () => {
-  if (isUploading.value) {
-    error.value = 'Загрузка уже идет. Подождите завершения.'
-    return
-  }
-
+async function initRecorder() {
   try {
-    error.value = null
+    isInitializing.value = true
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaRecorder.value = new MediaRecorder(stream);
     
-    mediaRecorder = new MediaRecorder(stream)
-    audioChunks = []
-
-    mediaRecorder.ondataavailable = (event: BlobEvent) => {
-      if (event.data.size > 0) {
-        audioChunks.push(event.data)
-      }
+    mediaRecorder.value.ondataavailable = (e) => {
+      chunks.push(e.data)
     }
 
-    mediaRecorder.onerror = (event) => {
-      // console.error('MediaRecorder ошибка:', event.error as any)
-      error.value = 'Ошибка записи аудио.'
-      stopRecording()
-    }
+    mediaRecorder.value.onstop = () =>
+      audioUrl.value = URL.createObjectURL(getBlob());
 
-    mediaRecorder.start()
+    isInitializing.value = false
+  } catch (error) {
+    console.error('Ошибка при инициализации записи:', error)
+    isInitializing.value = false
+  }
+}
+
+async function toggleRecording() {
+  if (!mediaRecorder.value) {
+    await initRecorder()
+  }
+
+  if (!isRecording.value) {
+    chunks.length = 0;
+    mediaRecorder.value?.start()
     isRecording.value = true
-    recordingTime.value = 0
-
-    // Запуск таймера
-    timer = window.setInterval(() => {
-      recordingTime.value++
-    }, 1000)
-
-  } catch (err) {
-    error.value = 'Не удалось получить доступ к микрофону.'
-    console.error('Ошибка доступа к микрофону:', err)
-  }
-}
-
-// Остановка записи
-const stopRecording = () => {
-  if (!isRecording.value || !mediaRecorder) return
-
-  mediaRecorder.stop()
-  isRecording.value = false
-
-  if (timer !== null) {
-    clearInterval(timer)
-    timer = null
-  }
-
-  mediaRecorder.onstop = async () => {
-    try {
-      if (audioChunks.length === 0) {
-        throw new Error('Нет записанных данных.')
-      }
-
-      isUploading.value = true
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
-
-      const formData = new FormData()
-      formData.append('audio', audioBlob, 'recording.webm')
-
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(errorText || 'Ошибка при отправке аудио.')
-      }
-
-      // Обработка успешной загрузки (например, отображение результата)
-      // const result = await response.json()
-      // console.log('Транскрипция:', result)
-
-    } catch (err: any) {
-      error.value = err.message || 'Неизвестная ошибка при загрузке аудио.'
-      console.error('Ошибка загрузки аудио:', err)
-    } finally {
-      // Очистка ресурсов
-      mediaRecorder?.stream.getTracks().forEach(track => track.stop())
-      mediaRecorder = null
-      audioChunks = []
-      isUploading.value = false
+    startTime.value = Date.now()
+    currentTime.value = 0
+    audioUrl.value = null
+    
+    timer.value = window.setInterval(() => {
+      currentTime.value = Date.now() - startTime.value
+    }, 100)
+  } else {
+    mediaRecorder.value?.stop()
+    isRecording.value = false;
+    
+    if (timer.value) {
+      clearInterval(timer.value)
+      timer.value = null
     }
   }
 }
 
-// Очистка при размонтировании компонента
-onUnmounted(() => {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop()
-  }
-  if (timer !== null) {
-    clearInterval(timer)
-  }
-})
+async function transcribe() {
+  if (!audioUrl.value) return;
+
+  const formData = new FormData();
+
+  formData.append("audioFile", getBlob(), "speech.webm");
+
+  const res = await fetch("/api/transcribe", {
+    body: formData,
+    method: "post"
+  })
+
+}
 </script>

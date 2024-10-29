@@ -1,6 +1,11 @@
-import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from "@effect/platform"
+import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema, Multipart } from "@effect/platform"
 import { Array, ParseResult } from "effect";
 import * as S from "effect/Schema";
+
+export class UnknownError extends S.TaggedError<UnknownError>()(
+  "UnknownError",
+  {}
+) {}
 
 const assetPath =
   S.transformOrFail(
@@ -28,6 +33,24 @@ const assetPath =
 
 export class Endpoints extends
   HttpApiGroup.make("endpoints")
+    .addError(UnknownError, { status: 418 })
+    .add(
+      HttpApiEndpoint
+        .get("compile", "/compile")
+        .addSuccess(S.Unknown)
+    )
+    .add(
+      HttpApiEndpoint
+        .post("transcribe", "/api/transcribe")
+        .setPayload(
+          HttpApiSchema.Multipart(
+            S.Struct({
+              audioFile: Multipart.SingleFileSchema
+            })
+          )
+        )
+        .addSuccess(S.Unknown)
+    )
     .add(
       HttpApiEndpoint
         .get("rootPage", "/")
@@ -56,7 +79,7 @@ export class Endpoints extends
         .setPath(S.Struct({
           path: S.NonEmptyString
         }))
-        .addSuccess(HttpApiSchema.Text({ contentType: "text/javascript" }))
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/css" }))
     )
     .add(
       HttpApiEndpoint

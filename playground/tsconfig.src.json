@@ -5,6 +5,7 @@
     { "path": "../packages/ai/tsconfig.src.json" }
   ],
   "compilerOptions": {
+    "resolveJsonModule": true,
     "types": ["node"],
     "outDir": "dist",
     "declaration": true,
