@@ -1,7 +1,7 @@
 import { FileSystem, HttpApi, HttpApiBuilder } from "@effect/platform";
-import { Effect, Layer, pipe } from "effect";
+import { Config, ConfigProvider, Effect, Layer, pipe } from "effect";
 import { readFile } from "fs/promises"
-import { Openai } from "@effect-ak/ai/vendor"
+import { Deepgram, Openai } from "@effect-ak/ai/vendor"
 
 import { Endpoints, UnknownError } from "./definition.js";
 import { htmlPage } from "./enrypoint.js";
@@ -32,19 +32,36 @@ export class BackendApi
 
               const compileService = yield* CompileVueService;
               const whisperService = yield* Openai.Audio.AudioService;
+              const deepgramStt = yield* Deepgram.SpeachToTextService;
               const fs = yield* FileSystem.FileSystem;
 
               return handlers
+                .handle("verbose", () =>
+                  pipe(
+                    Config.hashMap(Config.nonEmptyString(), "openai"),
+                    Effect.catchAll(() =>
+                      Effect.fail(new UnknownError())
+                    )
+                  )
+                )
                 .handle("transcribe", ({ payload }) =>
                   pipe(
                     fs.readFile(payload.audioFile.path),
                     Effect.andThen(fileContent =>
-                      whisperService.transcribe({
-                        fileContent: fileContent,
-                        fileName: payload.audioFile.name,
-                        model: "whisper-1",
-                        response_format: "text"
-                      }),
+                      Effect.all({
+                        whisper: 
+                          whisperService.transcribe({
+                            fileContent: fileContent,
+                            fileName: payload.audioFile.name,
+                            model: "whisper-1",
+                            response_format: "json"
+                          }),
+                        nova2:
+                          pipe(
+                            deepgramStt.getTranscription(fileContent, "audio/webm"),
+                            Effect.merge
+                          )
+                      }, { concurrency: "unbounded" }),
                     ),
                     Effect.tapError(Effect.logError),
                     Effect.catchAll(() =>

@@ -1,5 +1,5 @@
-import { Effect } from "effect";
-import { HttpClientRequest } from "@effect/platform";
+import { Effect, pipe } from "effect";
+import { HttpBody, HttpClientRequest } from "@effect/platform";
 
 import { DeepgramHttpClient } from "../../api/http-client.js";
 
@@ -11,13 +11,33 @@ export class SpeachToTextService
         const httpClient = yield* DeepgramHttpClient;
 
         const getTranscription = (
-          file: File
+          audioBytes: Uint8Array,
+          contentType: string
         ) =>
-          httpClient.getJson(
-            HttpClientRequest.post("/listen")
+          pipe(
+            httpClient.getJson(
+              HttpClientRequest.post("/listen", {
+                body: HttpBody.uint8Array(audioBytes),
+                headers: {
+                  "Content-type": contentType
+                },
+                urlParams: {
+                  language: "ru",
+                  model: "base",
+                  filler_words: true,
+                  punctuate: true,
+                  intents: true
+                }
+              })
+            )
           )
 
+        return {
+          getTranscription
+        } as const;
+      }),
 
-        return {} as const;
-      })
+      dependencies: [
+        DeepgramHttpClient.Default
+      ]
   }) { }

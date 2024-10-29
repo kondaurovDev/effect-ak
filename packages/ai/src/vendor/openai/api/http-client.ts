@@ -14,7 +14,7 @@ export class OpenaiHttpClient
             auth: {
               headerName: "Authorization",
               tokenContainerName: "openai",
-              isBearer: true,
+              tokenPrefix: "Bearer",
             }
           })
 

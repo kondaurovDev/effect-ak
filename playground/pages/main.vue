@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-// Нет необходимости в дополнительной логике для этого простого компонента
+
 </script>
 
 <style scoped>

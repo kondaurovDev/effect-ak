@@ -17,7 +17,7 @@ export class AnthropicHttpClient extends
             auth: {
               headerName: "x-api-key",
               tokenContainerName: "anthropic",
-              isBearer: false
+              tokenPrefix: ""
             }
           })
 

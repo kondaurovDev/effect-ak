@@ -36,6 +36,11 @@ export class Endpoints extends
     .addError(UnknownError, { status: 418 })
     .add(
       HttpApiEndpoint
+        .get("verbose", "/verbose")
+        .addSuccess(S.Unknown)
+    )
+    .add(
+      HttpApiEndpoint
         .get("compile", "/compile")
         .addSuccess(S.Unknown)
     )

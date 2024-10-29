@@ -1,4 +1,4 @@
-import { pipe, Effect, Config } from "effect";
+import { pipe, Effect, Config, String } from "effect";
 import { HttpClient, HttpClientRequest, FetchHttpClient } from "@effect/platform";
 import * as S from "effect/Schema";
 
@@ -10,7 +10,7 @@ export class MakeHttpClientInput
       S.Struct({
         headerName: S.NonEmptyString,
         tokenContainerName: S.NonEmptyString,
-        isBearer: S.Boolean
+        tokenPrefix: S.String
       })
   }) { }
 
@@ -34,8 +34,8 @@ export const makeJsonHttpClient = (
     const tokenHeaderValueEffect =
       pipe(
         Config.nonEmptyString("token").pipe(Config.nested(input.auth.tokenContainerName)),
-        Effect.andThen(token =>
-          input.auth.isBearer ? `Bearer ${token}` : token
+        Effect.andThen(token => 
+          String.isEmpty(input.auth.tokenPrefix) ? token : `${input.auth.tokenPrefix.trim()} ${token}`
         )
       )
 

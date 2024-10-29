@@ -15,7 +15,7 @@ export class DeepgramHttpClient extends
             defaultHeaders: {},
             auth: {
               headerName: "Authorization",
-              isBearer: false,
+              tokenPrefix: "Token",
               tokenContainerName: "deepgram"
             }
           });
