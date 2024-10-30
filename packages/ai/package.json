@@ -6,6 +6,9 @@
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "url": "https://github.com/kondaurovDev/efkit",
     "directory": "packages/ai"
