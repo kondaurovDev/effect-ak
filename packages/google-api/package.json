@@ -6,6 +6,9 @@
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist"
   ],
