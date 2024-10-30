@@ -1,6 +1,6 @@
 {
   "name": "@effect-ak/tg-bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "telegram bot client with help of Effect",
   "license": "MIT",
   "type": "module",
@@ -12,7 +12,7 @@
     "email": "kondaurov.dev@gmail.com"
   },
   "repository": {
-    "url": "https://github.com/kondaurovDev/efkit",
+    "url": "https://github.com/kondaurovDev/effect-ak",
     "directory": "packages/tg-bot"
   },
   "main": "./dist/index.js",

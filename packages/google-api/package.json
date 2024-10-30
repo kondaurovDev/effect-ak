@@ -28,8 +28,8 @@
     }
   },
   "repository": {
-    "url": "https://github.com/kondaurovDev/efkit",
-    "directory": "packages/google"
+    "url": "https://github.com/kondaurovDev/effect-ak",
+    "directory": "packages/google-api"
   },
   "license": "MIT",
   "main": "./dist/index.js",

@@ -10,7 +10,7 @@
     "email": "kondaurov.dev@gmail.com"
   },
   "repository": {
-    "url": "https://github.com/kondaurovDev/efkit",
+    "url": "https://github.com/kondaurovDev/effect-ak",
     "directory": "packages/misc"
   },
   "license": "MIT",

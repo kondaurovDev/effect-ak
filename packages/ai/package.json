@@ -10,7 +10,7 @@
     "access": "public"
   },
   "repository": {
-    "url": "https://github.com/kondaurovDev/efkit",
+    "url": "https://github.com/kondaurovDev/effect-ak",
     "directory": "packages/ai"
   },
   "license": "MIT",
