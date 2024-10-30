@@ -112,6 +112,9 @@ importers:
       '@effect-ak/ai':
         specifier: workspace:^
         version: link:../packages/ai
+      '@effect-ak/misc':
+        specifier: workspace:^
+        version: link:../packages/misc
       esbuild:
         specifier: ^0.24.0
         version: 0.24.0

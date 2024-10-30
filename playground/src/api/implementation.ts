@@ -1,7 +1,7 @@
 import { FileSystem, HttpApi, HttpApiBuilder } from "@effect/platform";
 import { Config, Effect, Layer, pipe } from "effect";
 import { readFile } from "fs/promises"
-import { Deepgram, Openai } from "@effect-ak/ai/vendor"
+import { Deepgram, Openai, Stabilityai } from "@effect-ak/ai/vendor"
 
 import { Endpoints, UnknownError } from "./definition.js";
 import { htmlPage } from "./enrypoint.js";
@@ -33,6 +33,7 @@ export class BackendApi
               const compileService = yield* CompileVueService;
               const whisperService = yield* Openai.Audio.AudioService;
               const deepgramStt = yield* Deepgram.SpeachToTextService;
+              const stabilityai = yield* Stabilityai.ImageGenerationService;
               const gpt4o = yield* Openai.Text.TextService;
               const fs = yield* FileSystem.FileSystem;
 
@@ -94,6 +95,17 @@ export class BackendApi
                     )
                   )
                 )
+                .handle("generateImage", ({ payload }) =>
+                  pipe(
+                    stabilityai.generateImage({
+                      prompt: payload.prompt
+                    }),
+                    Effect.tapError(Effect.logError),
+                    Effect.catchAll(() =>
+                      Effect.fail(new UnknownError())
+                    )
+                  )
+                )
                 .handle("compile", () =>
                   pipe(
                     compileService.compileAll,
@@ -106,8 +118,8 @@ export class BackendApi
                 .handle("rootPage", () =>
                   Effect.succeed(htmlPage("main"))
                 )
-                .handle("transcribeHtmlPage", () =>
-                  Effect.succeed(htmlPage("transcribe"))
+                .handle("page", ({ path }) =>
+                  Effect.succeed(htmlPage(path.pageName))
                 )
                 .handle("vue-component", (params) =>
                   params.path.path.endsWith(".map") ?
@@ -148,7 +160,8 @@ export class BackendApi
           Openai.Text.TextService.Default,
           CompileVueService.Default,
           Deepgram.SpeachToTextService.Default,
-          Openai.Audio.AudioService.Default
+          Openai.Audio.AudioService.Default,
+          Stabilityai.ImageGenerationService.Default
         ])
       )
 }

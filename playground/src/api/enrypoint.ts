@@ -7,15 +7,15 @@ export const htmlPage = (
   <head>
     <meta charset="UTF-8">
     <title>Effect-ak playground</title>
-    <link href="./vendor/css/vuetify:dist:vuetify.min" rel="stylesheet">
-    <link href="./css/${componentPath}" rel="stylesheet">
+    <link href="/vendor/css/vuetify:dist:vuetify.min" rel="stylesheet">
+    <link href="/css/${componentPath}" rel="stylesheet">
   </head>
   <body>
   <script type="importmap">
     {
       "imports": {
-        "vue": "./vendor/js/vue:dist:vue.esm-browser.js",
-        "vuetify": "./vendor/js/vuetify:dist:vuetify.esm.js"
+        "vue": "/vendor/js/vue:dist:vue.esm-browser.js",
+        "vuetify": "/vendor/js/vuetify:dist:vuetify.esm.js"
       }
     }
   </script>
@@ -27,7 +27,7 @@ export const htmlPage = (
 
       const vuetify = createVuetify();
           
-      import App2 from './js/${componentPath}';
+      import App2 from '/js/${componentPath}';
 
       createApp(App2).use(vuetify).mount('#app');
     </script>

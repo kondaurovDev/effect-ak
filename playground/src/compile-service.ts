@@ -103,7 +103,8 @@ export class CompileVueService
           pipe(
             Effect.all([
               compileVueFile("transcribe"),
-              compileVueFile("main")
+              compileVueFile("main"),
+              compileVueFile("image")
             ]),
             Effect.andThen(() => "Compiled"),
             Effect.provide(NodeContext.layer)

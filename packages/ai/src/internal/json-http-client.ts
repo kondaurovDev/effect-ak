@@ -28,6 +28,9 @@ export const makeJsonHttpClient = (
             HttpClientRequest.setHeaders(input.defaultHeaders ?? {})
           )
         ),
+        HttpClient.tapRequest(request =>
+          Effect.logDebug("http request", Object.keys(request.headers))
+        ),
         HttpClient.filterStatusOk
       );
 
@@ -74,6 +77,7 @@ export const makeJsonHttpClient = (
           )
         ),
         Effect.andThen(_ => _.json),
+        Effect.tap(() => Effect.logDebug("Successful response")),
         Effect.scoped,
       );
 

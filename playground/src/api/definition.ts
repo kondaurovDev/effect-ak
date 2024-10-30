@@ -58,12 +58,25 @@ export class Endpoints extends
     )
     .add(
       HttpApiEndpoint
+        .post("generateImage", "/api/generate-image")
+        .setPayload(
+          S.Struct({
+            prompt: S.NonEmptyString
+          })
+        )
+        .addSuccess(S.Unknown)
+    )
+    .add(
+      HttpApiEndpoint
         .get("rootPage", "/")
         .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
     )
     .add(
       HttpApiEndpoint
-        .get("transcribeHtmlPage", "/transcribe")
+        .get("page", "/page/:pageName")
+        .setPath(S.Struct({
+          pageName: S.NonEmptyString
+        }))
         .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
     )
     .add(
