@@ -1,5 +1,5 @@
 import { FileSystem, HttpApi, HttpApiBuilder } from "@effect/platform";
-import { Config, ConfigProvider, Effect, Layer, pipe } from "effect";
+import { Config, Effect, Layer, pipe } from "effect";
 import { readFile } from "fs/promises"
 import { Deepgram, Openai } from "@effect-ak/ai/vendor"
 
@@ -33,6 +33,7 @@ export class BackendApi
               const compileService = yield* CompileVueService;
               const whisperService = yield* Openai.Audio.AudioService;
               const deepgramStt = yield* Deepgram.SpeachToTextService;
+              const gpt4o = yield* Openai.Text.TextService;
               const fs = yield* FileSystem.FileSystem;
 
               return handlers
@@ -59,9 +60,33 @@ export class BackendApi
                         nova2:
                           pipe(
                             deepgramStt.getTranscription(fileContent, "audio/webm"),
+                            Effect.andThen(_ => _.results.channels[0].alternatives[0].transcript),
                             Effect.merge
-                          )
+                          ),
+                        gpt4o:
+                          gpt4o.complete({
+                            model: "gpt-4o-audio-preview",
+                            messages: [
+                              {
+                                role: "system",
+                                content: "your task is to transcribe user's speech, don't try to fix errors, let them be. Multiple languages might be used. Also, give json object with keys: transcription, grammarErrorsCount, fluency (in %)"
+                              },
+                              {
+                                role: "user",
+                                content: [
+                                  {
+                                    type: "input_audio",
+                                    input_audio: {
+                                      data: Buffer.from(fileContent).toString("base64"),
+                                      format: "wav"
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                          })
                       }, { concurrency: "unbounded" }),
+                        
                     ),
                     Effect.tapError(Effect.logError),
                     Effect.catchAll(() =>
@@ -118,5 +143,12 @@ export class BackendApi
             })
           )
         )
+      ).pipe(
+        Layer.provide([
+          Openai.Text.TextService.Default,
+          CompileVueService.Default,
+          Deepgram.SpeachToTextService.Default,
+          Openai.Audio.AudioService.Default
+        ])
       )
 }

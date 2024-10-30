@@ -1,4 +1,4 @@
-import { Effect, pipe } from "effect";
+import { Effect, pipe, Queue } from "effect";
 import * as S from "effect/Schema";
 
 import { OpenaiChatCompletionEndpoint } from "../../api/index.js";

@@ -4,7 +4,7 @@
       <v-col cols="12" sm="8" md="6">
         <v-card>
           <v-card-title class="text-center">
-            Запись голоса
+            Voice record
           </v-card-title>
 
           <v-card-text class="text-center">
@@ -46,12 +46,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
+
+import { MediaRecorder, register, IMediaRecorder } from 'extendable-media-recorder';
+import { connect } from 'extendable-media-recorder-wav-encoder';
 
 const isRecording = ref(false)
 const isInitializing = ref(false)
 const audioUrl = ref<string | null>(null)
-const mediaRecorder = ref<MediaRecorder | null>(null)
+const mediaRecorder = ref<IMediaRecorder | null>(null)
 const startTime = ref<number>(0)
 const currentTime = ref<number>(0)
 const timer = ref<number | null>(null)
@@ -69,9 +72,11 @@ const getBlob = () =>
 
 async function initRecorder() {
   try {
+    await register(await connect());
+
     isInitializing.value = true
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    mediaRecorder.value = new MediaRecorder(stream);
+    mediaRecorder.value = new MediaRecorder(stream, { mimeType: "audio/wav" });
     
     mediaRecorder.value.ondataavailable = (e) => {
       chunks.push(e.data)

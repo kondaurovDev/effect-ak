@@ -9,6 +9,16 @@ export class ImageMessageContent
       })
   }) {}
 
+export class AudioMessageContent
+  extends S.Class<AudioMessageContent>("AudioMessageContent")({
+    type: S.Literal("input_audio"),
+    input_audio:
+      S.Struct({
+        data: S.StringFromBase64,
+        format: S.Literal("wav")
+      })
+  }) {}
+
 export class TextMessageContent
   extends S.Class<TextMessageContent>("TextMessageContent")({
     type: S.Literal("text"),
@@ -18,7 +28,8 @@ export class TextMessageContent
 export const OneOfMessageContent =
   S.Union(
     ImageMessageContent,
-    TextMessageContent
+    TextMessageContent,
+    AudioMessageContent
   );
 
 export type MessageContent = typeof MessageContent.Type

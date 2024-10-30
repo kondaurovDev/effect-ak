@@ -3,11 +3,9 @@ import { NodeHttpServer, NodeRuntime } from "@effect/platform-node"
 import { ConfigProvider, Layer, Logger, LogLevel } from "effect"
 import { createServer } from "node:http"
 import { setConfigProvider } from "effect/Layer"
-import { Deepgram, Openai } from "@effect-ak/ai/vendor"
 
 import integrationConfig from "../../packages/ai/integration-config.json"
 import { BackendApi } from "./api/implementation.js"
-import { CompileVueService } from "./compile-service.js"
 
 const nodeHttpServer = (
   port: number
@@ -31,25 +29,14 @@ const configProvider =
     })
   )
 
-const servicesLive =
-  Layer.mergeAll(
-    CompileVueService.Default,
-    Openai.Audio.AudioService.Default,
-    Deepgram.SpeachToTextService.Default
-  ).pipe(
-    Layer.provide(configProvider)
-  )
-
 const HttpLive =
   HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
     Layer.provide(HttpApiBuilder.middlewareCors()),
-    Layer.provide(
-      BackendApi.live.pipe(
-        Layer.provide(servicesLive)
-      )
-    ),
+    Layer.provide(BackendApi.live),
     HttpServer.withLogAddress,
     Layer.provide(nodeHttpServer(3000))
+  ).pipe(
+    Layer.provide(configProvider)
   )
 
 Layer.launch(HttpLive).pipe(NodeRuntime.runMain)

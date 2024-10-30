@@ -2,7 +2,7 @@ import { compileTemplate, parse, compileScript, compileStyle } from "vue/compile
 import { Cause, pipe, Effect, Config } from "effect"
 import { FileSystem } from "@effect/platform"
 import { NodeContext } from "@effect/platform-node"
-import { transpile, ModuleKind, ScriptTarget } from "typescript"
+import { build } from "esbuild"
 
 export class CompileVueService
   extends Effect.Service<CompileVueService>()("CompileVueService", {
@@ -36,12 +36,7 @@ export class CompileVueService
                 id: componentName
               })
 
-            const jsScript = transpile(script.content, {
-              module: ModuleKind.ESNext,
-              target: ScriptTarget.ESNext
-            })
-
-            jsResult.push(jsScript.replace("export default", `const ${resultObjectName} =`));
+            jsResult.push(script.content.replace("export default", `const ${resultObjectName} =`));
 
             jsResult.push("// next, template");
 
@@ -87,7 +82,20 @@ export class CompileVueService
 
             }
 
-            yield* fs.writeFileString(`${componentsOutDir}/${componentName}.js`, jsResult.join("\n"));
+            yield* fs.writeFileString(`${componentsOutDir}/${componentName}.ts`, jsResult.join("\n"));
+
+            yield* Effect.tryPromise(() =>
+              build({
+                bundle: true,
+                // minify: true,
+                entryPoints: [
+                  `${componentsOutDir}/${componentName}.ts`
+                ],
+                format: "esm",
+                external: ["vue"],
+                outdir: __dirname + "/../.out"
+              })
+            )
 
           });
 

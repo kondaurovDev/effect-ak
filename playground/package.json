@@ -22,6 +22,7 @@
     "vuetify": "^3.7.3"
   },
   "dependencies": {
-    "@effect-ak/ai": "workspace:^"
+    "@effect-ak/ai": "workspace:^",
+    "esbuild": "^0.24.0"
   }
 }

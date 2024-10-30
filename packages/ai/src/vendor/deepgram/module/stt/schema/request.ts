@@ -1,4 +1,4 @@
-import * as S from "effect/Schema";;
+import * as S from "effect/Schema";
 
 export class TranscribeVoiceRequest
   extends S.Class<TranscribeVoiceRequest>("TranscribeVoiceRequest")({

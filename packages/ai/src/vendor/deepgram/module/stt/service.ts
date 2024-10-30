@@ -1,7 +1,9 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
+import * as S from "effect/Schema";
 
 import { DeepgramHttpClient } from "../../api/http-client.js";
+import { TranscribeVoiceResponse } from "./schema/response.js";
 
 export class SpeachToTextService
   extends Effect.Service<SpeachToTextService>()("SpeachToTextService", {
@@ -29,6 +31,10 @@ export class SpeachToTextService
                   intents: true
                 }
               })
+            ),
+            Effect.tap(Effect.logInfo),
+            Effect.andThen(
+              S.decodeUnknown(TranscribeVoiceResponse, { onExcessProperty: "ignore" })
             )
           )
 
