@@ -34,10 +34,7 @@ describe("Csv data service", () => {
           });
 
         const decoded1 =
-          service.decode({
-            columns,
-            lines: encoded1.split("\n")
-          })
+          service.decode(encoded1.split("\n"))
 
         return {
           encoded1, decoded1
@@ -51,6 +48,7 @@ describe("Csv data service", () => {
 
     expect(program.value.encoded1)
       .toEqual([
+        "col1;col2",
         "col1ObjValue;col2ObjValue",
         "col1Obj2Value;null"
       ].join("\n"));
@@ -77,8 +75,7 @@ describe("Csv data service", () => {
         const service = yield* CsvService;
 
         const encodedObjects =
-          service.encodeObjects({
-            objects: [
+          service.encodeObjects([
               {
                 price: 2,
                 name: "name1"
@@ -87,8 +84,7 @@ describe("Csv data service", () => {
                 price: 5,
                 category: "cId2"
               }
-            ],
-          })
+            ])
 
         return {
           encodedObjects

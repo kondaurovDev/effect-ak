@@ -1,13 +1,18 @@
-import { Array, Effect, pipe } from "effect";
+import { Array, Config, Effect, pipe } from "effect";
 
 import { Column, CsvCompatibleObject } from "./types.js";
+import { miscModuleName } from "../const.js";
 
 export class CsvService extends Effect.Service<CsvService>()("CsvService", {
   effect:
     Effect.gen(function* () {
 
-      const defaultSeparator = ";";
-      const sepOrDefault = (sep: string | undefined) => sep ?? defaultSeparator;
+      const columnSeparator = 
+        yield* pipe(
+          Config.nonEmptyString("columnSeparator"),
+          Config.nested(miscModuleName),
+          Config.withDefault(";")
+        );
 
       const encode = <O extends CsvCompatibleObject>(
         input: {
@@ -15,32 +20,36 @@ export class CsvService extends Effect.Service<CsvService>()("CsvService", {
           columns: Array.NonEmptyReadonlyArray<Column>,
           sep?: string
         }
-      ) =>
-        Array.map(
-          input.objects,
-          object =>
-            input.columns.reduce(
-              (result, column, index) => {
-                let val = object[column.columnName];
-                result += 
-                  index == input.columns.length - 1 ? val : `${val}${sepOrDefault(input.sep)}`
-                return result;
-              },
-              ""
-            )
-        ).join("\n");
+      ) => {
+        const result = [
+          input.columns.map(_ => _.columnName).join(";")
+        ];
+
+        for (const object of input.objects) {
+          const line = input.columns.reduce(
+            (result, column, index) => {
+              let val = object[column.columnName];
+              if (val == null) { val = null }
+              result += 
+                index == input.columns.length - 1 ? val : `${val}${columnSeparator}`
+              return result;
+            },
+            ""
+          )
+          result.push(line);
+        }
+
+        return result.join("\n");
+      }
 
       const encodeObjects = <O extends CsvCompatibleObject>(
-        input: {
-          objects: readonly O[],
-          sep?: string
-        }
+        input: readonly O[]
       ) => {
 
         const columns = 
           pipe(
             Array.reduce(
-              input.objects,
+              input,
               [] as string[],
               (result, currentObject) => {
                 Object.entries(currentObject).forEach(([ columnName ]) => {
@@ -60,8 +69,7 @@ export class CsvService extends Effect.Service<CsvService>()("CsvService", {
 
         if (Array.isNonEmptyArray(columns)) {
           return [
-            columns.map(_ => _.columnName).join(sepOrDefault(input.sep)),
-            encode({ objects: input.objects, columns })
+            encode({ objects: input, columns })
           ].join("\n")
         } else {
           return undefined;
@@ -70,32 +78,31 @@ export class CsvService extends Effect.Service<CsvService>()("CsvService", {
       }
 
       const decode = (
-        input: {
-          lines: string[],
-          columns: Array.NonEmptyReadonlyArray<Column>,
-          sep?: string
+        lines: string[]
+      ) => {
+        const result = [] as unknown[];
+
+        const columns = lines[0].split(columnSeparator);
+
+        for (const line of lines.slice(1)) {
+          const lineValues = line.split(columnSeparator);
+          const currentObject = new Map<string, string | undefined>();
+          columns.forEach((column, index) => {
+            let columnValue = lineValues.at(index);
+            if (columnValue == "undefined" || columnValue == "null") {
+              columnValue = undefined;
+            }
+            return currentObject.set(column, columnValue?.trim());
+          })
+          result.push(Object.fromEntries(currentObject.entries()));
         }
-      ) =>
-        Array.reduce(
-          input.lines,
-          [] as Record<string, string | undefined>[],
-          (result, currentLine) => {
-            const lineValues = currentLine.split(sepOrDefault(input.sep));
-            const currentObject = new Map<string, string | undefined>();
-            input.columns.forEach((column, index) => {
-              let columnValue = lineValues.at(index);
-              if (columnValue == "undefined" || columnValue == "null") {
-                columnValue = undefined;
-              }
-              return currentObject.set(column.columnName, columnValue?.trim());
-            })
-            result.push(Object.fromEntries(currentObject.entries()));
-            return result;
-          }
-        )
+
+        return result;
+
+      }
 
       return {
-        encodeObjects, encode, decode, defaultSeparator
+        encodeObjects, encode, decode, columnSeparator
       } as const;
 
     })

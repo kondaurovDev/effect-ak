@@ -1,5 +1,5 @@
 import { TaggedError } from "effect/Data";
-import { packageName } from "../common.js";
+import { packageName } from "../const.js";
 
 export class UtilError
   extends TaggedError(`${packageName}.SharedError`)<{

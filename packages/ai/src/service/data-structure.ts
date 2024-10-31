@@ -39,7 +39,7 @@ export class DataStructureService
             # Output
 
             - Must be provided in CSV format, without table header, introduction words or markdown
-            - Column separator is '${csvService.defaultSeparator}'
+            - Column separator is '${csvService.columnSeparator}'
 
             ## CSV columns:
             ${command.outputColumns.map((column, index) =>
@@ -80,10 +80,7 @@ export class DataStructureService
                   Match.exhaustive
                 ),
                 Effect.andThen(response =>
-                  csvService.decode({
-                    lines: response.split("\n"),
-                    columns: command.outputColumns
-                  })
+                  csvService.decode(response.split("\n"))
                 )
               )
 

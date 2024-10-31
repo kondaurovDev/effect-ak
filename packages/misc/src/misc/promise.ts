@@ -1,6 +1,6 @@
 import { Data, Effect, pipe } from "effect";
 
-import { packageName } from "../common.js";
+import { packageName } from "../const.js";
 
 export class PromiseError<E>
   extends Data.TaggedError(`${packageName}.PromiseError`)<{

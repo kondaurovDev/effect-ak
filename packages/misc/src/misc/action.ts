@@ -1,7 +1,7 @@
 import { Effect, pipe, Context, Layer, Cause, identity, Logger, Data } from "effect";
 import * as S from "effect/Schema"
 import { ActionError, ActionIOError, ActionLog } from "./action-error.js";
-import { packageName } from "../common.js";
+import { packageName } from "../const.js";
 
 export class ActionSuccess<O>
   extends Data.TaggedClass(`${packageName}.ActionSuccess`)<{

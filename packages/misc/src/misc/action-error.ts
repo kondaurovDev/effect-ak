@@ -1,6 +1,6 @@
 import { Cause, Data, ParseResult } from "effect"
 
-import { packageName } from "../common.js"
+import { packageName } from "../const.js"
 
 export type ActionLog = {
   message: unknown,
