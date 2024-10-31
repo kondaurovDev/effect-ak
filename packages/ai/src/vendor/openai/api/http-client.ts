@@ -9,11 +9,10 @@ export class OpenaiHttpClient
 
         const client =
           yield* makeJsonHttpClient({
+            vendorName: "openai",
             baseUrl: "https://api.openai.com",
-            defaultHeaders: {},
             auth: {
               headerName: "Authorization",
-              tokenContainerName: "openai",
               tokenPrefix: "Bearer",
             }
           })

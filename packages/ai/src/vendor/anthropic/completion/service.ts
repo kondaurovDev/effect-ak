@@ -2,7 +2,7 @@ import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
 import { AnthropicHttpClient } from "../api/http-client.js";
-import { ChatCompletionInterface, ProviderName } from "../../../interface/chat-completion.js";
+import { ChatCompletionInterface, ProviderName } from "../../../domain/chat-completion.js";
 import { MessageCompletionRequest, MessageResponse, TextMessageContent } from "./schema/index.js";
 
 export class AnthropicCompletionService

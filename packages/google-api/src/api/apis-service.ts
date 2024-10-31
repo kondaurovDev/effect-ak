@@ -1,6 +1,5 @@
-import { Effect, pipe } from "effect";
+import { Effect, pipe, Schema as S } from "effect";
 import { HttpClientRequest } from "@effect/platform";
-import * as S from "effect/Schema";
 
 import { UserInfo } from "./schema.js";
 import { BaseEndpoint } from "./base-endpoint.js";

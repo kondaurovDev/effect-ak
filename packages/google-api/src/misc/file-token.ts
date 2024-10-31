@@ -3,6 +3,7 @@ import * as S from "effect/Schema";
 import { FileSystem } from "@effect/platform";
 
 import { OAuth2Service, AuthResponse } from "../api/index.js"
+import { configPathConfigKey, moduleName } from "../const.js";
 
 type TokenFile = typeof TokenFile.Type
 const TokenFile =
@@ -12,10 +13,6 @@ const TokenFile =
     authResponse: AuthResponse.pipe(S.NullishOr)
   })
 
-export const configKeys = {
-  configPath: "configFilePath"
-}
-
 export class AccessTokenFromFile
   extends Effect.Service<AccessTokenFromFile>()("AccessTokenFromFile", {
     effect:
@@ -24,7 +21,10 @@ export class AccessTokenFromFile
         const oauth2 = yield* OAuth2Service;
         
         const tokenFilePath =
-          Config.nonEmptyString(configKeys.configPath);
+          pipe(
+            Config.nonEmptyString(configPathConfigKey),
+            Config.nested(moduleName)
+          );
 
         const fileEffect =
           pipe(

@@ -1,43 +1,40 @@
-import { Config, Effect, pipe } from "effect";
+import { Effect, pipe, Redacted } from "effect";
 import { HttpClientRequest } from "@effect/platform";
 
 import { GoogleApiHttpClient } from "./http-client.js";
-
-export const googleUserAccessTokenConfigKey = "GOOGLE_USER_ACCESS_TOKEN";
-
-export type BaseUrlDomain = keyof typeof baseUrlMap;
-
-const baseUrlMap = {
-  apis: "www.googleapis.com",
-  sheets: "sheets.googleapis.com",
-  people: "people.googleapis.com",
-  tasks: "tasks.googleapis.com"
-} as const;
+import { GoogleUserAccessTokenProvider } from "./config-provider.js";
+import { BaseUrlDomain, baseUrlMap } from "../const.js";
 
 export class BaseEndpoint
   extends Effect.Service<BaseEndpoint>()(`Google.Api.BaseEndpoint`, {
-    effect: 
+    effect:
       Effect.gen(function* () {
         const httpClient = yield* GoogleApiHttpClient;
+        const acceeTokenProvider = yield* GoogleUserAccessTokenProvider;
+
         const execute = (
           baseUrl: BaseUrlDomain,
-          originRequest: HttpClientRequest.HttpClientRequest
+          originRequest: HttpClientRequest.HttpClientRequest,
+          userId?: string
         ) =>
-          pipe(
-            Config.nonEmptyString(googleUserAccessTokenConfigKey),
-            Effect.andThen(token =>
-              pipe(
-                originRequest,
-                HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
-                HttpClientRequest.prependUrl("https://" + baseUrlMap[baseUrl])
-              )
-            ),
-            Effect.andThen(httpClient.execute)
-          )
-          
+          Effect.gen(function* () {
+
+            const token =
+              yield* (userId ? acceeTokenProvider.getAccessToken(userId) : acceeTokenProvider.getAccessToken(undefined));
+
+            const upgradedRequest = pipe(
+              originRequest,
+              HttpClientRequest.setHeader("Authorization", `Bearer ${Redacted.value(token)}`),
+              HttpClientRequest.prependUrl("https://" + baseUrlMap[baseUrl]),
+            );
+
+            return yield* httpClient.execute(upgradedRequest);
+
+          })
+
         return {
           execute
         } as const;
       }),
-      dependencies: [ GoogleApiHttpClient.Default ]
-  }) {};
+    dependencies: [GoogleApiHttpClient.Default]
+  }) { };

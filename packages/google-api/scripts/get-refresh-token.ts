@@ -2,8 +2,9 @@ import { ConfigProvider, Console, Effect, Logger, LogLevel, pipe } from "effect"
 import { Terminal } from "@effect/platform";
 
 import { OAuth2Service } from "../src/api";
-import { AccessTokenFromFile, configKeys } from "../src/misc";
+import { AccessTokenFromFile, } from "../src/misc";
 import { live } from "./live";
+import { configPathConfigKey, moduleName } from "../src/const";
 
 const program =
   Effect.gen(function* () {
@@ -31,10 +32,11 @@ await pipe(
   Logger.withMinimumLogLevel(LogLevel.Debug),
   Effect.provide(live),
   Effect.withConfigProvider(
-    ConfigProvider.fromMap(
-      new Map([
-        [ configKeys.configPath, __dirname + "/../integration-config.json" ]
-      ]))
+    ConfigProvider.fromJson({
+      [ moduleName ]: {
+        [ configPathConfigKey ]: __dirname + "/../integration-config.json"
+      }
+    })
   ),
   Effect.runPromise
 )

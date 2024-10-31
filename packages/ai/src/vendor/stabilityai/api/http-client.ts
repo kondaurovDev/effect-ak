@@ -12,10 +12,10 @@ export class StabilityaiHttpClient extends
         const httpClient =
           yield* makeJsonHttpClient({
             baseUrl: "https://api.stability.ai/v2beta",
+            vendorName: "stabilityai",
             auth: {
               headerName: "Authorization",
-              tokenPrefix: "Bearer",
-              tokenContainerName: "stabilityai"
+              tokenPrefix: "Bearer"
             }
           });
 

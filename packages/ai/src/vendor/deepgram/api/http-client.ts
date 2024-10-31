@@ -12,11 +12,10 @@ export class DeepgramHttpClient extends
         const httpClient =
           yield* makeJsonHttpClient({
             baseUrl: "https://api.deepgram.com/v1",
-            defaultHeaders: {},
+            vendorName: "deepgram",
             auth: {
               headerName: "Authorization",
               tokenPrefix: "Token",
-              tokenContainerName: "deepgram"
             }
           });
 

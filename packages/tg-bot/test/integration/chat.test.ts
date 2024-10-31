@@ -16,13 +16,13 @@ describe("chat service integration test", () => {
             TgChatService, _ =>
               _.sendMessage({
                 chat_id: ChatId.make(270501423),
-                text: "hey",
+                text: "hey again",
                 message_effect_id: MessageEffectIdCodes["🎉"]
               })
           )
         ),
         Logger.withMinimumLogLevel(LogLevel.Debug),
-        Effect.provide([ testEnv, TgChatService.Default ]),
+        Effect.provide([ testEnv ]),
         Effect.runPromiseExit
       );
 
@@ -51,7 +51,7 @@ describe("chat service integration test", () => {
           )
         ),
         Logger.withMinimumLogLevel(LogLevel.Debug),
-        Effect.provide([ testEnv, TgChatService.Default ]),
+        Effect.provide([ testEnv ]),
         Effect.runPromiseExit
       );
 

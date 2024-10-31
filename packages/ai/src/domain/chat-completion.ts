@@ -1,11 +1,11 @@
 import { Effect } from "effect";
-import * as S from "effect/Schema"
+import * as S from "effect/Schema";
 
-export const availableProviders = ["openai", "anthropic"] as const;
+import { chatCompletionProviders } from "../const.js";
 
 export type ProviderName = typeof ProviderName.Type;
 export const ProviderName = 
-  S.Literal(...availableProviders).pipe(S.brand("ProviderName"));
+  S.Literal(...chatCompletionProviders).pipe(S.brand("ChatCompletionProviderName"));
 
 export const GenerativeModelName =
   S.Struct({

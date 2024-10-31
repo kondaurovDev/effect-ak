@@ -3,7 +3,7 @@ import * as S from "effect/Schema";
 import { Column, CsvService, CsvCompatibleObject } from "@effect-ak/misc/data-format";
 
 import { Anthropik, Openai } from "../vendor/index.js";
-import { GenerativeModelName } from "../interface/chat-completion.js";
+import { GenerativeModelName } from "../domain/chat-completion.js";
 
 export class DataStructureCommand
   extends S.Class<DataStructureCommand>("DataStructureCommand")({

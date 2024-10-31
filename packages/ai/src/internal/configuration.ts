@@ -1,7 +1,7 @@
 import { Config, pipe, Redacted, Option } from "effect";
 import * as S from "effect/Schema";
 
-import { ProviderName } from "../interface/chat-completion.js";
+import { ProviderName } from "../domain/chat-completion.js";
 
 export class AIConfig
   extends S.Class<AIConfig>("AIConfig")({

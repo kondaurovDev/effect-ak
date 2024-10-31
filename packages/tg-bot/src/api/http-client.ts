@@ -1,11 +1,11 @@
 import { FetchHttpClient, HttpBody, HttpClient, HttpClientRequest } from "@effect/platform";
-import { Config, Effect, pipe } from "effect";
+import { Cause, Effect, pipe, Redacted } from "effect";
 import * as S from "effect/Schema";
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
 import { TgResponse } from "./response.js";
-import { tgBotTokenConfigKey } from "./const.js";
 import { FileWithContent } from "../module/chat/schema/commands.js";
+import { TgBotTokenProvider } from "./config-provider.js";
 
 export class TgBotHttpClient
   extends Effect.Service<TgBotHttpClient>()("TgBotHttpClient", {
@@ -13,6 +13,7 @@ export class TgBotHttpClient
       Effect.gen(function* () {
 
         const originHttpClient = yield* HttpClient.HttpClient;
+        const { tokenEffect } = yield* TgBotTokenProvider;
         const baseUrl = "https://api.telegram.org";
 
         const httpClient =
@@ -56,7 +57,11 @@ export class TgBotHttpClient
           Effect.gen(function* () {
 
             const botToken =
-              yield* Config.nonEmptyString(tgBotTokenConfigKey);
+              yield* pipe(
+                tokenEffect,
+                Effect.andThen(Redacted.value),
+                Effect.mapError(errors => new Cause.UnknownException(errors))
+              )
 
             yield* Effect.logDebug("request body", body);
 

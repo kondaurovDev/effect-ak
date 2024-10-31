@@ -2,8 +2,9 @@ import { HttpBody, HttpClientRequest } from "@effect/platform";
 import { Effect, pipe, Redacted } from "effect";
 import * as S from "effect/Schema";
 
-import { AuthResponse, OAuth2ClientCredentials } from "./schema.js";
+import { AuthResponse } from "./schema.js";
 import { GoogleApiHttpClient } from "./http-client.js";
+import { GoogleOAuth2ClientCredentialsProvider } from "./config-provider.js";
 
 export class OAuth2Service
   extends Effect.Service<OAuth2Service>()("Google.OAuthService", {
@@ -11,7 +12,7 @@ export class OAuth2Service
       Effect.gen(function* () {
 
         const httpClient = yield* GoogleApiHttpClient;
-        const credentials = yield* OAuth2ClientCredentials.fromConfig();
+        const { credentials } = yield* GoogleOAuth2ClientCredentialsProvider;
 
         const authUrl =
           pipe(

@@ -1,15 +1,16 @@
 import { NodeContext  } from "@effect/platform-node"
 import { Layer } from "effect";
 
-import { TgBotHttpClient } from "../../src/api";
-
-const tgBotHttpClient =
-  TgBotHttpClient.Default.pipe(
-    Layer.provide(NodeContext.layer)
-  )
+import { TgBotChat } from "../../src/module";
+import { TgBotTokenProvider } from "../../src/api/config-provider";
 
 export const testEnv = 
   Layer.mergeAll(
     NodeContext.layer,
-    tgBotHttpClient
+    TgBotChat.TgChatService.Default
+  ).pipe(
+    Layer.provide([ 
+      TgBotTokenProvider.fromConfig,
+      NodeContext.layer
+    ])
   )

@@ -1,6 +1,6 @@
 {
   "name": "@effect-ak/tg-bot",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "telegram bot client with help of Effect",
   "license": "MIT",
   "type": "module",

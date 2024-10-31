@@ -1,7 +1,7 @@
 {
   "name": "@effect-ak/ai",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
@@ -38,16 +38,16 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/modules/index.d.ts",
-      "default": "./dist/modules/index.js"
-    },
-    "./api": {
-      "types": "./dist/api/index.d.ts",
-      "default": "./dist/api/index.js"
+      "types": "./dist/service/index.d.ts",
+      "default": "./dist/service/index.js"
     },
     "./vendor": {
       "types": "./dist/vendor/index.d.ts",
       "default": "./dist/vendor/index.js"
+    },
+    "./domain": {
+      "types": "./dist/domain/index.d.ts",
+      "default": "./dist/domain/index.js"
     }
   }
 }

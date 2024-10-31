@@ -11,12 +11,12 @@ export class AnthropicHttpClient extends
         const client =
           yield* makeJsonHttpClient({
             baseUrl: "https://api.anthropic.com/",
+            vendorName: "anthropic",
             defaultHeaders: {
               "anthropic-version": "2023-06-01"
             },
             auth: {
               headerName: "x-api-key",
-              tokenContainerName: "anthropic",
               tokenPrefix: ""
             }
           })

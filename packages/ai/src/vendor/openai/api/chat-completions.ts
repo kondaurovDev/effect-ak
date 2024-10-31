@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import { HttpBody, HttpClientRequest } from "@effect/platform";
 
-import { ChatCompletionInterface, ProviderName } from "../../../interface/chat-completion.js";
+import { ChatCompletionInterface, ProviderName } from "../../../domain/chat-completion.js";
 import { 
   ChatCompletionRequest, ChatCompletionResponse, OneOfRequest, SystemMessage, UserMessage 
 } from "../modules/text/schema/index.js"
