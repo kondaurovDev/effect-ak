@@ -19,16 +19,16 @@ const configProvider =
       vueComponentsDir: __dirname + "/../pages",
       vueComponentsOutDir: __dirname + "/../.out",
       openai: {
-        token: integrationConfig.openai_token
+        token: integrationConfig["effect-ak-ai_openai-token"]
       },
       anthropic: {
-        token: integrationConfig.anthropic_token
+        token: integrationConfig["effect-ak-ai_anthropic-token"]
       },
       deepgram: {
-        token: integrationConfig.deepgram_token
+        token: integrationConfig["effect-ak-ai_deepgram-token"]
       },
       stabilityai: {
-        token: integrationConfig.stabilityai_token
+        token: integrationConfig["effect-ak-ai_stabilityai-token"]
       },
       LOG_LEVEL: "debug"
     })

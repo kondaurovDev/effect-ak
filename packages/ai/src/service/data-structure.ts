@@ -38,8 +38,10 @@ export class DataStructureService
 
             # Output
 
-            - Must be provided in CSV format, without table header, introduction words or markdown
+            - Must be provided in CSV format with table header (use exact column names)
+            - Must be provided without introduction words or markdown
             - Column separator is '${csvService.columnSeparator}'
+            - break line is the standard unix's symbol n
 
             ## CSV columns:
             ${command.outputColumns.map((column, index) =>
@@ -80,7 +82,12 @@ export class DataStructureService
                   Match.exhaustive
                 ),
                 Effect.andThen(response =>
-                  csvService.decode(response.split("\n"))
+                  pipe(
+                    Effect.logDebug("csv response", response),
+                    Effect.andThen(() =>
+                      csvService.decode(response.split("\n"))
+                    )
+                  )
                 )
               )
 

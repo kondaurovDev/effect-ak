@@ -78,7 +78,7 @@ export const makeJsonHttpClient = (
           )
         ),
         Effect.andThen(_ => _.json),
-        Effect.tap(() => Effect.logDebug("Successful response")),
+        Effect.tap(_ => Effect.logDebug("Successful response", _)),
         Effect.scoped,
       );
 

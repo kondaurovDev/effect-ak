@@ -3,7 +3,7 @@ import { DateTime, Effect, Exit, Logger } from "effect";
 import { LogLevelConfigFromEnv } from "@effect-ak/misc";
 
 import { DataStructureService } from "../src/service/data-structure";
-import { ProviderName } from "../src/interface/chat-completion";
+import { ProviderName } from "../src/domain/chat-completion";
 
 const live =
   DataStructureService.Default
@@ -49,8 +49,6 @@ describe("data structure service", () => {
               }
             ]
           });
-          
-        console.log(result);
 
         return result;
       }).pipe(
