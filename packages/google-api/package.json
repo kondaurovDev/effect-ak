@@ -50,8 +50,5 @@
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
     "effect": "catalog:"
-  },
-  "peerDependencies": {
-    "@effect/cli": "catalog:"
   }
 }

@@ -18,17 +18,11 @@ const configProvider =
     ConfigProvider.fromJson({
       vueComponentsDir: __dirname + "/../pages",
       vueComponentsOutDir: __dirname + "/../.out",
-      openai: {
-        token: integrationConfig["effect-ak-ai_openai-token"]
-      },
-      anthropic: {
-        token: integrationConfig["effect-ak-ai_anthropic-token"]
-      },
-      deepgram: {
-        token: integrationConfig["effect-ak-ai_deepgram-token"]
-      },
-      stabilityai: {
-        token: integrationConfig["effect-ak-ai_stabilityai-token"]
+      "effect-ak-ai": {
+        "openai-token": integrationConfig["effect-ak-ai_openai-token"],
+        "anthropic-token": integrationConfig["effect-ak-ai_anthropic-token"],
+        "deepgram-token": integrationConfig["effect-ak-ai_deepgram-token"],
+        "stabilityai-token": integrationConfig["effect-ak-ai_stabilityai-token"],
       },
       LOG_LEVEL: "debug"
     })

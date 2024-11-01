@@ -48,6 +48,10 @@
     "./domain": {
       "types": "./dist/domain/index.d.ts",
       "default": "./dist/domain/index.js"
+    },
+    "./const": {
+      "types": "./dist/const.d.ts",
+      "default": "./dist/const.js"
     }
   }
 }

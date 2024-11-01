@@ -2,7 +2,8 @@ import { Schema as S } from "effect";
 
 export class GenerateImageRequest 
   extends S.Class<GenerateImageRequest>("GenerateImageRequest")({
-    prompt: S.NonEmptyString
+    prompt: S.NonEmptyString,
+    modelEndpoint: S.TemplateLiteral("/", S.String)
   }) {}
 
 export class GeneratedEncodedImageResponse 

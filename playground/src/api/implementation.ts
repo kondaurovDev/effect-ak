@@ -98,7 +98,8 @@ export class BackendApi
                 .handle("generateImage", ({ payload }) =>
                   pipe(
                     stabilityai.generateImage({
-                      prompt: payload.prompt
+                      prompt: payload.prompt,
+                      modelEndpoint: "/core"
                     }),
                     Effect.tapError(Effect.logError),
                     Effect.catchAll(() =>

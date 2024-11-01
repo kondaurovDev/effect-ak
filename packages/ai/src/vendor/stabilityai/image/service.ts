@@ -21,10 +21,12 @@ export class ImageGenerationService
             formData.append("prompt", request.prompt);
             formData.append("output_format", "webp");
 
+            const url = `/stable-image/generate${request.modelEndpoint}`;
+
             const result =
               yield* pipe(
                 httpClient.getJson(
-                  HttpClientRequest.post("/stable-image/generate/core", {
+                  HttpClientRequest.post(url, {
                     body: HttpBody.formData(formData),
                     headers: {
                       accept: "application/json"

@@ -3,7 +3,6 @@ packages:
   - 'playground'
 
 catalog:
-  effect: ^3.10.4
-  "@effect/platform": ^0.69.9
-  "@effect/platform-node": ^0.64.10
-  "@effect/cli": ^0.48.9
+  effect: ^3.10.0
+  "@effect/platform": ^0.69.0
+  "@effect/platform-node": ^0.64.0
