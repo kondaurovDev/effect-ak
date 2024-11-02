@@ -6,6 +6,7 @@
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
   },
+  "description": "Extensible Google API services library built with effect.",
   "publishConfig": {
     "access": "public"
   },

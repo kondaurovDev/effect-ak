@@ -12,16 +12,14 @@ export class TgBotTokenProvider
         TgBotTokenProvider,
         pipe(
           Config.nonEmptyString("token"),
-          Config.map(Redacted.make),
           Config.nested(tgBotModuleName),
+          Config.map(Redacted.make),
           Effect.andThen(token =>
             TgBotTokenProvider.of({
               tokenEffect: Effect.succeed(token)
             })
           )
         )
-
-      )
-
+      );
 
   }

@@ -5,23 +5,23 @@ import { ReplyMarkup } from "./reply-markup.js";
 
 export const GetChatCommand =
   S.Struct({
-    chat_id: S.NonEmptyString
+    chat_id: ChatId
   });
 
 export const SetChatActionCommand =
   S.Struct({
-    chat_id: S.String,
+    chat_id: ChatId,
     action: ChatAction,
     message_thread_id: S.optional(S.Number)
   });
 
 export const EditMessageTextCommand =
   S.Struct({
-    text: S.String,
+    text: S.Number,
     chat_id: ChatId,
     message_id: S.Number,
     reply_markup: S.optional(ReplyMarkup)
-  })
+  });
 
 export const UpdateMessageReplyMarkupCommand =
   S.Struct({
@@ -40,7 +40,6 @@ export const CommonOptionalFieldsWhenSending =
     message_effect_id: S.String,
     protect_content: S.Boolean
   }).pipe(
-    // S.partial
     S.partialWith({ exact: true })
   );
 
@@ -55,7 +54,7 @@ export const SendChatMessageCommand =
     text: S.String,
     chat_id: ChatId,
   }).pipe(
-    S.extend(CommonOptionalFieldsWhenSending)
+    S.extend(CommonOptionalFieldsWhenSending),
   )
 
 export const SendVoiceCommand =
@@ -67,11 +66,21 @@ export const SendVoiceCommand =
     S.extend(CommonOptionalFieldsWhenSending)
   )
 
-export const SendDocument =
+export const SendDocumentCommand =
   S.Struct({
     chat_id: ChatId,
     caption: S.UndefinedOr(S.String),
     document: S.Union(FileWithContent, S.String)
   }).pipe(
     S.extend(CommonOptionalFieldsWhenSending)
+  );
+
+export const SendDiceCommand = 
+  S.Struct({
+    chat_id: ChatId,
+    emoji: S.Literal("🎲", "🎯", "🏀", "⚽", "🎰")
+  }).pipe(
+    S.extend(
+      CommonOptionalFieldsWhenSending.pipe(S.omit("parse_mode"))
+    )
   );

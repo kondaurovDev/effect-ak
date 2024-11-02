@@ -2,7 +2,7 @@ import { Data, pipe } from "effect";
 
 import { MessageUpdate } from "./message-update.js";
 import { OriginUpdateEvent } from "./origin-update-event.js";
-import { User } from "../schema.js";
+import { ChatId, User } from "../schema.js";
 
 type MessageSource = "channel" | "group";
 
@@ -16,7 +16,7 @@ export const getUserName = (
 
 export class MessageUpdateEvent 
   extends Data.TaggedClass("UpdateMessageEvent")<{
-    chatId: number,
+    chatId: ChatId,
     source: MessageSource,
     authorId: string,
     updateId: number
@@ -32,7 +32,7 @@ export class MessageUpdateEvent
     ) {
       return (
         new MessageUpdateEvent({
-          chatId: update.chat.id,
+          chatId: ChatId.make(update.chat.id),
           authorId: getUserName(update.from),
           updateId, update, isEdited, source
         })

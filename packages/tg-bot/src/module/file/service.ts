@@ -85,5 +85,8 @@ export class TgFileService
           getFileInfo, downloadFile
         } as const;
 
-      })
+      }), 
+      dependencies: [
+        TgBotHttpClient.Default
+      ]
   }) { }

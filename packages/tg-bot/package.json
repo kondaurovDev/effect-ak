@@ -1,33 +1,19 @@
 {
   "name": "@effect-ak/tg-bot",
-  "version": "0.0.3",
-  "description": "telegram bot client with help of Effect",
+  "version": "0.0.4",
+  "description": "An Effect-powered Telegram bot client designed for building Telegram bots",
   "license": "MIT",
   "type": "module",
   "publishConfig": {
     "access": "public"
   },
-  "author": {
-    "name": "Aleksandr Kondaurov",
-    "email": "kondaurov.dev@gmail.com"
-  },
   "repository": {
+    "type": "git",
     "url": "https://github.com/kondaurovDev/effect-ak",
     "directory": "packages/tg-bot"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/module/index.d.ts",
-      "default": "./dist/module/index.js"
-    },
-    "./api": {
-      "types": "./dist/api/index.d.ts",
-      "default": "./dist/api/index.js"
-    }
-  },
   "files": [
     "dist"
   ],
@@ -42,5 +28,20 @@
   },
   "peerDependencies": {
     "effect": "catalog:"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/module/index.d.ts",
+      "default": "./dist/module/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
+    },
+    "./misc": {
+      "types": "./dist/misc/index.d.ts",
+      "default": "./dist/misc/index.js"
+    }
   }
 }

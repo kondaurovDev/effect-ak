@@ -15,7 +15,11 @@ export const ChatInfo =
 
 export type ChatAction = typeof ChatAction.Type
 export const ChatAction =
-  S.Literal("typing", "record_voice")
+  S.Literal(
+    "typing", "upload_photo", "record_video", "record_voice", 
+    "upload_voice", "upload_document", "find_location", 
+    "upload_video_note", "record_video_note"
+  );
 
 export const User =
   S.Struct({
