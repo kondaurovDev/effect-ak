@@ -20,4 +20,3 @@ export const GetBotCommandsCommand =
     scope: S.UndefinedOr(S.suspend(() => CommandScope)),
     language_code: S.UndefinedOr(S.NonEmptyString)
   });
-

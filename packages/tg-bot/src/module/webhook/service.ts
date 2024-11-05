@@ -14,20 +14,20 @@ export class TgWebhookService
         const empty = {};
 
         const webhookInfo =
-          botClient.executeMethod(
-            "/getWebhookInfo",
-            empty,
-            WebhookInfo
-          )
+          botClient.executeMethod({
+            path: "/getWebhookInfo",
+            responseSchema: WebhookInfo,
+            payload: empty,
+          })
 
         const setWebhook = (
-          input: typeof SetWebhookCommand.Type
+          payload: typeof SetWebhookCommand.Type
         ) =>
-          botClient.executeMethod(
-            "/setWebhook",
-            input,
-            S.Boolean
-          )
+          botClient.executeMethod({
+            path: "/setWebhook",
+            responseSchema: S.Literal(true),
+            payload
+          })
 
         return {
           webhookInfo, setWebhook

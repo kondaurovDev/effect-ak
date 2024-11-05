@@ -38,13 +38,19 @@ export const ReplyParameters =
   S.Struct({
     message_id: S.Number,
     chat_id: ChatId
-  })
+  });
 
-export const MessageEffectIdCodes = {
-  "🔥": "5104841245755180586",
-  "👍": "5107584321108051014",
-  "👎": "5104858069142078462",
-  "❤️": "5159385139981059251",
-  "🎉": "5046509860389126442",
-  "💩": "5046589136895476101"
-}
+export const SetMenuButtonCommand =
+  S.Union(
+    S.Struct({
+      type: S.Literal("default", "commands")
+    }),
+    S.Struct({
+      type: S.Literal("webapp"),
+      text: S.NonEmptyString,
+      web_app: 
+        S.Struct({
+          url: S.NonEmptyString.pipe(S.startsWith("https://"))
+        })
+    })
+  )

@@ -21,7 +21,8 @@ export const makeJsonHttpClient = (
   Effect.gen(function* () {
 
     const httpClient =
-      (yield* HttpClient.HttpClient).pipe(
+      pipe(
+        yield* HttpClient.HttpClient,
         HttpClient.mapRequest(request =>
           pipe(
             request,

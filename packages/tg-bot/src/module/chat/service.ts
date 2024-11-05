@@ -6,7 +6,7 @@ import {
   SendVoiceCommand, SetChatActionCommand, UpdateMessageReplyMarkupCommand, SendDiceCommand
 } from "./schema/commands.js";
 import { MessageUpdate } from "./schema/message-update.js";
-import { ChatInfo } from "./schema.js";
+import { ChatInfo, SetMenuButtonCommand } from "./schema.js";
 import { TgBotHttpClient } from "../../api/http-client.js";
 
 export class TgChatService
@@ -14,91 +14,93 @@ export class TgChatService
     effect:
       Effect.gen(function* () {
 
-        const httpClient = yield* TgBotHttpClient;
+        const botClient = yield* TgBotHttpClient;
 
-        const sendMessage = (
-          input: typeof SendChatMessageCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/sendMessage",
-            input,
-            MessageUpdate
-          )
+        const sendMessage =
+          (payload: typeof SendChatMessageCommand.Type) =>
+            botClient.executeMethod({
+              path: "/sendMessage",
+              responseSchema: MessageUpdate,
+              payload
+            })
 
-        const editMessageText = (
-          input: typeof EditMessageTextCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/editMessageText",
-            input,
-            MessageUpdate
-          )
+        const editMessageText =
+          (payload: typeof EditMessageTextCommand.Type) =>
+            botClient.executeMethod({
+              path: "/editMessageText",
+              responseSchema: MessageUpdate,
+              payload,
+            })
 
-        const updateMessageReplyMarkup = (
-          input: typeof UpdateMessageReplyMarkupCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/editMessageReplyMarkup",
-            input,
-            S.Union(
-              S.Boolean,
-              MessageUpdate
-            )
-          )
+        const updateMessageReplyMarkup =
+          (payload: typeof UpdateMessageReplyMarkupCommand.Type) =>
+            botClient.executeMethod({
+              path: "/editMessageReplyMarkup",
+              responseSchema:
+                S.Union(
+                  S.Boolean,
+                  MessageUpdate
+                ),
+              payload
+            })
 
-        const getChat = (
-          input: typeof GetChatCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/getChat",
-            input,
-            ChatInfo
-          )
+        const getChat =
+          (payload: typeof GetChatCommand.Type) =>
+            botClient.executeMethod({
+              path: "/getChat",
+              responseSchema: ChatInfo,
+              payload
+            })
 
-        const setChatAction = (
-          input: typeof SetChatActionCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/sendChatAction",
-            input,
-            S.Boolean
-          )
+        const setChatAction =
+          (payload: typeof SetChatActionCommand.Type) =>
+            botClient.executeMethod({
+              path: "/sendChatAction",
+              responseSchema: S.Boolean,
+              payload
+            })
 
-        const sendVoice = (
-          input: typeof SendVoiceCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/sendVoice",
-            input,
-            MessageUpdate
-          )
+        const sendVoice =
+          (payload: typeof SendVoiceCommand.Type) =>
+            botClient.executeMethod({
+              path: "/sendVoice",
+              responseSchema: MessageUpdate,
+              payload
+            })
 
-        const sendDocument = (
-          input: typeof SendDocumentCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/sendDocument",
-            input,
-            MessageUpdate
-          )
+        const sendDocument =
+          (payload: typeof SendDocumentCommand.Type) =>
+            botClient.executeMethod({
+              path: "/sendDocument",
+              responseSchema: MessageUpdate,
+              payload
+            })
 
-        const sendDice = (
-          input: typeof SendDiceCommand.Type
-        ) =>
-          httpClient.executeMethod(
-            "/sendDice",
-            input,
-            MessageUpdate
-          )
+        const sendDice =
+          (payload: typeof SendDiceCommand.Type) =>
+            botClient.executeMethod({
+              path: "/sendDice",
+              responseSchema: MessageUpdate,
+              payload
+            });
+
+        const setChatMenuButton =
+          (payload: typeof SetMenuButtonCommand.Type) =>
+            botClient.executeMethod({
+              path: "/setChatMenuButton",
+              responseSchema: S.Literal(true),
+              payload
+            });
 
         return {
           sendMessage, editMessageText, updateMessageReplyMarkup,
-          getChat, setChatAction, sendVoice, sendDocument, sendDice
+          getChat, setChatAction, sendVoice, sendDocument, sendDice,
+          setChatMenuButton
         } as const;
 
       }),
 
-      dependencies: [
-        TgBotHttpClient.Default
-      ]
+    dependencies: [
+      TgBotHttpClient.Default
+    ]
   }) { }

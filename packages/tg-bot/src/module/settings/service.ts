@@ -14,35 +14,35 @@ export class TgBotSettingsService
         const empty = {};
 
         const getMe =
-          botClient.executeMethod(
-            "/getMe",
-            empty,
-            User
-          )
+          botClient.executeMethod({
+            path: "/getMe",
+            responseSchema: User,
+            payload: empty
+          })
 
         const setBotName =
-          (input: typeof SetBotNameCommand.Type) =>
-            botClient.executeMethod(
-              "/sendMyName",
-              input,
-              S.Boolean
-            )
+          (payload: typeof SetBotNameCommand.Type) =>
+            botClient.executeMethod({
+              path: "/sendMyName",
+              responseSchema: S.Boolean,
+              payload,
+            })
 
         const setBotCommands =
-          (input: typeof SetBotCommandsCommand.Type) =>
-            botClient.executeMethod(
-              "/setMyCommands",
-              input,
-              S.Boolean
-            )
+          (payload: typeof SetBotCommandsCommand.Type) =>
+            botClient.executeMethod({
+              path: "/setMyCommands",
+              responseSchema: S.Boolean,
+              payload
+            })
 
         const getBotCommands =
-          (input: typeof GetBotCommandsCommand.Type) =>
-            botClient.executeMethod(
-              "/getMyCommands",
-              input,
-              S.Array(BotCommand)
-            )
+          (payload: typeof GetBotCommandsCommand.Type) =>
+            botClient.executeMethod({
+              path: "/getMyCommands",
+              responseSchema: S.Array(BotCommand),
+              payload
+            })
 
         return {
           getMe, setBotName, setBotCommands, getBotCommands
@@ -50,7 +50,7 @@ export class TgBotSettingsService
 
       }),
 
-      dependencies: [
-        TgBotHttpClient.Default
-      ]
+    dependencies: [
+      TgBotHttpClient.Default
+    ]
   }) { }

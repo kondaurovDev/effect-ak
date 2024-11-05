@@ -1,6 +1,6 @@
 import { Config, Effect, Layer, pipe, Redacted } from "effect";
 
-import { tgBotModuleName } from "../const.js";
+import { tgBotModuleName } from "../internal/const.js";
 
 export class TgBotTokenProvider
   extends Effect.Tag("TgBotTokenProvider")<TgBotTokenProvider, {

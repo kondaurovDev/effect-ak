@@ -1,1 +1,5 @@
-export * from "./main.js"
+export { TgChatService } from "./chat/service.js"
+export { TgFileService } from "./file/service.js"
+export { TgPaymentService } from "./payment/service.js"
+export { TgBotSettingsService } from "./settings/service.js"
+export { TgWebhookService } from "./webhook/service.js"

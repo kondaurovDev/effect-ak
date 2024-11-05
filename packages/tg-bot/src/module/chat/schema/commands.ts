@@ -2,6 +2,7 @@ import * as S from "effect/Schema";
 
 import { ChatAction, ChatId, ParseMode, ReplyParameters } from "../schema.js"
 import { ReplyMarkup } from "./reply-markup.js";
+import { messageEffectIdCodes } from "../../../internal/message-effect.js";
 
 export const GetChatCommand =
   S.Struct({
@@ -37,7 +38,7 @@ export const CommonOptionalFieldsWhenSending =
     parse_mode: ParseMode,
     reply_parameters: ReplyParameters,
     reply_markup: ReplyMarkup,
-    message_effect_id: S.String,
+    message_effect_id: S.Literal(...messageEffectIdCodes),
     protect_content: S.Boolean
   }).pipe(
     S.partialWith({ exact: true })

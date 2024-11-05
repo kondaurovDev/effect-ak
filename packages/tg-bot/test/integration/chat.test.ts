@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Effect, Exit, Logger, LogLevel, pipe } from "effect"
 
-import { ChatId, FileWithContent, MessageEffectIdCodes } from "../../src/module/chat/index";
+import { ChatId, FileWithContent } from "../../src/module/chat/index";
 import { testEnv } from "./live";
-import { TgBotService } from "../../src/module/index";
+import { TgBotService } from "../../src/public";
 
 describe("chat service integration test", () => {
 
@@ -18,7 +18,7 @@ describe("chat service integration test", () => {
               _.chat.sendMessage({
                 chat_id: ChatId.make(270501423),
                 text: "hey again",
-                message_effect_id: MessageEffectIdCodes["🎉"]
+                message_effect_id: "❤️"
               })
           )
         ),
@@ -47,9 +47,9 @@ describe("chat service integration test", () => {
               content: Buffer.from("Hello!"),
               fileName: "hey.txt"
             }),
-          message_effect_id: MessageEffectIdCodes["❤️"],
+          message_effect_id: "❤️",
           caption: "some code"
-        })
+        }).effect
 
       }).pipe(
         Logger.withMinimumLogLevel(LogLevel.Debug),
@@ -72,9 +72,9 @@ describe("chat service integration test", () => {
 
         yield* service.chat.sendDice({
           chat_id: ChatId.make(270501423),
-          message_effect_id: MessageEffectIdCodes["❤️"],
+          message_effect_id: "❤️",
           emoji: "🎯"
-        })
+        }).effect
 
       }).pipe(
         Logger.withMinimumLogLevel(LogLevel.Debug),

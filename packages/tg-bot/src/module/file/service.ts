@@ -5,7 +5,7 @@ import { PlatformError } from "@effect/platform/Error";
 import { TgBotHttpClient } from "../../api/index.js";
 import { FileExtension, FileInfo, GetFileInfoCommandInput, RemoteFilePath } from "./schema.js";
 
-import { telegramApiUrl } from "../../const.js";
+import { telegramApiUrl } from "../../internal/const.js";
 
 export class TgFileServiceError
   extends Data.TaggedError("TgFileServiceError")<{
@@ -30,13 +30,13 @@ export class TgFileService
           Config.nonEmptyString("TG_BOT_TOKEN")
 
         const getFileInfo = (
-          input: typeof GetFileInfoCommandInput.Type
+          payload: typeof GetFileInfoCommandInput.Type
         ) =>
-          botClient.executeMethod(
-            "/getFile",
-            input,
-            FileInfo
-          );
+          botClient.executeMethod({
+            path: "/getFile",
+            responseSchema: FileInfo,
+            payload,
+          });
 
         const downloadFile = (
           remoteFilePath: RemoteFilePath,

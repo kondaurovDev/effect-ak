@@ -12,23 +12,23 @@ export class TgPaymentService extends Effect.Service<TgPaymentService>()("TgPaym
 
       // https://core.telegram.org/bots/api#sendinvoice
       const sendStarsInvoice = (
-        input: typeof SendStarsInvoice.Type
+        payload: typeof SendStarsInvoice.Type
       ) =>
-        botClient.executeMethod(
-          "/sendInvoice",
-          input,
-          MessageUpdate
-        )
+        botClient.executeMethod({
+          path: "/sendInvoice",
+          responseSchema: MessageUpdate,
+          payload
+        })
 
       // https://core.telegram.org/bots/api#answerprecheckoutquery
       const answerPreCheckoutQuery = (
-        input: typeof AnswerPreCheckoutQuery.Type
+        payload: typeof AnswerPreCheckoutQuery.Type
       ) =>
-        botClient.executeMethod(
-          "/answerPreCheckoutQuery",
-          input,
-          S.Boolean
-        )
+        botClient.executeMethod({
+          path: "/answerPreCheckoutQuery",
+          responseSchema: S.Boolean,
+          payload
+        });
 
       return {
         sendStarsInvoice, answerPreCheckoutQuery
