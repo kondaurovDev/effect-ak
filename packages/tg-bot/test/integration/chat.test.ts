@@ -19,7 +19,7 @@ describe("chat service integration test", () => {
                 chat_id: ChatId.make(270501423),
                 text: "hey again",
                 message_effect_id: "❤️"
-              })
+              }).effect
           )
         ),
         Logger.withMinimumLogLevel(LogLevel.Debug),

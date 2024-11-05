@@ -1,10 +1,10 @@
-import { Context, Effect, pipe, Ref, Schema as S } from "effect";
+import { Array, Context, Effect, pipe, Ref, Schema as S } from "effect";
 
 import { MethodEffectOrPromiseResponse, TgBotHttpClient } from "../api/http-client.js";
 import { OriginUpdateEvent, MessageUpdate, MessageUpdateEvent, ChatId } from "../module/chat/index.js";
 import { TgBotService } from "./bot-service.js";
 
-export type MessageHandler = 
+export type MessageHandler =
   (input: MessageHandlerContext) => unknown
 
 export type MessageHandlerContext = {
@@ -48,14 +48,14 @@ export class PollingService
                   offset: lastUpdateId,
                   timeout: 10
                 }
-              }).effect;
+              }).effect
 
             yield* Effect.logInfo("Got updates", { number: updates.length })
 
-            const id = updates.at(-1)?.update_id;
-            if (id) {
-              yield* Effect.logInfo("setting last update id", id);
-              yield* Ref.update(lastUpdateIdRef, () => id + 1);
+            const ids = updates.map(_ => _.update_id).sort();
+            if (Array.isNonEmptyArray(ids)) {
+              yield* Effect.logInfo("setting last update id", ids.at(-1));
+              yield* Ref.update(lastUpdateIdRef, () => Array.lastNonEmpty(ids) + 1);
               yield* Ref.update(emptyResponsesRef, () => 0);
             } else {
               yield* Ref.update(emptyResponsesRef, _ => _ + 1);
@@ -90,25 +90,42 @@ export class PollingService
                         )
                       };
 
-                      const handlerResult =
-                        messageHandler({
+                      let handlerResult: any;
+                      try {
+                        handlerResult = messageHandler({
                           message: messageUpdate.update,
                           currentChatId: messageUpdate.chatId,
                           service
-                        });
-
-                      if (handlerResult instanceof MethodEffectOrPromiseResponse) {
-                        return Effect.tryPromise(() => handlerResult.promise); // just wait for promise resolving
+                        })
+                      } catch (error) {
+                        return Effect.die(error);
                       }
 
-                      if (handlerResult instanceof Promise) {
-                        return Effect.tryPromise(() => handlerResult); // just wait for promise resolving
-                      }
+                      console.info("handler result", handlerResult);
 
+                      if (handlerResult instanceof Promise) { //unwrap Promise
+                        return pipe(
+                          Effect.tryPromise(() => handlerResult),
+                          Effect.andThen(_ => {
+                            if (Effect.isEffect(_)) {
+                              return _ as Effect.Effect<unknown, unknown, never>
+                            } else if (_ instanceof Promise) {
+                              return Effect.tryPromise(() => _)
+                            } else if (_ instanceof MethodEffectOrPromiseResponse) {
+                              return _.effect
+                            }
+                          })
+                        )
+                      }
+                    
                       if (Effect.isEffect(handlerResult)) {
                         return handlerResult as Effect.Effect<unknown, unknown, never>;  // just wait for effect resolving
                       }
 
+                      if (handlerResult instanceof MethodEffectOrPromiseResponse) {
+                        return handlerResult.effect; // just wait for effect resolving
+                      }
+                      
                       return pipe(
                         Effect.logDebug("discarding message handler result", typeof handlerResult),
                         Effect.andThen(Effect.void)

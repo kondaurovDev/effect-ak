@@ -19,7 +19,7 @@ export type MethodInput<O, O2> = {
 export class MethodEffectOrPromiseResponse<O>
   extends Data.Class<{
     effect: Effect.Effect<O, unknown, never>,
-    promise: Promise<O>
+    promise: () => Promise<O>
   }> { }
 
 export class TgBotHttpClient
@@ -95,10 +95,12 @@ export class TgBotHttpClient
               );
 
             const promise =
-              pipe(
-                effect,
-                Effect.runPromise
-              );
+              () =>
+                pipe(
+                  Effect.logDebug("executing promise"),
+                  Effect.andThen(effect),
+                  Effect.runPromise
+                );
 
             return (
               new MethodEffectOrPromiseResponse({

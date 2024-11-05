@@ -39,9 +39,9 @@
       "types": "./dist/api/index.d.ts",
       "default": "./dist/api/index.js"
     },
-    "./misc": {
-      "types": "./dist/misc/index.d.ts",
-      "default": "./dist/misc/index.js"
+    "./module": {
+      "types": "./dist/module/index.d.ts",
+      "default": "./dist/module/index.js"
     }
   }
 }

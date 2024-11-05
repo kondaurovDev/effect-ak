@@ -33,5 +33,9 @@ export class TgWebhookService
           webhookInfo, setWebhook
         } as const;
 
-      })
+      }),
+
+      dependencies: [
+        TgBotHttpClient.Default
+      ]
   }) { }
