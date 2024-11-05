@@ -1,12 +1,12 @@
 {
-  "name": "@efkit/notion",
+  "name": "@effect-ak/notion",
   "version": "0.0.1",
   "author": {
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
   },
   "repository": {
-    "url": "https://github.com/kondaurovDev/efkit",
+    "url": "https://github.com/kondaurovDev/effect-ak",
     "directory": "packages/notion"
   },
   "license": "MIT",

@@ -1,4 +1,4 @@
-import { Array, Context, Effect, pipe, Ref, Schema as S } from "effect";
+import { Array, Context, Effect, ManagedRuntime, pipe, Ref, Schema as S } from "effect";
 
 import { MethodEffectOrPromiseResponse, TgBotHttpClient } from "../api/http-client.js";
 import { OriginUpdateEvent, MessageUpdate, MessageUpdateEvent, ChatId } from "../module/chat/index.js";
@@ -12,6 +12,9 @@ export type MessageHandlerContext = {
   currentChatId: ChatId,
   service: Context.Tag.Service<typeof TgBotService>
 }
+
+export const TgBotMessageHandlerRuntime = 
+  Context.GenericTag<ManagedRuntime.ManagedRuntime<any, any>>("TgBotMessageHandlerRuntime");
 
 export class PollingService
   extends Effect.Service<PollingService>()("PollingService", {
@@ -75,6 +78,7 @@ export class PollingService
             Effect.gen(function* () {
 
               yield* Effect.logInfo("Listening Telegram bot updates...");
+              const botMessageHandlerRuntime = yield* TgBotMessageHandlerRuntime; 
 
               const handleBatchEffect =
                 pipe(
@@ -92,11 +96,12 @@ export class PollingService
 
                       let handlerResult: any;
                       try {
-                        handlerResult = messageHandler({
-                          message: messageUpdate.update,
-                          currentChatId: messageUpdate.chatId,
-                          service
-                        })
+                        handlerResult =
+                          messageHandler({
+                            message: messageUpdate.update,
+                            currentChatId: messageUpdate.chatId,
+                            service
+                          })
                       } catch (error) {
                         return Effect.die(error);
                       }
@@ -117,7 +122,7 @@ export class PollingService
                           })
                         )
                       }
-                    
+
                       if (Effect.isEffect(handlerResult)) {
                         return handlerResult as Effect.Effect<unknown, unknown, never>;  // just wait for effect resolving
                       }
@@ -125,14 +130,15 @@ export class PollingService
                       if (handlerResult instanceof MethodEffectOrPromiseResponse) {
                         return handlerResult.effect; // just wait for effect resolving
                       }
-                      
+
                       return pipe(
                         Effect.logDebug("discarding message handler result", typeof handlerResult),
                         Effect.andThen(Effect.void)
                       );
 
                     })
-                  )
+                  ),
+                  Effect.provide(botMessageHandlerRuntime)
                 )
 
               // run infinitely in global scope until first error
