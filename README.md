@@ -1,26 +1,38 @@
-# EFKIT: Effect-based Wrappers for Popular Services
+# Motivation
 
-## Overview
+I believe in the "divide and conquer" approach. When I want to create a functional project, such as a personal Telegram bot, I focus on developing the bot's unique logic instead of getting bogged down by the intricacies of the Telegram Bot API. This allows me to concentrate on how my bot should operate without simultaneously dealing with API complexities.
 
-EFKIT is a monorepo containing a collection of [Effect](https://effect.website/)-based wrappers for various popular services and APIs. The primary motivation behind this project is to provide ready-to-use, type-safe, and composable abstractions for commonly used services in different projects.
+For example, if I want my Telegram bot to generate an interesting fact about TypeScript using a generative LLM model when the `/typescript-fact` command is invoked, I can focus solely on crafting the prompt for the model. I don't need to worry about which library to integrate or writing an HTTP client from scratch to interact with the fact-generating API.
 
-## Motivation
+Similarly, if I want to add a new row to a Google Spreadsheet, I simply use my pre-built code that handles sheet operations and appends the row to the table.
 
-As developers, we often find ourselves rewriting similar integration code across different projects. EFKIT aims to solve this problem by offering a set of reusable wrappers built on top of the Effect library. This approach allows for:
+## What Underpins All Packages?
 
-- Consistent API usage across different services
-- Type-safe interactions with external APIs
-- Improved testability and maintainability of code
-- Reduced boilerplate in project setup
+I couldn't have implemented all of this without the [Effect](https://effect.website/) library.
 
-## Features
+Currently, all packages depend on version ^3.10 of this library.
 
-- Google services wrapper: Includes Calendar integration for adding and managing events
-- ChatGPT API wrapper: Interact with OpenAI's ChatGPT seamlessly
-- Claude AI integration: Utilize Anthropic's Claude AI in your projects
-- Notion API wrapper: Interact with Notion databases and pages
-- Telegram Bot API: Build Telegram bots without dealing with low-level API details
-- Shared utilities: Common functions and tools used across different integrations
-- ... (other packages to be added)
+# What Is This
 
-Each package in this monorepo is designed to provide a convenient, Effect-based interface to these services, allowing for easy integration into your TypeScript projects running on Node.js.
+A monorepository for the following packages:
+
+### AI
+![NPM Version](https://img.shields.io/npm/v/@effect-ak/ai)<br>
+Contains clients for interacting with the following vendors:
+- OpenAI
+- Anthropic
+- Deepgram
+- Stability AI
+
+### Google API
+![NPM Version](https://img.shields.io/npm/v/@effect-ak/google-api)<br>
+- Service for working with Google Sheets
+- Google Calendar
+- Google Tasks
+- Google Drive
+
+### TG-Bot
+![NPM Version](https://img.shields.io/npm/v/@effect-ak/tg-bot)<br>
+- HTTP client for interacting with the Telegram Bot API
+- Sending text messages, dice, documents, etc.
+- Service for creating bots using a polling architecture. Bots can be run locally.

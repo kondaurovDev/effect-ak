@@ -1,3 +1,5 @@
+![NPM Version](https://img.shields.io/npm/v/@effect-ak/google-api)
+
 ## Auth
 
 ### Create client
