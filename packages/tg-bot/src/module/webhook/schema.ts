@@ -1,4 +1,4 @@
-import * as S from "effect/Schema";
+import { DateTime, Schema as S } from "effect";
 import { UpdateEventType } from "../chat/schema/origin-update-event.js";
 
 export const SetWebhookCommand =
@@ -8,3 +8,19 @@ export const SetWebhookCommand =
     drop_pending_updates: S.UndefinedOr(S.Boolean),
     secret_token: S.NonEmptyString.pipe(S.minLength(3))
   });
+
+export const WebhookInfo =
+  S.Struct({
+    url: S.String,
+    pending_update_count: S.Number,
+    last_error_date:
+      S.transform(
+        S.Number,
+        S.DateTimeUtcFromSelf,
+        {
+          strict: true,
+          decode: seconds => DateTime.unsafeMake(seconds * 1000),
+          encode: dt => dt.epochMillis / 1000
+        }
+      ).pipe(S.optional)
+  })

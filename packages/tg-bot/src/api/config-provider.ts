@@ -18,6 +18,9 @@ export class TgBotTokenProvider
             TgBotTokenProvider.of({
               tokenEffect: Effect.succeed(token)
             })
+          ),
+          Effect.tap(
+            Effect.logInfo("telegram bot token was resolved")
           )
         )
       );

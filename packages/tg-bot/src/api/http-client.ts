@@ -6,21 +6,29 @@ import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
 import { TgResponse } from "./response.js";
 import { FileWithContent } from "../module/chat/schema/commands.js";
 import { TgBotTokenProvider } from "./config-provider.js";
+import { telegramApiUrl } from "../const.js";
+
+export type ExecuteTgBotMethod<I, O> = (input: I) => Effect.Effect<O, unknown>
+
+export type TgBotApiMethodExecutor =
+  <O, O2>(
+    methodName: `/${string}`,
+    body: Record<string, unknown>,
+    resultSchema: S.Schema<O, O2>
+  ) => Effect.Effect<O, unknown, never>
 
 export class TgBotHttpClient
   extends Effect.Service<TgBotHttpClient>()("TgBotHttpClient", {
     effect:
       Effect.gen(function* () {
 
-        const originHttpClient = yield* HttpClient.HttpClient;
         const { tokenEffect } = yield* TgBotTokenProvider;
-        const baseUrl = "https://api.telegram.org";
 
         const httpClient =
           pipe(
-            originHttpClient,
+            yield* HttpClient.HttpClient,
             HttpClient.mapRequest(
-              HttpClientRequest.prependUrl(baseUrl)
+              HttpClientRequest.prependUrl(telegramApiUrl)
             ),
             HttpClient.tapRequest(request =>
               Effect.logDebug(`request to telegram bot api`, {
@@ -38,7 +46,7 @@ export class TgBotHttpClient
           for (const [key, value] of Object.entries(body)) {
             if (typeof value == "object") {
               if (S.is(FileWithContent)(value)) {
-                result.append(key, new Blob([ value.content ]), value.fileName);
+                result.append(key, new Blob([value.content]), value.fileName);
                 continue;
               }
               result.append(key, JSON.stringify(value));
@@ -49,10 +57,10 @@ export class TgBotHttpClient
           return HttpBody.formData(result);
         }
 
-        const executeMethod = <O, O2>(
-          methodName: `/${string}`,
-          body: Record<string, unknown>,
-          resultSchema: S.Schema<O, O2>
+        const executeMethod: TgBotApiMethodExecutor = (
+          methodName,
+          body,
+          resultSchema
         ) =>
           Effect.gen(function* () {
 
@@ -76,7 +84,7 @@ export class TgBotHttpClient
                 }),
                 httpClient.execute,
                 Effect.andThen(_ => _.json),
-                Effect.tap(_ => 
+                Effect.tap(_ =>
                   Effect.logDebug("response", _)
                 ),
                 Effect.andThen(S.validate(TgResponse)),
@@ -102,7 +110,7 @@ export class TgBotHttpClient
           )
 
         return {
-          executeMethod, originHttpClient, baseUrl
+          executeMethod, httpClient
         } as const
 
       }),

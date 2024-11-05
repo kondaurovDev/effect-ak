@@ -12,6 +12,7 @@ export const RemoteFilePath = Brand.nominal<RemoteFilePath>();
 export type FileExtension = Brand.Branded<string, "FileExtension">
 export const FileExtension = Brand.nominal<FileExtension>();
 
+export type FileInfo = typeof FileInfo.Type;
 export const FileInfo =
   S.Struct({
     file_id: S.String,

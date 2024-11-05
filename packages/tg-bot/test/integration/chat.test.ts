@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Effect, Exit, Logger, LogLevel, pipe } from "effect"
 
-import { ChatId, FileWithContent, MessageEffectIdCodes, TgChatService } from "../../src/module/chat/index";
+import { ChatId, FileWithContent, MessageEffectIdCodes } from "../../src/module/chat/index";
 import { testEnv } from "./live";
+import { TgBotService } from "../../src/module/index";
 
 describe("chat service integration test", () => {
 
@@ -13,8 +14,8 @@ describe("chat service integration test", () => {
         Effect.sleep("3 seconds"),
         Effect.andThen(() => 
           Effect.andThen(
-            TgChatService, _ =>
-              _.sendMessage({
+            TgBotService, _ =>
+              _.chat.sendMessage({
                 chat_id: ChatId.make(270501423),
                 text: "hey again",
                 message_effect_id: MessageEffectIdCodes["🎉"]
@@ -35,11 +36,11 @@ describe("chat service integration test", () => {
     const actual = 
       await Effect.gen(function* () {
 
-        const service = yield* TgChatService;
+        const service = yield* TgBotService;
 
         yield* Effect.sleep("3 seconds");
 
-        yield* service.sendDocument({
+        yield* service.chat.sendDocument({
           chat_id: ChatId.make(270501423),
           document: 
             FileWithContent.make({
@@ -65,11 +66,11 @@ describe("chat service integration test", () => {
     const actual = 
       await Effect.gen(function* () {
 
-        const service = yield* TgChatService;
+        const service = yield* TgBotService;
 
         yield* Effect.sleep("3 seconds");
 
-        yield* service.sendDice({
+        yield* service.chat.sendDice({
           chat_id: ChatId.make(270501423),
           message_effect_id: MessageEffectIdCodes["❤️"],
           emoji: "🎯"

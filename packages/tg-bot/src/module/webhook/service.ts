@@ -1,54 +1,37 @@
-import { DateTime, Effect } from "effect";
-import * as S from "effect/Schema";
+import { Context, Schema as S, Effect } from "effect";
 
+import { SetWebhookCommand, WebhookInfo } from "./schema.js";
 import { TgBotHttpClient } from "../../api/http-client.js";
-import { SetWebhookCommand } from "./schema.js";
 
-export class TgBotWebhookService
-  extends Effect.Service<TgBotWebhookService>()("TgBotWebhookService", {
+export const TgWebhookServiceTag = Context.GenericTag<TgWebhookService>("TgWebhookService");
 
+export class TgWebhookService
+  extends Effect.Service<TgWebhookService>()("TgWebhookService", {
     effect:
       Effect.gen(function* () {
 
-        const httpClient = yield* TgBotHttpClient;
+        const botClient = yield* TgBotHttpClient;
+        const empty = {};
 
-        const getWebhook = () =>
-          httpClient.executeMethod(
+        const webhookInfo =
+          botClient.executeMethod(
             "/getWebhookInfo",
-            {},
-            S.Struct({
-              url: S.String,
-              pending_update_count: S.Number,
-              last_error_date:
-                S.transform(
-                  S.Number,
-                  S.DateTimeUtcFromSelf,
-                  {
-                    strict: true,
-                    decode: seconds => DateTime.unsafeMake(seconds * 1000),
-                    encode: dt => dt.epochMillis / 1000
-                  }
-                ).pipe(S.optional)
-            })
+            empty,
+            WebhookInfo
           )
 
         const setWebhook = (
           input: typeof SetWebhookCommand.Type
         ) =>
-          httpClient.executeMethod(
+          botClient.executeMethod(
             "/setWebhook",
             input,
             S.Boolean
           )
 
         return {
-          getWebhook, setWebhook
+          webhookInfo, setWebhook
         } as const;
 
-      }),
-
-    dependencies: [
-      TgBotHttpClient.Default
-    ]
-
+      })
   }) { }

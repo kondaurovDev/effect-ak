@@ -1,18 +1,15 @@
-import { Effect, pipe, Ref, Schema as S } from "effect";
+import { Context, Effect, pipe, Ref, Schema as S } from "effect";
 
 import { TgBotHttpClient } from "../api/http-client.js";
 
-import { OriginUpdateEvent, MessageUpdate, MessageUpdateEvent, TgChatService, ChatId } from "../module/chat/index.js";
-import { TgFileService } from "../module/file/service.js";
-import { TgBotSettingsService } from "../module/settings/service.js";
+import { OriginUpdateEvent, MessageUpdate, MessageUpdateEvent, ChatId } from "../module/chat/index.js";
+import { TgBotService } from "../module/main.js";
 
 export type MessageHandler =
   (_: {
     message: MessageUpdate,
     currentChatId: ChatId,
-    chat: TgChatService,
-    file: TgFileService,
-    settings: TgBotSettingsService
+    service: Context.Tag.Service<typeof TgBotService>
   }) => unknown
 
 export class PollingService
@@ -21,22 +18,25 @@ export class PollingService
       Effect.gen(function* () {
 
         const httpClient = yield* TgBotHttpClient;
-
-        const modules = {
-          chat: yield* TgChatService,
-          file: yield* TgFileService,
-          settings: yield* TgBotSettingsService
-        }
+        const service = yield* TgBotService;
 
         const lastUpdateIdRef =
           yield* Ref.make<number | undefined>(undefined);
+
+        const emptyResponsesRef =
+          yield* Ref.make(0);
 
         const getLastUpdatesEffect =
           Effect.gen(function* () {
 
             const lastUpdateId = yield* Ref.get(lastUpdateIdRef);
+            const emptyResponses = yield* Ref.get(emptyResponsesRef);
 
-            yield* Effect.logInfo("Getting updates", lastUpdateId);
+            if (emptyResponses == 3) {
+              yield* Effect.fail("Got 3 empty responses, quitting")
+            }
+
+            yield* Effect.logInfo("Getting updates", { lastUpdateId, emptyResponses });
 
             const updates =
               yield* httpClient.executeMethod(
@@ -49,10 +49,15 @@ export class PollingService
                 OriginUpdateEvent.pipe(S.Array)
               );
 
+            yield* Effect.logInfo("Got updates", { number: updates.length })
+
             const id = updates.at(-1)?.update_id;
             if (id) {
-              console.log("setting update id", id);
+              yield* Effect.logInfo("setting last update id", id)
               yield* Ref.update(lastUpdateIdRef, () => id + 1);
+              yield* Ref.update(emptyResponsesRef, () => 0);
+            } else {
+              yield* Ref.update(emptyResponsesRef, _ => _ + 1);
             }
 
             yield* Effect.logDebug(`Got updates`, {
@@ -89,7 +94,7 @@ export class PollingService
                       messageHandler({
                         message: messageUpdate.update,
                         currentChatId: messageUpdate.chatId,
-                        ...modules
+                        service
                       });
 
                     if (handlerResult instanceof Promise) {
@@ -106,9 +111,10 @@ export class PollingService
                 )
               )
 
-            // run infinitely in global scope
+            // run infinitely until first error in global scope
             return yield* pipe(
               handleBatchEffect,
+              Effect.andThen(Effect.sleep("2 seconds")),
               Effect.forever,
               Effect.forkDaemon
             );
@@ -122,9 +128,7 @@ export class PollingService
       }),
 
     dependencies: [
-      TgBotHttpClient.Default,
-      TgChatService.Default,
-      TgBotSettingsService.Default,
-      TgFileService.Default
+      TgBotService.Default,
+      TgBotHttpClient.Default
     ]
   }) { }

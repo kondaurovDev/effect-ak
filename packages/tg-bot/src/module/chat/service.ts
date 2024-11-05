@@ -1,17 +1,16 @@
-import { Effect } from "effect";
 import * as S from "effect/Schema"
+import { Effect } from "effect";
 
-import { TgBotHttpClient } from "../../api/http-client.js";
-import { 
+import {
   EditMessageTextCommand, GetChatCommand, SendChatMessageCommand, SendDocumentCommand,
-  SendVoiceCommand, SetChatActionCommand, UpdateMessageReplyMarkupCommand , SendDiceCommand
+  SendVoiceCommand, SetChatActionCommand, UpdateMessageReplyMarkupCommand, SendDiceCommand
 } from "./schema/commands.js";
 import { MessageUpdate } from "./schema/message-update.js";
 import { ChatInfo } from "./schema.js";
+import { TgBotHttpClient } from "../../api/http-client.js";
 
 export class TgChatService
   extends Effect.Service<TgChatService>()("TgChatService", {
-
     effect:
       Effect.gen(function* () {
 
@@ -96,10 +95,10 @@ export class TgChatService
           sendMessage, editMessageText, updateMessageReplyMarkup,
           getChat, setChatAction, sendVoice, sendDocument, sendDice
         } as const;
+
       }),
 
       dependencies: [
         TgBotHttpClient.Default
       ]
-
   }) { }

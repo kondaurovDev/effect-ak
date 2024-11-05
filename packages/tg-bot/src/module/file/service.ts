@@ -1,9 +1,11 @@
 import { Config, ConfigError, Data, Effect, pipe } from "effect";
 import { FileSystem, HttpClientError, HttpClientRequest } from "@effect/platform";
+import { PlatformError } from "@effect/platform/Error";
 
 import { TgBotHttpClient } from "../../api/index.js";
 import { FileExtension, FileInfo, GetFileInfoCommandInput, RemoteFilePath } from "./schema.js";
-import { PlatformError } from "@effect/platform/Error";
+
+import { telegramApiUrl } from "../../const.js";
 
 export class TgFileServiceError
   extends Data.TaggedError("TgFileServiceError")<{
@@ -15,7 +17,7 @@ export class TgFileService
     effect:
       Effect.gen(function* () {
 
-        const httpClient = yield* TgBotHttpClient;
+        const botClient = yield* TgBotHttpClient;
         const fs = yield* FileSystem.FileSystem;
 
         const tmpDir =
@@ -30,7 +32,7 @@ export class TgFileService
         const getFileInfo = (
           input: typeof GetFileInfoCommandInput.Type
         ) =>
-          httpClient.executeMethod(
+          botClient.executeMethod(
             "/getFile",
             input,
             FileInfo
@@ -44,8 +46,7 @@ export class TgFileService
 
             const botToken = yield* botTokenConfig;
             const fileName = `${remoteFilePath.replaceAll("/", "-")}${fileExtension ?? ""}`;
-            const downloadTo =
-              `${tmpDir}/${fileName}`;
+            const downloadTo = `${tmpDir}/${fileName}`;
 
             const alreadyDownloaded =
               yield* fs.exists(downloadTo);
@@ -55,21 +56,21 @@ export class TgFileService
                 yield* pipe(
                   fs.readFile(downloadTo),
                   Effect.andThen(bytes =>
-                    new File([ bytes ], fileName)
+                    new File([bytes], fileName)
                   )
                 )
               )
             }
 
             return (
-              yield* httpClient.originHttpClient.execute(
-                HttpClientRequest.get(`${httpClient.baseUrl}/file/bot${botToken}/${remoteFilePath}`)
+              yield* botClient.httpClient.execute(
+                HttpClientRequest.get(`${telegramApiUrl}/file/bot${botToken}/${remoteFilePath}`)
               ).pipe(
                 Effect.andThen(_ => _.arrayBuffer),
                 Effect.andThen(_ => new Uint8Array(_)),
                 Effect.tap(_ => fs.writeFile(downloadTo, _)),
                 Effect.andThen(bytes =>
-                  new File([ bytes ], fileName)
+                  new File([bytes], fileName)
                 ),
                 Effect.scoped
               )
@@ -85,7 +86,8 @@ export class TgFileService
           getFileInfo, downloadFile
         } as const;
 
-      }), 
+      }),
+
       dependencies: [
         TgBotHttpClient.Default
       ]
