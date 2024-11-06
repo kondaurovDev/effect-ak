@@ -1,1 +1,1 @@
-[Model pricing](./doc/price.md)
+[Model pricing](./docs/price.md)

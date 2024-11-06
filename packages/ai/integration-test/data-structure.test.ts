@@ -1,12 +1,11 @@
-import { describe, expect, it } from "vitest"
-import { DateTime, Effect, Exit, Logger } from "effect";
+import { assert, describe, it } from "vitest"
+import { DateTime, Effect, Logger } from "effect";
 import { LogLevelConfigFromEnv } from "@effect-ak/misc";
 
-import { DataStructureService } from "../src/service/data-structure";
-import { ProviderName } from "../src/domain/chat-completion";
+import { AiDataStructureService } from "../src/public";
 
 const live =
-  DataStructureService.Default
+  AiDataStructureService.Default
 
 describe("data structure service", () => {
 
@@ -14,11 +13,11 @@ describe("data structure service", () => {
 
     const program =
       await Effect.gen(function* () {
-        const service = yield* DataStructureService;
+        const service = yield* AiDataStructureService;
 
         const result =
           yield* service.getStructured({
-            model: { provider: ProviderName.make("anthropic")},
+            providerName: "anthropic",
             objects: [
               {
                 phrase: "bought a table for 10 dollars"
@@ -58,7 +57,9 @@ describe("data structure service", () => {
         Effect.runPromiseExit
       );
 
-    expect(program).toEqual(Exit.succeed)
+    assert(program._tag == "Success");
+
+    assert(program.value.length == 2);
 
   })
 

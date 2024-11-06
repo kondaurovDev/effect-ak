@@ -13,9 +13,6 @@ export type MessageHandlerContext = {
   service: Context.Tag.Service<typeof TgBotService>
 }
 
-export const TgBotMessageHandlerRuntime = 
-  Context.GenericTag<ManagedRuntime.ManagedRuntime<any, any>>("TgBotMessageHandlerRuntime");
-
 export class PollingService
   extends Effect.Service<PollingService>()("PollingService", {
     effect:
@@ -78,7 +75,6 @@ export class PollingService
             Effect.gen(function* () {
 
               yield* Effect.logInfo("Listening Telegram bot updates...");
-              const botMessageHandlerRuntime = yield* TgBotMessageHandlerRuntime; 
 
               const handleBatchEffect =
                 pipe(
@@ -137,8 +133,7 @@ export class PollingService
                       );
 
                     })
-                  ),
-                  Effect.provide(botMessageHandlerRuntime)
+                  )
                 )
 
               // run infinitely in global scope until first error

@@ -1,5 +1,5 @@
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
-import { Cause, Data, Effect, pipe, Redacted } from "effect";
+import { Cause, ConfigProvider, Context, Data, Effect, Option, pipe, Redacted } from "effect";
 import * as S from "effect/Schema";
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
@@ -22,12 +22,23 @@ export class MethodEffectOrPromiseResponse<O>
     promise: () => Promise<O>
   }> { }
 
+export const TgPromiseConfigProvider =
+  Context.GenericTag<ConfigProvider.ConfigProvider>("TgPromiseConfigProvider");
+
 export class TgBotHttpClient
   extends Effect.Service<TgBotHttpClient>()("TgBotHttpClient", {
     effect:
       Effect.gen(function* () {
 
         const { tokenEffect } = yield* TgBotTokenProvider;
+
+        const promiseConfigProvider = 
+          pipe(
+            yield* Effect.serviceOption(TgPromiseConfigProvider),
+            Option.getOrUndefined
+          );
+
+        yield* Effect.logInfo("Is config provider defined?", promiseConfigProvider == null)
 
         const httpClient =
           pipe(
@@ -98,6 +109,7 @@ export class TgBotHttpClient
               () =>
                 pipe(
                   Effect.logDebug("executing promise"),
+                  Effect.withConfigProvider(promiseConfigProvider ?? ConfigProvider.fromJson({})),
                   Effect.andThen(effect),
                   Effect.runPromise
                 );
