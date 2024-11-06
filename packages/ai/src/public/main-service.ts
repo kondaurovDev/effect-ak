@@ -1,20 +1,20 @@
 import * as Effect from "effect/Effect";
-import { Anthropik, Openai, Stabilityai } from "../internal/index.js";
+import { Anthropic, Openai, Stabilityai } from "../internal/index.js";
 
 export class AiMainService
   extends Effect.Service<AiMainService>()("AiMainService", {
     effect: Effect.gen(function* () {
 
       const openaiTextService = yield* Openai.Text.TextService;
-      const anthropik = yield* Anthropik.AnthropicCompletionService;
+      const anthropic = yield* Anthropic.AnthropicCompletionService;
       const stabilityai = yield* Stabilityai.ImageGenerationService;
 
       return {
         openai: {
           completeChat: openaiTextService.completeText
         },
-        anthropik: {
-          completeChat: anthropik.completeChat
+        anthropic: {
+          completeChat: anthropic.completeChat
         },
         stabilityai: {
           generateImage: stabilityai.generateImage
@@ -25,7 +25,7 @@ export class AiMainService
 
     dependencies: [
       Openai.Text.TextService.Default,
-      Anthropik.AnthropicCompletionService.Default,
+      Anthropic.AnthropicCompletionService.Default,
       Stabilityai.ImageGenerationService.Default
     ]
   }) { }

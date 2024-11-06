@@ -4,7 +4,7 @@ import * as Match from "effect/Match";
 import * as S from "effect/Schema";
 import { Column, CsvService, CsvCompatibleObject } from "@effect-ak/misc/data-format";
 
-import { Anthropik, Openai } from "../internal/index.js";
+import { Anthropic, Openai } from "../internal/index.js";
 import { ProviderName } from "../internal/chat-completion.js";
 
 export class AiDataStructureCommand
@@ -25,7 +25,7 @@ export class AiDataStructureService
         const csvService = yield* CsvService;
 
         const completion = {
-          anthropic: yield* Anthropik.AnthropicCompletionService,
+          anthropic: yield* Anthropic.AnthropicCompletionService,
           openai: yield* Openai.OpenaiChatCompletionEndpoint
         }
 
@@ -107,7 +107,7 @@ export class AiDataStructureService
     dependencies: [
       CsvService.Default,
       Openai.OpenaiChatCompletionEndpoint.Default,
-      Anthropik.AnthropicCompletionService.Default
+      Anthropic.AnthropicCompletionService.Default
     ]
 
   }) { }

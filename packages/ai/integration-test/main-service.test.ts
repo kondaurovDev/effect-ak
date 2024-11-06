@@ -49,11 +49,11 @@ describe("main ai service", () => {
 
   });
 
-  it("check anthropik, sonnet", async () => {
+  it("check anthropic, sonnet", async () => {
 
     const result = 
       await program(_ =>
-        _.anthropik.completeChat({
+        _.anthropic.completeChat({
           model: "claude-3-5-sonnet-20241022",
           system: "give plain answer without any words",
           max_tokens: 10,
