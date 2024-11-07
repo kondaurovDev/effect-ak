@@ -1,6 +1,15 @@
-import { FetchHttpClient, HttpClient, HttpClientRequest } from "@effect/platform";
-import { Cause, ConfigProvider, Context, Data, Effect, Option, pipe, Redacted } from "effect";
+import { pipe } from "effect/Function";
+import * as Cause from "effect/Cause";
+import * as ConfigProvider from "effect/ConfigProvider";
+import * as Context from "effect/Context";
+import * as Data from "effect/Data";
+import * as Effect from "effect/Effect";
+import * as Option from "effect/Option";
+import * as Redacted from "effect/Redacted";
 import * as S from "effect/Schema";
+import * as FetchHttpClient from "@effect/platform/FetchHttpClient";
+import * as HttpClient from "@effect/platform/HttpClient";
+import * as HttpClientRequest from "@effect/platform/HttpClientRequest";
 
 import { TgBotApiClientError, TgBotApiServerError } from "./error.js";
 import { TgResponse } from "./response.js";

@@ -1,4 +1,6 @@
-import { Context, Schema as S, Effect } from "effect";
+import * as Effect from "effect/Effect";
+import * as S from "effect/Schema";
+import * as Context from "effect/Context";
 
 import { SetWebhookCommand, WebhookInfo } from "./schema.js";
 import { TgBotHttpClient } from "../../api/http-client.js";

@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import * as Effect from "effect/Effect";
 
 import { TgBotHttpClient } from "../api/http-client.js";
 import { TgChatService } from "../module/chat/service.js";

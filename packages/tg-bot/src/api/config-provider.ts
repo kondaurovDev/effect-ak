@@ -1,11 +1,15 @@
-import { Config, Effect, Layer, pipe, Redacted } from "effect";
+import { pipe } from "effect/Function";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
+import * as Redacted from "effect/Redacted";
+import * as Config from "effect/Config";
 
 import { tgBotModuleName } from "../internal/const.js";
 
 export class TgBotTokenProvider
   extends Effect.Tag("TgBotTokenProvider")<TgBotTokenProvider, {
     tokenEffect: Effect.Effect<Redacted.Redacted<string>, unknown>
-  }>() { 
+  }>() {
 
     static readonly fromConfig =
       Layer.effect(

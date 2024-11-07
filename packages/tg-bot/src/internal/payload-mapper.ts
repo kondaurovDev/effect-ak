@@ -1,5 +1,5 @@
 import * as S from "effect/Schema";
-import { HttpBody } from "@effect/platform";
+import * as HttpBody from "@effect/platform/HttpBody";
 
 import { isMessageEffect, messageEffectIdCodesMap } from "./message-effect.js";
 import { FileWithContent } from "../module/chat/schema/commands.js";

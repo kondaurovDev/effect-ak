@@ -1,4 +1,5 @@
-import { Effect, Schema as S } from "effect";
+import * as S from "effect/Schema";
+import * as Effect from "effect/Effect";
 
 import { TgBotHttpClient } from "../../api/http-client.js";
 import { User } from "../chat/schema.js";

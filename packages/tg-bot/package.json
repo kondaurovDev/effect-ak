@@ -1,6 +1,6 @@
 {
   "name": "@effect-ak/tg-bot",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An Effect-powered Telegram bot client designed for building Telegram bots",
   "license": "MIT",
   "type": "module",
@@ -18,7 +18,6 @@
     "dist"
   ],
   "scripts": {
-    "compile": "tsc -b tsconfig.src.json",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "devDependencies": {

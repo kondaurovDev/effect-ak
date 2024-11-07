@@ -1,4 +1,4 @@
-import { Brand } from "effect"
+import * as Brand from "effect/Brand"
 import * as S from "effect/Schema";
 
 export const GetFileInfoCommandInput = 

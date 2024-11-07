@@ -1,10 +1,15 @@
-import { Config, ConfigError, Data, Effect, pipe } from "effect";
-import { FileSystem, HttpClientError, HttpClientRequest } from "@effect/platform";
+import * as Config from "effect/Config";
+import * as Data from "effect/Data";
+import * as Effect from "effect/Effect";
+import { pipe } from "effect/Function";
+import * as ConfigError from "effect/ConfigError";
+import * as FileSystem from "@effect/platform/FileSystem";
+import * as HttpClientError from "@effect/platform/HttpClientError";
+import * as HttpClientRequest from "@effect/platform/HttpClientRequest";
 import { PlatformError } from "@effect/platform/Error";
 
 import { TgBotHttpClient } from "../../api/index.js";
 import { FileExtension, FileInfo, GetFileInfoCommandInput, RemoteFilePath } from "./schema.js";
-
 import { telegramApiUrl } from "../../internal/const.js";
 
 export class TgFileServiceError

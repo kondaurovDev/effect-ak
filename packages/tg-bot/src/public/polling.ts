@@ -1,4 +1,9 @@
-import { Array, Context, Effect, ManagedRuntime, pipe, Ref, Schema as S } from "effect";
+import { pipe } from "effect/Function";
+import * as Effect from "effect/Effect";
+import * as Array from "effect/Array";
+import * as Context from "effect/Context";
+import * as S from "effect/Schema";
+import * as Ref from "effect/Ref";
 
 import { MethodEffectOrPromiseResponse, TgBotHttpClient } from "../api/http-client.js";
 import { OriginUpdateEvent, MessageUpdate, MessageUpdateEvent, ChatId } from "../module/chat/index.js";

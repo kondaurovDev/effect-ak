@@ -1,4 +1,6 @@
-import { DateTime, Schema as S } from "effect";
+import * as S from "effect/Schema";
+import * as DateTime from "effect/DateTime";
+
 import { UpdateEventType } from "../chat/schema/origin-update-event.js";
 
 export const SetWebhookCommand =

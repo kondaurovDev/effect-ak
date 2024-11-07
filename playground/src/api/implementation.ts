@@ -1,7 +1,7 @@
 import { FileSystem, HttpApi, HttpApiBuilder } from "@effect/platform";
 import { Config, Effect, Layer, pipe } from "effect";
 import { readFile } from "fs/promises"
-import { Deepgram, Openai, Stabilityai } from "@effect-ak/ai/vendor"
+import { Deepgram, Openai, Stabilityai } from "@effect-ak/ai/internal"
 
 import { Endpoints, UnknownError } from "./definition.js";
 import { htmlPage } from "./enrypoint.js";
@@ -65,7 +65,7 @@ export class BackendApi
                             Effect.merge
                           ),
                         gpt4o:
-                          gpt4o.complete({
+                          gpt4o.completeText({
                             model: "gpt-4o-audio-preview",
                             messages: [
                               {

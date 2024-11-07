@@ -1,4 +1,5 @@
-import { Data, pipe } from "effect";
+import { pipe } from "effect/Function";
+import * as Data from "effect/Data";
 
 import { MessageUpdate } from "./message-update.js";
 import { OriginUpdateEvent } from "./origin-update-event.js";

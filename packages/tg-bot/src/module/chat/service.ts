@@ -1,5 +1,5 @@
 import * as S from "effect/Schema"
-import { Effect } from "effect";
+import * as Effect from "effect/Effect";
 
 import {
   EditMessageTextCommand, GetChatCommand, SendChatMessageCommand, SendDocumentCommand,
