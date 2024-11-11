@@ -3,7 +3,7 @@ import * as FetchHttpClient from "@effect/platform/FetchHttpClient";
 import * as HttpClientRequest from "@effect/platform/HttpClientRequest";
 import * as S from "effect/Schema";
 
-import { makeHttpClient } from "../../http-client.js";
+import { makeHttpClient } from "../../../internal/http-client.js";
 
 export class DeepgramHttpClient extends
   Effect.Service<DeepgramHttpClient>()("DeepgramHttpClient", {

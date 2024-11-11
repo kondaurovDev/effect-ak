@@ -4,7 +4,7 @@ import * as Match from "effect/Match";
 import * as S from "effect/Schema";
 import { Column, CsvService, CsvCompatibleObject } from "@effect-ak/misc/data-format";
 
-import { Anthropic, Openai } from "../internal/index.js";
+import { Anthropic, Openai } from "../vendor/index.js";
 import { ProviderName } from "../internal/chat-completion.js";
 
 export class AiDataStructureCommand
@@ -47,9 +47,11 @@ export class AiDataStructureService
             - break line is the standard unix's symbol n
 
             ## CSV columns:
-            ${command.outputColumns.map((column, index) =>
-            `${index + 1} - ${column.columnName} - ${column.description}`
-          ).join("\n")}
+            ${
+              command.outputColumns
+                .map((column, idx) => `${idx + 1} - ${column.columnName} - ${column.description}`)
+                .join("\n")
+            }
           `
 
         const getStructured = (

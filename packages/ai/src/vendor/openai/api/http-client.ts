@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 
-import { makeHttpClient } from "../../http-client.js";
+import { makeHttpClient } from "../../../internal/http-client.js";
 
 export class OpenaiHttpClient
   extends Effect.Service<OpenaiHttpClient>()("OpenaiHttpClient", {

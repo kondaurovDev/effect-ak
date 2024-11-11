@@ -7,8 +7,7 @@ import * as FetchHttpClient from "@effect/platform/FetchHttpClient";
 import * as HttpClientRequest from "@effect/platform/HttpClientRequest";
 import * as HttpClient from "@effect/platform/HttpClient";
 
-import { availableVendors } from "./const.js";
-import { aiModuleName } from "../public/const.js";
+import { availableVendors, aiModuleName } from "./const.js";
 
 export class MakeHttpClientInput
   extends S.Class<MakeHttpClientInput>("MakeHttpClientInput")({
@@ -46,33 +45,16 @@ export const makeHttpClient = (
     const tokenHeaderValueEffect =
       pipe(
         Config.nonEmptyString(`${input.vendorName}-token`).pipe(Config.nested(aiModuleName)),
-        Effect.andThen(token => 
+        Effect.andThen(token =>
           String.isEmpty(input.auth.tokenPrefix) ? token : `${input.auth.tokenPrefix.trim()} ${token}`
         )
       )
 
-    const getBuffer = (
-      originRequest: HttpClientRequest.HttpClientRequest
-    ) =>
-      pipe(
-        tokenHeaderValueEffect,
-        Effect.andThen(tokenHeaderValue =>
-          originRequest.pipe(
-            HttpClientRequest.setHeader(input.auth.headerName, tokenHeaderValue)
-          )
-        ),
-        Effect.andThen(httpClient.execute),
-        Effect.andThen(_ => _.arrayBuffer),
-        Effect.andThen(Buffer.from),
-        Effect.scoped
-      )
-
-    const getJson = (
+    const execute = (
       request: HttpClientRequest.HttpClientRequest
     ) =>
       pipe(
-        Effect.logDebug(`request to ${input.baseUrl}`, request),
-        Effect.andThen(tokenHeaderValueEffect),
+        tokenHeaderValueEffect,
         Effect.andThen(tokenHeaderValue =>
           request.pipe(
             HttpClientRequest.setHeader(input.auth.headerName, tokenHeaderValue)
@@ -85,9 +67,16 @@ export const makeHttpClient = (
             Effect.andThen(_ => Effect.logError("HTTP client, bad response =>", _))
           )
         ),
+        Effect.scoped
+      )
+
+    const getJson = (
+      request: HttpClientRequest.HttpClientRequest
+    ) =>
+      pipe(
+        execute(request),
         Effect.andThen(_ => _.json),
         Effect.tap(_ => Effect.logDebug("Successful response", _)),
-        Effect.scoped,
       );
 
     const getTyped = <I, I2>(
@@ -97,11 +86,10 @@ export const makeHttpClient = (
       pipe(
         getJson(request),
         Effect.andThen(S.decodeUnknown(schema)),
-        Effect.scoped
-      )
+      );
 
     return {
-      getBuffer, getJson, getTyped
+      execute, getJson, getTyped
     } as const;
 
   }).pipe(

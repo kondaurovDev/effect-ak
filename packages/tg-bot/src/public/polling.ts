@@ -107,8 +107,6 @@ export class PollingService
                         return Effect.die(error);
                       }
 
-                      console.info("handler result", handlerResult);
-
                       if (handlerResult instanceof Promise) { //unwrap Promise
                         return pipe(
                           Effect.tryPromise(() => handlerResult),

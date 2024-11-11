@@ -3,7 +3,7 @@ import * as Effect from "effect/Effect";
 import * as HttpBody from "@effect/platform/HttpBody";
 import * as HttpClientRequest from "@effect/platform/HttpClientRequest";
 
-import { ChatCompletionInterface, ProviderName } from "../../chat-completion.js";
+import { ChatCompletionInterface, ProviderName } from "../../../internal/chat-completion.js";
 import { 
   ChatCompletionRequest, ChatCompletionResponse, OneOfRequest, SystemMessage, UserMessage 
 } from "../modules/text/schema/index.js"

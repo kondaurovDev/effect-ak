@@ -1,5 +1,6 @@
 import * as Effect from "effect/Effect";
-import { Anthropic, Openai, Stabilityai } from "../internal/index.js";
+
+import { Anthropic, Openai, Stabilityai } from "../vendor/index.js";
 
 export class AiMainService
   extends Effect.Service<AiMainService>()("AiMainService", {

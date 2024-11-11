@@ -11,21 +11,25 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "server-dev": "bun run --watch src/main.ts",
+    "server": "tsx run src/main.ts",
     "compile": "tsc -b tsconfig.src.json",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "devDependencies": {
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
-    "effect": "catalog:",
-    "vue": "^3.5.12",
-    "vuetify": "^3.7.3"
+    "effect": "catalog:"
   },
   "dependencies": {
     "@effect-ak/ai": "workspace:^",
     "@effect-ak/misc": "workspace:^",
     "esbuild": "^0.24.0",
     "extendable-media-recorder": "^9.2.16",
-    "extendable-media-recorder-wav-encoder": "^7.0.120"
+    "extendable-media-recorder-wav-encoder": "^7.0.120",
+    "bootstrap": "^5.3.3",
+    "htmx.org": "^2.0.3",
+    "hyperscript.org": "^0.9.13",
+    "marked": "^15.0.0"
   }
 }

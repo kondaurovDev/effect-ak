@@ -1,118 +1,89 @@
-import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema, Multipart } from "@effect/platform"
-import { Array, ParseResult } from "effect";
+import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from "@effect/platform"
+import { ParseResult, Array } from "effect";
 import * as S from "effect/Schema";
 
-export class UnknownError extends S.TaggedError<UnknownError>()(
-  "UnknownError",
-  {}
-) {}
+export class UnknownError
+  extends S.TaggedError<UnknownError>()(
+    "UnknownError",
+    {}
+  ) { }
 
-const assetPath =
+const StaticFileUrlPath =
   S.transformOrFail(
     S.NonEmptyString,
     S.NonEmptyArray(S.NonEmptyString),
     {
       strict: true,
-      decode: (input, options, ast) => {
-        const arr = input.split(":")
-        if (Array.isNonEmptyArray(arr)) {
-          return ParseResult.succeed(arr)
+      decode: _ => {
+        const els = _.split(":");
+        if (Array.isNonEmptyArray(els)) {
+          return ParseResult.succeed(els);
         } else {
           return ParseResult.fail(
-            new ParseResult.Type(
-              ast,
-              input,
-              "Failed to convert string to asset path"
-            )
+            new ParseResult.Unexpected(els, "Is empty")
           )
         }
       },
-      encode: input => ParseResult.succeed(input.join(":"))
+      encode: _ => ParseResult.succeed(_.join(":"))
     }
   )
 
-export class Endpoints extends
-  HttpApiGroup.make("endpoints")
+export class ApiEndpoints extends
+  HttpApiGroup.make("api")
     .addError(UnknownError, { status: 418 })
     .add(
       HttpApiEndpoint
-        .get("verbose", "/verbose")
-        .addSuccess(S.Unknown)
-    )
-    .add(
-      HttpApiEndpoint
-        .get("compile", "/compile")
-        .addSuccess(S.Unknown)
-    )
-    .add(
-      HttpApiEndpoint
-        .post("transcribe", "/api/transcribe")
-        .setPayload(
-          HttpApiSchema.Multipart(
-            S.Struct({
-              audioFile: Multipart.SingleFileSchema
-            })
-          )
-        )
-        .addSuccess(S.Unknown)
-    )
-    .add(
-      HttpApiEndpoint
-        .post("generateImage", "/api/generate-image")
-        .setPayload(
+        .get("ask-ai", "/api/ask-ai")
+        .setUrlParams(
           S.Struct({
-            prompt: S.NonEmptyString
+            question: S.NonEmptyString
           })
         )
-        .addSuccess(S.Unknown)
-    )
-    .add(
-      HttpApiEndpoint
-        .get("rootPage", "/")
         .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
     )
     .add(
       HttpApiEndpoint
-        .get("page", "/page/:pageName")
-        .setPath(S.Struct({
-          pageName: S.NonEmptyString
-        }))
-        .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
-    )
-    .add(
-      HttpApiEndpoint
-        .get("vue-component", "/js/:path")
-        .setPath(S.Struct({
-          path: S.NonEmptyString
-        }))
-        .addSuccess(
-          S.Union(
-            HttpApiSchema.Text({ contentType: "text/javascript" })
-          )
+        .get("generate-image", "/api/generate-image")
+        .setUrlParams(
+          S.Struct({
+            description: S.NonEmptyString
+          })
         )
-    )
-    .add(
-      HttpApiEndpoint
-        .get("vue-component-style", "/css/:path")
-        .setPath(S.Struct({
-          path: S.NonEmptyString
-        }))
-        .addSuccess(HttpApiSchema.Text({ contentType: "text/css" }))
-    )
-    .add(
-      HttpApiEndpoint
-        .get("vendorJs", "/vendor/js/:path")
-        .setPath(S.Struct({
-          path: assetPath
-        }))
-        .addSuccess(HttpApiSchema.Text({ contentType: "text/javascript" }))
-    )
-    .add(
-      HttpApiEndpoint
-        .get("vendorCss", "/vendor/css/:path")
-        .setPath(S.Struct({
-          path: assetPath
-        }))
-        .addSuccess(HttpApiSchema.Text({ contentType: "text/css" }))
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
     )
 { }
+
+export class PageEndpoints extends
+  HttpApiGroup.make("html")
+    .addError(UnknownError, { status: 418 })
+    .add(
+      HttpApiEndpoint
+        .get("ask-ai", "/page/:path")
+        .setPath(
+          S.Struct({ path: StaticFileUrlPath })
+        )
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
+    )
+{ }
+
+export class StaticFilesEndpoints extends
+  HttpApiGroup.make("static")
+    .addError(UnknownError, { status: 418 })
+    .add(
+      HttpApiEndpoint
+        .get("css", "/css/:path")
+        .setPath(
+          S.Struct({ path: StaticFileUrlPath })
+        )
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/css" }))
+    )
+    .add(
+      HttpApiEndpoint
+        .get("js", "/js/:path")
+        .setPath(
+          S.Struct({ path: StaticFileUrlPath })
+        )
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/javascript" }))
+    )
+{ }
+

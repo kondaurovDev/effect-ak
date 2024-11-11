@@ -1,168 +1,123 @@
-import { FileSystem, HttpApi, HttpApiBuilder } from "@effect/platform";
-import { Config, Effect, Layer, pipe } from "effect";
-import { readFile } from "fs/promises"
-import { Deepgram, Openai, Stabilityai } from "@effect-ak/ai/internal"
+import { HttpApi, HttpApiBuilder } from "@effect/platform";
+import { Cause, Effect, Layer, pipe, Array } from "effect";
 
-import { Endpoints, UnknownError } from "./definition.js";
-import { htmlPage } from "./enrypoint.js";
-import { CompileVueService } from "../compile-service.js";
+import { Openai, Stabilityai } from "@effect-ak/ai/vendor";
+import * as Marked from "marked"
 
-const readFileEffect = (
-  path: string
-) =>
-  pipe(
-    Effect.succeed(__dirname + `/../../${path}`),
-    Effect.tap(_ => Effect.logInfo("reading file", _)),
-    Effect.andThen(file =>
-      Effect.tryPromise(() => readFile(file))
-    ),
-    Effect.andThen(_ => _.toString("utf-8")),
-    Effect.catchAll(() => Effect.succeed(""))
-  )
+import { ApiEndpoints, PageEndpoints, StaticFilesEndpoints, UnknownError } from "./definition.js";
+import { UtilService } from "../util.js";
 
 export class BackendApi
-  extends HttpApi.empty.add(Endpoints) {
+  extends HttpApi.empty
+    .add(ApiEndpoints)
+    .add(PageEndpoints)
+    .add(StaticFilesEndpoints) {
 
   static live =
     HttpApiBuilder.api(BackendApi)
       .pipe(
         Layer.provide(
-          HttpApiBuilder.group(BackendApi, "endpoints", handlers =>
+          HttpApiBuilder.group(BackendApi, "api", handlers =>
             Effect.gen(function* () {
-
-              const compileService = yield* CompileVueService;
-              const whisperService = yield* Openai.Audio.AudioService;
-              const deepgramStt = yield* Deepgram.SpeachToTextService;
-              const stabilityai = yield* Stabilityai.ImageGenerationService;
-              const gpt4o = yield* Openai.Text.TextService;
-              const fs = yield* FileSystem.FileSystem;
+              const deps = {
+                chatgpt: yield* Openai.OpenaiChatCompletionEndpoint,
+                stabilityai: yield* Stabilityai.ImageGenerationService
+              }
 
               return handlers
-                .handle("verbose", () =>
+                .handle("ask-ai", ({ urlParams }) =>
                   pipe(
-                    Config.hashMap(Config.nonEmptyString(), "openai"),
-                    Effect.catchAll(() =>
-                      Effect.fail(new UnknownError())
-                    )
-                  )
-                )
-                .handle("transcribe", ({ payload }) =>
-                  pipe(
-                    fs.readFile(payload.audioFile.path),
-                    Effect.andThen(fileContent =>
-                      Effect.all({
-                        whisper: 
-                          whisperService.transcribe({
-                            fileContent: fileContent,
-                            fileName: payload.audioFile.name,
-                            model: "whisper-1",
-                            response_format: "json"
-                          }),
-                        nova2:
-                          pipe(
-                            deepgramStt.getTranscription(fileContent, "audio/webm"),
-                            Effect.andThen(_ => _.results.channels[0].alternatives[0].transcript),
-                            Effect.merge
-                          ),
-                        gpt4o:
-                          gpt4o.completeText({
-                            model: "gpt-4o-audio-preview",
-                            messages: [
-                              {
-                                role: "system",
-                                content: "your task is to transcribe user's speech, don't try to fix errors, let them be. Multiple languages might be used. Also, give json object with keys: transcription, grammarErrorsCount, fluency (in %)"
-                              },
-                              {
-                                role: "user",
-                                content: [
-                                  {
-                                    type: "input_audio",
-                                    input_audio: {
-                                      data: Buffer.from(fileContent).toString("base64"),
-                                      format: "wav"
-                                    }
-                                  }
-                                ]
-                              }
-                            ],
-                          })
-                      }, { concurrency: "unbounded" }),
-                        
-                    ),
-                    Effect.tapError(Effect.logError),
-                    Effect.catchAll(() =>
-                      Effect.fail(new UnknownError())
-                    )
-                  )
-                )
-                .handle("generateImage", ({ payload }) =>
-                  pipe(
-                    stabilityai.generateImage({
-                      prompt: payload.prompt,
-                      modelEndpoint: "/core"
+                    deps.chatgpt.complete({
+                      model: "gpt4o",
+                      systemMessage: "you are a helpful assistant",
+                      userMessage: urlParams.question
                     }),
-                    Effect.tapError(Effect.logError),
-                    Effect.catchAll(() =>
-                      Effect.fail(new UnknownError())
+                    Effect.andThen(answer =>
+                      Effect.tryPromise(() =>
+                        Marked.parse(answer, { async: true })
+                      )
+                    ),
+                    Effect.catchAllCause((error) =>
+                      Effect.succeed(`
+                        <pre class="bg-warning">
+                          ${Cause.pretty(error, { renderErrorCause: true })}
+                        </pre>
+                      `)
                     )
                   )
-                )
-                .handle("compile", () =>
+                ).handle("generate-image", ({ urlParams }) =>
                   pipe(
-                    compileService.compileAll,
-                    Effect.tapError(Effect.logError),
+                    deps.stabilityai.generateImageAndSave({
+                      modelEndpoint: "/core",
+                      prompt: urlParams.description
+                    }),
+                    Effect.tap(_ => Effect.logInfo("An image has been generated", _)),
+                    Effect.andThen(filePath =>
+                      /*html*/`<img
+                        src="/img/"
+                      />`
+                    )
+                  ).pipe(
+                    Effect.tapErrorCause(Effect.logError),
+                    Effect.catchAllCause(() =>
+                      new UnknownError({ })
+                    )
+                  )
+                )
+            })
+          )
+        ),
+        Layer.provide(
+          HttpApiBuilder.group(BackendApi, "html", handlers =>
+            Effect.gen(function* () {
+              const util = yield* UtilService;
+              return handlers
+                .handle("ask-ai", ({ path }) =>
+                  pipe(
+                    util.readFileFromProjectRoot(
+                      Array.modifyNonEmptyLast(["html", ...path.path], _ => _ + ".html")
+                    ),
                     Effect.catchAll(() =>
                       Effect.fail(new UnknownError())
                     )
                   )
                 )
-                .handle("rootPage", () =>
-                  Effect.succeed(htmlPage("main"))
+            })
+          )
+        ),
+        Layer.provide(
+          HttpApiBuilder.group(BackendApi, "static", handlers =>
+            Effect.gen(function* () {
+              const util = yield* UtilService;
+              return handlers
+                .handle("css", ({ path }) =>
+                  pipe(
+                    util.readFileFromNodeModules(
+                      Array.modifyNonEmptyLast([ ...path.path ], _ => _ + ".css"),
+                    ),
+                    Effect.catchAll(() =>
+                      Effect.fail(new UnknownError())
+                    )
+                  )
                 )
-                .handle("page", ({ path }) =>
-                  Effect.succeed(htmlPage(path.pageName))
-                )
-                .handle("vue-component", (params) =>
-                  params.path.path.endsWith(".map") ?
-                    pipe(
-                      readFileEffect(`.out/${params.path.path}.js.map`),
-                      Effect.andThen(input =>
-                        Effect.try(() => JSON.parse(input))
-                      ),
-                      Effect.mapError(() => new UnknownError())
-                    ) :
-                    readFileEffect(`.out/${params.path.path}.js`)
-                )
-                .handle("vue-component-style", (params) =>
-                  readFileEffect(`.out/${params.path.path}.css`)
-                )
-                .handle("vendorJs", (params) =>
-                  params.path.path.at(-1)?.endsWith(".js.map") === true ?
-                    pipe(
-                      Effect.logInfo("reading vendor js source map file"),
-                      Effect.andThen(
-                        readFileEffect(`node_modules/${params.path.path.join("/")}`)
-                      ),
-                      Effect.andThen(input =>
-                        Effect.try(() => JSON.parse(input))
-                      ),
-                      Effect.mapError(() => new UnknownError())
-                    ) :
-                    readFileEffect(`node_modules/${params.path.path.join("/")}`)
-                )
-                .handle("vendorCss", (params) =>
-                  readFileEffect(`node_modules/${params.path.path.join("/")}.css`)
+                .handle("js", ({ path }) =>
+                  pipe(
+                    util.readFileFromNodeModules(
+                      Array.modifyNonEmptyLast([...path.path], _ => _ + ".js"),
+                    ),
+                    Effect.catchAll(() =>
+                      Effect.fail(new UnknownError())
+                    )
+                  )
                 )
             })
           )
         )
       ).pipe(
         Layer.provide([
-          Openai.Text.TextService.Default,
-          CompileVueService.Default,
-          Deepgram.SpeachToTextService.Default,
-          Openai.Audio.AudioService.Default,
-          Stabilityai.ImageGenerationService.Default
+          Openai.OpenaiChatCompletionEndpoint.Default,
+          Stabilityai.ImageGenerationService.Default,
+          UtilService.Default
         ])
       )
 }

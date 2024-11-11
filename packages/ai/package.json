@@ -1,7 +1,7 @@
 {
   "name": "@effect-ak/ai",
   "type": "module",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Integrations with AI services powered by Effect",
   "author": {
     "name": "Aleksandr Kondaurov",
@@ -45,6 +45,10 @@
     "./internal": {
       "types": "./dist/internal/index.d.ts",
       "default": "./dist/internal/index.js"
+    },
+    "./vendor": {
+      "types": "./dist/vendor/index.d.ts",
+      "default": "./dist/vendor/index.js"
     }
   }
 }

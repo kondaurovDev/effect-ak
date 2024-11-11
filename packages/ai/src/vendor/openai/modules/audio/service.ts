@@ -28,7 +28,7 @@ export class AudioService
           pipe(
             HttpBody.json(request),
             Effect.andThen(requestBody =>
-              httpClient.getBuffer(
+              httpClient.execute(
                 HttpClientRequest.post(
                   `/v1/audio/speech`,
                   {
@@ -37,8 +37,9 @@ export class AudioService
                 )
               )
             ),
-            Effect.andThen(fileBuffer =>
-              fs.writeFile(tmpDir + '/' + `text.${request.response_format}`, new Uint8Array(fileBuffer))
+            Effect.andThen(_ => _.arrayBuffer),
+            Effect.andThen(_ =>
+              fs.writeFile(tmpDir + '/' + `text.${request.response_format}`, new Uint8Array(_))
             )
           );
 

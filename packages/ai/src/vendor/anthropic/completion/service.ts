@@ -4,7 +4,7 @@ import * as HttpBody from "@effect/platform/HttpBody";
 import * as HttpClientRequest from "@effect/platform/HttpClientRequest";
 
 import { AnthropicHttpClient } from "../api/http-client.js";
-import { ChatCompletionInterface, ProviderName } from "../../chat-completion.js";
+import { ChatCompletionInterface, ProviderName } from "../../../internal/chat-completion.js";
 import { MessageCompletionRequest, MessageResponse, TextMessageContent } from "./schema/index.js";
 
 export class AnthropicCompletionService

@@ -1,9 +1,9 @@
 import { HttpApiBuilder, HttpMiddleware, HttpServer } from "@effect/platform"
 import { NodeHttpServer, NodeRuntime } from "@effect/platform-node"
 import { ConfigProvider, Layer } from "effect"
-import { createServer } from "node:http"
 import { setConfigProvider } from "effect/Layer"
 import { LogLevelConfigFromEnv } from "@effect-ak/misc"
+import { createServer } from "node:http"
 
 import integrationConfig from "../../packages/ai/integration-config.json"
 import { BackendApi } from "./api/implementation.js"
@@ -16,13 +16,12 @@ const nodeHttpServer = (
 const configProvider = 
   setConfigProvider(
     ConfigProvider.fromJson({
-      vueComponentsDir: __dirname + "/../pages",
-      vueComponentsOutDir: __dirname + "/../.out",
       "effect-ak-ai": {
         "openai-token": integrationConfig["effect-ak-ai_openai-token"],
         "anthropic-token": integrationConfig["effect-ak-ai_anthropic-token"],
         "deepgram-token": integrationConfig["effect-ak-ai_deepgram-token"],
         "stabilityai-token": integrationConfig["effect-ak-ai_stabilityai-token"],
+        "output-image-dir": __dirname + "/../.out/image",
       },
       LOG_LEVEL: "debug"
     })
