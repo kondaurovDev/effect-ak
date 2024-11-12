@@ -6,7 +6,7 @@ import { LogLevelConfigFromEnv } from "@effect-ak/misc"
 import { createServer } from "node:http"
 
 import integrationConfig from "../../packages/ai/integration-config.json"
-import { BackendApi } from "./api/implementation.js"
+import { httpApiLive } from "./api/layer.js"
 
 const nodeHttpServer = (
   port: number
@@ -21,21 +21,21 @@ const configProvider =
         "anthropic-token": integrationConfig["effect-ak-ai_anthropic-token"],
         "deepgram-token": integrationConfig["effect-ak-ai_deepgram-token"],
         "stabilityai-token": integrationConfig["effect-ak-ai_stabilityai-token"],
-        "output-image-dir": __dirname + "/../.out/image",
+        "output-dir": __dirname + "/../.out/ai/",
       },
       LOG_LEVEL: "debug"
     })
-  )
+  );
 
 const HttpLive =
   HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
     Layer.provide(HttpApiBuilder.middlewareCors()),
-    Layer.provide(BackendApi.live),
+    Layer.provide(httpApiLive),
     Layer.provide(LogLevelConfigFromEnv),
     HttpServer.withLogAddress,
     Layer.provide(nodeHttpServer(3000))
   ).pipe(
     Layer.provide(configProvider)
-  )
+  );
 
-Layer.launch(HttpLive).pipe(NodeRuntime.runMain)
+Layer.launch(HttpLive).pipe(NodeRuntime.runMain);

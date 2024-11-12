@@ -66,18 +66,43 @@ export const makeHttpClient = (
             error.response.text,
             Effect.andThen(_ => Effect.logError("HTTP client, bad response =>", _))
           )
-        ),
-        Effect.scoped
-      )
-
-    const getJson = (
-      request: HttpClientRequest.HttpClientRequest
-    ) =>
-      pipe(
-        execute(request),
-        Effect.andThen(_ => _.json),
-        Effect.tap(_ => Effect.logDebug("Successful response", _)),
+        )
       );
+
+    const getTypedArray =
+      (request: HttpClientRequest.HttpClientRequest) =>
+        Effect.gen(function* () {
+
+          const response = yield* execute(request);
+
+          const bytes = 
+            yield* pipe(
+              response.arrayBuffer,
+              Effect.andThen(_ => new Uint8Array(_))
+            )
+
+          Effect.logDebug("Successful binary response", bytes.length);
+
+          return {
+            bytes,
+            headers: response.headers,
+            status: response.status
+          } as const;
+
+        }).pipe(
+          Effect.scoped
+        )
+
+    const getJson =
+      (request: HttpClientRequest.HttpClientRequest) =>
+        pipe(
+          execute(request),
+          Effect.andThen(_ => _.json),
+          Effect.tap(_ =>
+            Effect.logDebug("Successful response", _)
+          ),
+          Effect.scoped
+        );
 
     const getTyped = <I, I2>(
       request: HttpClientRequest.HttpClientRequest,
@@ -89,7 +114,7 @@ export const makeHttpClient = (
       );
 
     return {
-      execute, getJson, getTyped
+      execute, getJson, getTyped, getTypedArray
     } as const;
 
   }).pipe(

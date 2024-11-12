@@ -16,7 +16,8 @@ export class ImageGenerationService
         const deps = {
           client: yield* StabilityaiHttpClient,
           fs: yield* FileSystem,
-          path: yield* Path
+          path: yield* Path,
+          settings: yield* AiSettingsProvider
         };
 
         const generateImage =
@@ -30,23 +31,20 @@ export class ImageGenerationService
               const url = `/stable-image/generate${request.modelEndpoint}`;
 
               const response =
-                yield* deps.client.execute(
+                yield* deps.client.getTypedArray(
                   HttpClientRequest.post(url, {
                     body: HttpBody.formData(formData),
                     headers: {
                       accept: "image/*"
                     }
                   })
-                );
-
-              const content = 
-                new Uint8Array(yield* response.arrayBuffer);
+                )
 
               const name =
                 `${response.headers["x-request-id"]}.webp`;
 
               return {
-                content,
+                content: response.bytes,
                 name
               } as const;
 
@@ -58,13 +56,15 @@ export class ImageGenerationService
 
               const image = yield* generateImage(request);
 
-              const settings = yield* AiSettingsProvider;
+              yield* Effect.logInfo("New image was generated");
 
-              const filePath = deps.path.join(...settings.outDir, image.name);
+              const filePath = deps.path.resolve(deps.settings.outDir, image.name);
 
               yield* deps.fs.writeFile(filePath, image.content);
 
-              return filePath;
+              yield* Effect.logInfo("Image has been saved");
+
+              return deps.path.parse(filePath);
               
             });
 
@@ -74,6 +74,7 @@ export class ImageGenerationService
       }),
 
     dependencies: [
-      StabilityaiHttpClient.Default
+      StabilityaiHttpClient.Default,
+      AiSettingsProvider.Default
     ]
   }) { }

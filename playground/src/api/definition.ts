@@ -33,6 +33,10 @@ export class ApiEndpoints extends
     .addError(UnknownError, { status: 418 })
     .add(
       HttpApiEndpoint
+        .get("debug", "/api/debug")
+        .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
+    ).add(
+      HttpApiEndpoint
         .get("ask-ai", "/api/ask-ai")
         .setUrlParams(
           S.Struct({
@@ -40,8 +44,7 @@ export class ApiEndpoints extends
           })
         )
         .addSuccess(HttpApiSchema.Text({ contentType: "text/html" }))
-    )
-    .add(
+    ).add(
       HttpApiEndpoint
         .get("generate-image", "/api/generate-image")
         .setUrlParams(
@@ -76,14 +79,19 @@ export class StaticFilesEndpoints extends
           S.Struct({ path: StaticFileUrlPath })
         )
         .addSuccess(HttpApiSchema.Text({ contentType: "text/css" }))
-    )
-    .add(
+    ).add(
       HttpApiEndpoint
         .get("js", "/js/:path")
         .setPath(
           S.Struct({ path: StaticFileUrlPath })
         )
         .addSuccess(HttpApiSchema.Text({ contentType: "text/javascript" }))
+    ).add(
+      HttpApiEndpoint
+        .get("generated-image", "/image/ai/:path")
+        .setPath(
+          S.Struct({ path: StaticFileUrlPath })
+        )
+        .addSuccess(HttpApiSchema.Uint8Array({ contentType: "image/webp" }))
     )
 { }
-

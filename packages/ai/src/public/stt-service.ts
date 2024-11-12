@@ -8,13 +8,13 @@ type VoiceFileInput = {
   fileName: string
 }
 
-export class AiVoiceService
-  extends Effect.Service<AiVoiceService>()("AiVoiceService", {
+export class AiSpeechToTextService
+  extends Effect.Service<AiSpeechToTextService>()("AiSpeechToTextService", {
     effect:
       Effect.gen(function* () {
 
         const dependencies = {
-          whisper: yield* Openai.Audio.AudioService,
+          whisper: yield* Openai.Audio.OpenaiSpeechToText,
           deepgramStt: yield* Deepgram.SpeachToTextService,
           gpt4o: yield* Openai.Text.TextService
         }
@@ -79,7 +79,7 @@ export class AiVoiceService
       }),
 
       dependencies: [
-        Openai.Audio.AudioService.Default,
+        Openai.Audio.OpenaiSpeechToText.Default,
         Deepgram.SpeachToTextService.Default,
         Openai.Text.TextService.Default
       ]
