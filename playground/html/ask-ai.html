@@ -16,6 +16,8 @@
       add .active to <a.nav-link#$arg/>
 
       send clicked to <div.tab#$arg/>
+
+      set location.hash to arg
     end
 
     def initNavbar()
@@ -53,7 +55,6 @@
         class="row tab"
         hx-get="/page/partial:create-image"
         hx-trigger="clicked once"
-        hx-push-url="#create-image"
       ></div>
 
       <div
@@ -61,7 +62,6 @@
         class="row tab"
         hx-get="/page/partial:complete-chat"
         hx-trigger="clicked once"
-        hx-push-url="#complete-chat"
       ></div>
 
       <div
@@ -69,7 +69,6 @@
         class="row tab"
         hx-get="/page/partial:transcribe-voice"
         hx-trigger="clicked once"
-        hx-push-url="#transcribe-voice"
       ></div>
 
       <div
@@ -77,7 +76,6 @@
         class="row tab"
         hx-get="/page/partial:create-speech"
         hx-trigger="clicked once"
-        hx-push-url="#create-speech"
       ></div>
 
   </div>
