@@ -61,7 +61,7 @@ export class PageEndpoints extends
     .addError(UnknownError, { status: 418 })
     .add(
       HttpApiEndpoint
-        .get("ask-ai", "/page/:path")
+        .get("page", "/page/:path")
         .setPath(
           S.Struct({ path: StaticFileUrlPath })
         )

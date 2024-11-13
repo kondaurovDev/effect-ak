@@ -1,0 +1,17 @@
+<h4>Synthesize a speech</h4>
+      
+<input
+  type="text" class="form-control" 
+  placeholder="enter a text that will be used" 
+  name="speech-prompt"
+  hx-get="/api/create-speech" 
+  hx-trigger="keyup[keyCode==13]" 
+  hx-target="#aiAnswer" 
+  hx-include="[name='speech-prompt']"
+>
+
+</div>
+
+<div id="aiAnswer" class="row mt-4 text-success">
+
+</div>

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 
 <head>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/css/bootstrap:dist:css:bootstrap.min">
 
   <script src="/js/htmx.org:dist:htmx.min"></script>
+  <script src="/js/hyperscript.org:dist:_hyperscript.min"></script>
 
   <script type="text/hyperscript">
     def setActive(arg)
@@ -12,15 +14,22 @@
       show <div.tab#$arg/>
       remove .active from <a.nav-link/>
       add .active to <a.nav-link#$arg/>
+
+      send clicked to <div.tab#$arg/>
     end
 
-    def initPage()
-      log "init..."
-      call setActive('text')
+    def initNavbar()
+      log "Init..."
+      js
+        if (location.hash) {
+          setActive(location.hash.slice(1))
+        } else {
+          setActive('complete-chat')
+        }
+      end
+      
     end
   </script> 
-
-  <script src="/js/hyperscript.org:dist:_hyperscript.min"></script>
 
 </head>
 <html>
@@ -29,96 +38,47 @@
 
   <div 
     class="container"
-    _="init call initPage()"
   >
 
     <div class="row">
-      <ul class="nav nav-tabs mb-3">
-        <li class="nav-item">
-          <a
-            id="text" 
-            class="nav-link"
-            _="on click call setActive('text')"
-          >Text</a>
-        </li>
-        <li class="nav-item">
-          <a 
-            id="image"
-            class="nav-link" 
-            _="on click call setActive('image')"
-          >Image</a>
-        </li>
-      </ul>
 
-      <div id="image" class="tab">
+      <div
+        hx-get="/page/navbar"
+        hx-trigger="load"
+        hx-on::after-swap="initNavbar()"
+      ></div>
 
-        <div class="row">
+      <div
+        id="create-image" 
+        class="row tab"
+        hx-get="/page/partial:create-image"
+        hx-trigger="clicked once"
+        hx-push-url="#create-image"
+      ></div>
 
-          <h4>Generate image</h4>
-        
-            <input 
-              type="text" class="form-control"
-              placeholder="describe what you want to be drawn" 
-              name="description"
-              hx-get="/api/generate-image" 
-              hx-trigger="keyup[keyCode==13]" 
-              hx-target="#ai-image-answer" 
-              hx-include="[name='description']"
-            >
-        
-        </div>
-        
-        <div id="ai-image-answer" class="row mt-4 text-success">
-        
-        </div>  
+      <div
+        id="complete-chat"
+        class="row tab"
+        hx-get="/page/partial:complete-chat"
+        hx-trigger="clicked once"
+        hx-push-url="#complete-chat"
+      ></div>
 
-      </div>
+      <div
+        id="transcribe-voice" 
+        class="row tab"
+        hx-get="/page/partial:transcribe-voice"
+        hx-trigger="clicked once"
+        hx-push-url="#transcribe-voice"
+      ></div>
 
-    </div>
-
-    <div id="text" class="tab">
-      <div class="row">
-  
-        <h4>Ask a question</h4>
-      
-          <input 
-            type="text" class="form-control" 
-            placeholder="what do you want to ask?" 
-            name="question"
-            hx-get="/api/ask-ai" 
-            hx-trigger="keyup[keyCode==13]" 
-            hx-target="#aiAnswer" 
-            hx-include="[name='question']"
-          >
-      
-      </div>
-      
-      <div id="aiAnswer" class="row mt-4 text-success">
-      
-      </div>
-    </div>
-
-    <div id="speech" class="tab">
-      <div class="row">
-
-        <h4>Synthesize a speech</h4>
-      
-          <input
-            type="text" class="form-control" 
-            placeholder="enter a text that will be used" 
-            name="speech-prompt"
-            hx-get="/api/create-speech" 
-            hx-trigger="keyup[keyCode==13]" 
-            hx-target="#aiAnswer" 
-            hx-include="[name='speech-prompt']"
-          >
-
-      </div>
-      
-      <div id="aiAnswer" class="row mt-4 text-success">
-      
-      </div>
-    </div>
+      <div
+        id="create-speech" 
+        class="row tab"
+        hx-get="/page/partial:create-speech"
+        hx-trigger="clicked once"
+        hx-push-url="#create-speech"
+      ></div>
 
   </div>
 

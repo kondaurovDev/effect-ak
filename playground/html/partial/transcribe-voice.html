@@ -1,0 +1,30 @@
+<script type="text/hyperscript">
+  def startRecording()
+    log "Recording..."
+  end
+</script> 
+
+<h4>Transcribe voice</h4>
+
+<div>
+  <h2 class="my-4" id="formattedTime">00:00</h2>
+  <button 
+    id="recordBtn" 
+    class="btn btn-primary btn-lg rounded-pill" 
+    hx-on:click="startRecording()" 
+  >
+    <i class="bi bi-mic"></i> Start recording
+  </button>
+  <div id="lastRecord" class="mt-6 d-none">
+    <h5 class="mb-2">The last record:</h5>
+    <audio controls src="#"></audio>
+    <button 
+      class="btn btn-outline-secondary mt-2" 
+      hx-post="/transcribe" 
+      hx-target="#transcription"
+    >
+      Get text version
+    </button>
+    <div id="transcription" class="mt-2"></div>
+  </div>
+</div>

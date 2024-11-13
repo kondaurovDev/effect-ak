@@ -1,0 +1,15 @@
+<h4>Create image</h4>
+        
+<input 
+  type="text" class="form-control"
+  placeholder="describe what you want to be drawn" 
+  name="description"
+  hx-get="/api/generate-image" 
+  hx-trigger="keyup[keyCode==13]" 
+  hx-target="#ai-image-answer" 
+  hx-include="[name='description']"
+>
+
+<div id="ai-image-answer" class="row mt-4 text-success">
+        
+</div>

@@ -10,7 +10,7 @@ export const htmlRoute =
     Effect.gen(function* () {
       const util = yield* UtilService;
       return handlers
-        .handle("ask-ai", ({ path }) =>
+        .handle("page", ({ path }) =>
           pipe(
             util.readFileFromProjectRoot(
               Array.modifyNonEmptyLast(["html", ...path.path], _ => _ + ".html")

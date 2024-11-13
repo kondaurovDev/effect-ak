@@ -1,0 +1,17 @@
+<h4>Ask a question</h4>
+      
+<input 
+  type="text" class="form-control" 
+  placeholder="what do you want to ask?" 
+  name="question"
+  hx-get="/api/ask-ai" 
+  hx-trigger="keyup[keyCode==13]" 
+  hx-target="#aiAnswer" 
+  hx-include="[name='question']"
+>
+
+</div>
+
+<div id="aiAnswer" class="row mt-4 text-success">
+
+</div>
