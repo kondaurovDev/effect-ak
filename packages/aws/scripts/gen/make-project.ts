@@ -16,9 +16,11 @@ export const makeMorphProject =
         }
       });
 
-    project.addSourceFilesAtPaths(__dirname + `/../node_modules/@aws-sdk/client-${moduleName}/**/*{.d.ts,.ts}`);
+    project.addSourceFilesAtPaths(`./node_modules/@aws-sdk/client-${moduleName}/**/*{.d.ts,.ts}`);
 
     const allClasses = project.getSourceFiles().flatMap(_ => _.getClasses());
+
+    console.info("classes " + allClasses.length)
 
     const out = `./src/module/${target}/client.ts`;
     const outputFile = project.createSourceFile(out, "", { overwrite: true });
@@ -68,3 +70,4 @@ export const makeMorphProject =
       allClasses, outputFile, names, classes
     }
   }
+  

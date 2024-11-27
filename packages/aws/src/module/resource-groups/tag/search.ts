@@ -54,11 +54,11 @@ export class ResourceGroupsTagSearchService
 
               const result =
                 yield* client.execute(
-                  "get tagged resources", _ =>
-                  _.getResources({
+                  "getResources",
+                  {
                     ResourceTypeFilters: input.resourceTypes,
                     TagFilters: tags
-                  })
+                  }
                 ).pipe(
                   Effect.andThen(_ =>
                     _.ResourceTagMappingList ?? []

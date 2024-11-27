@@ -26,11 +26,11 @@ export class S3BucketContentViewService
           const fileContent =
             pipe(
               deps.s3.execute(
-                `get file content ${bucketName}:${key}`, _ =>
-                _.getObject({
+                `getObject`,
+                {
                   Bucket: bucketName,
                   Key: key.objectName,
-                })
+                }
               ),
               Effect.andThen(_ => _.Body),
               Effect.filterOrFail(_ => _ != null),

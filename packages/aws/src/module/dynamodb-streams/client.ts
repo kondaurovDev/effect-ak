@@ -29,7 +29,7 @@ export class DynamodbStreamsClientService extends
       ) =>
         pipe(
           Effect.succeed(DynamodbStreamsCommandFactory[name](input)),
-          Effect.filterOrFail(_ => _ != null, () => new Cause.RuntimeException(`Command "${name}" is unknown`)),
+          Effect.filterOrDieMessage(_ => _ != null, `Command "${name}" is unknown`),
           Effect.andThen(input =>
             Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<DynamodbStreamsClientApi[M]>>)
           ),
@@ -39,7 +39,8 @@ export class DynamodbStreamsClientService extends
                 name: error.cause.name as DynamodbStreamsExceptionName,
                 cause: error.cause,
               }) : new Cause.UnknownException(error)
-          )
+          ),
+          Effect.catchTag("UnknownException", Effect.die)
         );
 
       return { execute };
@@ -81,16 +82,16 @@ export class DynamodbStreamsClientException extends Data.TaggedError("DynamodbSt
 > { } {
 }
 
-export function recoverFromDynamodbStreamsException<A, A2>(name: DynamodbStreamsExceptionName, recover: A2) {
+export function recoverFromDynamodbStreamsException<A, A2, E>(name: DynamodbStreamsExceptionName, recover: A2) {
 
-  return (effect: Effect.Effect<A, DynamodbStreamsClientException | Cause.UnknownException>) =>
+  return (effect: Effect.Effect<A, DynamodbStreamsClientException>) =>
     Effect.catchIf(
       effect,
-      (error): error is DynamodbStreamsClientException => error._tag == "DynamodbStreamsClientException" && error.name == name,
-      (error) =>
+      error => error._tag == "DynamodbStreamsClientException" && error.name == name,
+      error =>
         pipe(
           Effect.logDebug("Recovering from error", { errorName: name, details: { message: error.cause.message, ...error.cause.$metadata } }),
-          Effect.andThen(() => recover)
+          Effect.andThen(() => Effect.succeed(recover))
         )
     )
 

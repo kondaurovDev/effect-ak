@@ -1,5 +1,5 @@
 import * as Sdk from "@aws-sdk/client-kms";
-import { Effect, Data, pipe } from "effect";
+import { Effect, Data, pipe, Cause } from "effect";
 import { AwsRegionConfig } from "../../internal/index.js";
 
 // *****  GENERATED CODE *****
@@ -8,9 +8,20 @@ export class KmsClientService extends
     scoped: Effect.gen(function*() {
       const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client (kms) =>");
+      yield* Effect.logDebug("Creating aws client", { client: "Kms" });
 
       const client = new Sdk.KMSClient({ region });
+
+      yield* Effect.addFinalizer(() =>
+        pipe(
+          Effect.try(() => client.destroy()),
+          Effect.tapBoth({
+            onFailure: Effect.logWarning,
+            onSuccess: () => Effect.logDebug("aws client has been closed", { client: "Kms" })
+          }),
+          Effect.merge
+        )
+      );
 
       const execute = <M extends keyof KmsClientApi>(
         name: M,
@@ -18,19 +29,18 @@ export class KmsClientService extends
       ) =>
         pipe(
           Effect.succeed(KmsCommandFactory[name](input)),
-          Effect.filterOrDieMessage(_ => _ != null, "command not found in factory"),
+          Effect.filterOrDieMessage(_ => _ != null, `Command "${name}" is unknown`),
           Effect.andThen(input =>
             Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<KmsClientApi[M]>>)
           ),
-          Effect.catchAll(error => {
-            if (error.cause instanceof Sdk.KMSServiceException) {
-              return new KmsClientException({
-                name: error.name as KmsExceptionName,
+          Effect.mapError(error =>
+            error.cause instanceof Sdk.KMSServiceException ?
+              new KmsClientException({
+                name: error.cause.name as KmsExceptionName,
                 cause: error.cause,
-              });
-            }
-            return Effect.die(error);
-          })
+              }) : new Cause.UnknownException(error)
+          ),
+          Effect.catchTag("UnknownException", Effect.die)
         );
 
       return { execute };
@@ -39,7 +49,9 @@ export class KmsClientService extends
 {
 }
 
-interface KmsClientApi {
+export type KmsMethodInput<M extends keyof KmsClientApi> = Parameters<KmsClientApi[M]>[0];
+
+export interface KmsClientApi {
   cancelKeyDeletion(_: Sdk.CancelKeyDeletionCommandInput): Sdk.CancelKeyDeletionCommandOutput;
   connectCustomKeyStore(_: Sdk.ConnectCustomKeyStoreCommandInput): Sdk.ConnectCustomKeyStoreCommandOutput;
   createAlias(_: Sdk.CreateAliasCommandInput): Sdk.CreateAliasCommandOutput;
@@ -153,7 +165,7 @@ const KmsCommandFactory = {
 } as Record<keyof KmsClientApi, (_: unknown) => unknown>
 
 
-const kmsExceptionNames = [
+const KmsExceptionNames = [
   "KMSServiceException", "AlreadyExistsException", "DependencyTimeoutException",
   "InvalidArnException", "KMSInternalException", "KMSInvalidStateException",
   "NotFoundException", "CloudHsmClusterInUseException", "CloudHsmClusterInvalidConfigurationException",
@@ -173,7 +185,7 @@ const kmsExceptionNames = [
   "KMSInvalidSignatureException",
 ] as const;
 
-export type KmsExceptionName = typeof kmsExceptionNames[number];
+export type KmsExceptionName = typeof KmsExceptionNames[number];
 
 export class KmsClientException extends Data.TaggedError("KmsClientException")<
   {
@@ -181,4 +193,19 @@ export class KmsClientException extends Data.TaggedError("KmsClientException")<
     cause: Sdk.KMSServiceException
   }
 > { } {
+}
+
+export function recoverFromKmsException<A, A2, E>(name: KmsExceptionName, recover: A2) {
+
+  return (effect: Effect.Effect<A, KmsClientException>) =>
+    Effect.catchIf(
+      effect,
+      error => error._tag == "KmsClientException" && error.name == name,
+      error =>
+        pipe(
+          Effect.logDebug("Recovering from error", { errorName: name, details: { message: error.cause.message, ...error.cause.$metadata } }),
+          Effect.andThen(() => Effect.succeed(recover))
+        )
+    )
+
 }

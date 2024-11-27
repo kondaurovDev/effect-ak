@@ -1,14 +1,14 @@
-import * as Sdk from "@aws-sdk/client-dynamoDB";
+import * as Sdk from "@aws-sdk/client-dynamodb";
 import { Effect, Data, pipe, Cause } from "effect";
 import { AwsRegionConfig } from "../../internal/index.js";
 
 // *****  GENERATED CODE *****
-export class DynamoDBClientService extends
-  Effect.Service<DynamoDBClientService>()("DynamoDBClientService", {
+export class DynamodbClientService extends
+  Effect.Service<DynamodbClientService>()("DynamodbClientService", {
     scoped: Effect.gen(function*() {
       const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "DynamoDB" });
+      yield* Effect.logDebug("Creating aws client", { client: "Dynamodb" });
 
       const client = new Sdk.DynamoDBClient({ region });
 
@@ -17,29 +17,30 @@ export class DynamoDBClientService extends
           Effect.try(() => client.destroy()),
           Effect.tapBoth({
             onFailure: Effect.logWarning,
-            onSuccess: () => Effect.logDebug("aws client has been closed", { client: "DynamoDB" })
+            onSuccess: () => Effect.logDebug("aws client has been closed", { client: "Dynamodb" })
           }),
           Effect.merge
         )
       );
 
-      const execute = <M extends keyof DynamoDBClientApi>(
+      const execute = <M extends keyof DynamodbClientApi>(
         name: M,
-        input: Parameters<DynamoDBClientApi[M]>[0]
+        input: Parameters<DynamodbClientApi[M]>[0]
       ) =>
         pipe(
-          Effect.succeed(DynamoDBCommandFactory[name](input)),
-          Effect.filterOrFail(_ => _ != null, () => new Cause.RuntimeException(`Command "${name}" is unknown`)),
+          Effect.succeed(DynamodbCommandFactory[name](input)),
+          Effect.filterOrDieMessage(_ => _ != null, `Command "${name}" is unknown`),
           Effect.andThen(input =>
-            Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<DynamoDBClientApi[M]>>)
+            Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<DynamodbClientApi[M]>>)
           ),
           Effect.mapError(error =>
             error.cause instanceof Sdk.DynamoDBServiceException ?
-              new DynamoDBClientException({
-                name: error.cause.name as DynamoDBExceptionName,
+              new DynamodbClientException({
+                name: error.cause.name as DynamodbExceptionName,
                 cause: error.cause,
               }) : new Cause.UnknownException(error)
-          )
+          ),
+          Effect.catchTag("UnknownException", Effect.die)
         );
 
       return { execute };
@@ -48,9 +49,9 @@ export class DynamoDBClientService extends
 {
 }
 
-export type DynamoDBMethodInput<M extends keyof DynamoDBClientApi> = Parameters<DynamoDBClientApi[M]>[0];
+export type DynamodbMethodInput<M extends keyof DynamodbClientApi> = Parameters<DynamodbClientApi[M]>[0];
 
-export interface DynamoDBClientApi {
+export interface DynamodbClientApi {
   batchExecuteStatement(_: Sdk.BatchExecuteStatementCommandInput): Sdk.BatchExecuteStatementCommandOutput;
   batchGetItem(_: Sdk.BatchGetItemCommandInput): Sdk.BatchGetItemCommandOutput;
   batchWriteItem(_: Sdk.BatchWriteItemCommandInput): Sdk.BatchWriteItemCommandOutput;
@@ -111,7 +112,7 @@ export interface DynamoDBClientApi {
 }
 
 
-const DynamoDBCommandFactory = {
+const DynamodbCommandFactory = {
   batchExecuteStatement: (_: Sdk.BatchExecuteStatementCommandInput) => new Sdk.BatchExecuteStatementCommand(_),
   batchGetItem: (_: Sdk.BatchGetItemCommandInput) => new Sdk.BatchGetItemCommand(_),
   batchWriteItem: (_: Sdk.BatchWriteItemCommandInput) => new Sdk.BatchWriteItemCommand(_),
@@ -169,10 +170,10 @@ const DynamoDBCommandFactory = {
   updateTable: (_: Sdk.UpdateTableCommandInput) => new Sdk.UpdateTableCommand(_),
   updateTableReplicaAutoScaling: (_: Sdk.UpdateTableReplicaAutoScalingCommandInput) => new Sdk.UpdateTableReplicaAutoScalingCommand(_),
   updateTimeToLive: (_: Sdk.UpdateTimeToLiveCommandInput) => new Sdk.UpdateTimeToLiveCommand(_),
-} as Record<keyof DynamoDBClientApi, (_: unknown) => unknown>
+} as Record<keyof DynamodbClientApi, (_: unknown) => unknown>
 
 
-const dynamoDBExceptionNames = [
+const DynamodbExceptionNames = [
   "DynamoDBServiceException", "BackupInUseException", "BackupNotFoundException",
   "InternalServerError", "RequestLimitExceeded", "InvalidEndpointException",
   "ProvisionedThroughputExceededException", "ResourceNotFoundException", "ItemCollectionSizeLimitExceededException",
@@ -187,26 +188,26 @@ const dynamoDBExceptionNames = [
   "TransactionCanceledException",
 ] as const;
 
-export type DynamoDBExceptionName = typeof dynamoDBExceptionNames[number];
+export type DynamodbExceptionName = typeof DynamodbExceptionNames[number];
 
-export class DynamoDBClientException extends Data.TaggedError("DynamoDBClientException")<
+export class DynamodbClientException extends Data.TaggedError("DynamodbClientException")<
   {
-    name: DynamoDBExceptionName;
+    name: DynamodbExceptionName;
     cause: Sdk.DynamoDBServiceException
   }
 > { } {
 }
 
-export function recoverFromDynamoDBException<A, A2>(name: DynamoDBExceptionName, recover: A2) {
+export function recoverFromDynamodbException<A, A2, E>(name: DynamodbExceptionName, recover: A2) {
 
-  return (effect: Effect.Effect<A, DynamoDBClientException | Cause.UnknownException>) =>
+  return (effect: Effect.Effect<A, DynamodbClientException>) =>
     Effect.catchIf(
       effect,
-      (error): error is DynamoDBClientException => error._tag == "DynamoDBClientException" && error.name == name,
-      (error) =>
+      error => error._tag == "DynamodbClientException" && error.name == name,
+      error =>
         pipe(
           Effect.logDebug("Recovering from error", { errorName: name, details: { message: error.cause.message, ...error.cause.$metadata } }),
-          Effect.andThen(() => recover)
+          Effect.andThen(() => Effect.succeed(recover))
         )
     )
 

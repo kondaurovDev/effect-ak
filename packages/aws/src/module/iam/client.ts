@@ -1,5 +1,5 @@
 import * as Sdk from "@aws-sdk/client-iam";
-import { Effect, Data, pipe } from "effect";
+import { Effect, Data, pipe, Cause } from "effect";
 import { AwsRegionConfig } from "../../internal/index.js";
 
 // *****  GENERATED CODE *****
@@ -8,9 +8,20 @@ export class IamClientService extends
     scoped: Effect.gen(function*() {
       const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client (iam) =>");
+      yield* Effect.logDebug("Creating aws client", { client: "Iam" });
 
       const client = new Sdk.IAMClient({ region });
+
+      yield* Effect.addFinalizer(() =>
+        pipe(
+          Effect.try(() => client.destroy()),
+          Effect.tapBoth({
+            onFailure: Effect.logWarning,
+            onSuccess: () => Effect.logDebug("aws client has been closed", { client: "Iam" })
+          }),
+          Effect.merge
+        )
+      );
 
       const execute = <M extends keyof IamClientApi>(
         name: M,
@@ -18,19 +29,18 @@ export class IamClientService extends
       ) =>
         pipe(
           Effect.succeed(IamCommandFactory[name](input)),
-          Effect.filterOrDieMessage(_ => _ != null, "command not found in factory"),
+          Effect.filterOrDieMessage(_ => _ != null, `Command "${name}" is unknown`),
           Effect.andThen(input =>
             Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<IamClientApi[M]>>)
           ),
-          Effect.catchAll(error => {
-            if (error.cause instanceof Sdk.IAMServiceException) {
-              return new IamClientException({
-                name: error.name as IamExceptionName,
+          Effect.mapError(error =>
+            error.cause instanceof Sdk.IAMServiceException ?
+              new IamClientException({
+                name: error.cause.name as IamExceptionName,
                 cause: error.cause,
-              });
-            }
-            return Effect.die(error);
-          })
+              }) : new Cause.UnknownException(error)
+          ),
+          Effect.catchTag("UnknownException", Effect.die)
         );
 
       return { execute };
@@ -39,7 +49,9 @@ export class IamClientService extends
 {
 }
 
-interface IamClientApi {
+export type IamMethodInput<M extends keyof IamClientApi> = Parameters<IamClientApi[M]>[0];
+
+export interface IamClientApi {
   addClientIDToOpenIDConnectProvider(_: Sdk.AddClientIDToOpenIDConnectProviderCommandInput): Sdk.AddClientIDToOpenIDConnectProviderCommandOutput;
   addRoleToInstanceProfile(_: Sdk.AddRoleToInstanceProfileCommandInput): Sdk.AddRoleToInstanceProfileCommandOutput;
   addUserToGroup(_: Sdk.AddUserToGroupCommandInput): Sdk.AddUserToGroupCommandOutput;
@@ -375,7 +387,7 @@ const IamCommandFactory = {
 } as Record<keyof IamClientApi, (_: unknown) => unknown>
 
 
-const iamExceptionNames = [
+const IamExceptionNames = [
   "IAMServiceException", "AccountNotManagementOrDelegatedAdministratorException", "InvalidInputException",
   "LimitExceededException", "NoSuchEntityException", "ServiceFailureException",
   "EntityAlreadyExistsException", "UnmodifiableEntityException", "PolicyNotAttachableException",
@@ -390,7 +402,7 @@ const iamExceptionNames = [
   "InvalidPublicKeyException",
 ] as const;
 
-export type IamExceptionName = typeof iamExceptionNames[number];
+export type IamExceptionName = typeof IamExceptionNames[number];
 
 export class IamClientException extends Data.TaggedError("IamClientException")<
   {
@@ -398,4 +410,19 @@ export class IamClientException extends Data.TaggedError("IamClientException")<
     cause: Sdk.IAMServiceException
   }
 > { } {
+}
+
+export function recoverFromIamException<A, A2, E>(name: IamExceptionName, recover: A2) {
+
+  return (effect: Effect.Effect<A, IamClientException>) =>
+    Effect.catchIf(
+      effect,
+      error => error._tag == "IamClientException" && error.name == name,
+      error =>
+        pipe(
+          Effect.logDebug("Recovering from error", { errorName: name, details: { message: error.cause.message, ...error.cause.$metadata } }),
+          Effect.andThen(() => Effect.succeed(recover))
+        )
+    )
+
 }

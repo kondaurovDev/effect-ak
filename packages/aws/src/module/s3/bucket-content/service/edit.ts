@@ -18,12 +18,12 @@ export class S3BucketContentEditService
         ) =>
           pipe(
             s3.execute(
-              `put object to ${bucketName}:${key}`, _ =>
-              _.putObject({
+              "putObject",
+              {
                 Bucket: bucketName,
                 Key: [...key.path, key.objectName].join("/"),
                 Body: content
-              })
+              }
             )
           );
 
