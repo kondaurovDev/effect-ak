@@ -1,10 +1,13 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
+import type { Runtime } from "@aws-sdk/client-lambda";
 
 import type { IamRoleArn } from "../../../iam/index.js";
 import { LambdaClientService, recoverFromLambdaException } from "../../client.js";
 import { LambdaFunctionConfiguration } from "../../function-configuration/schema.js";
 import { LambdaFunctionConfigurationManageService } from "../../function-configuration/index.js";
+import { LambdaFunctionFactoryService } from "./factory.js";
+import { LambdaFunctionSourceCode } from "../schema.js";
 
 export class LambdaFunctionManageService
   extends Effect.Service<LambdaFunctionManageService>()("LambdaFunctionManageService", {
@@ -13,13 +16,14 @@ export class LambdaFunctionManageService
 
         const $ = {
           client: yield* LambdaClientService,
-          configuration: yield* LambdaFunctionConfigurationManageService
+          configuration: yield* LambdaFunctionConfigurationManageService,
+          factory: yield* LambdaFunctionFactoryService
         };
 
         const updateFunctionCode =
           (input: {
             functionName: string,
-            code: Uint8Array
+            code: LambdaFunctionSourceCode
           }) =>
             Effect.gen(function* () {
 
@@ -29,7 +33,7 @@ export class LambdaFunctionManageService
                     "updateFunctionCode", 
                     {
                       FunctionName: input.functionName,
-                      ZipFile: input.code
+                      ZipFile: yield* $.factory.makeCodeZipArchive(input.code)
                     }
                   ),
                 ).pipe(
@@ -51,15 +55,14 @@ export class LambdaFunctionManageService
           (input: {
             functionName: string,
             configuration: LambdaFunctionConfiguration,
-            code: Uint8Array,
-            role: IamRoleArn
+            code: LambdaFunctionSourceCode,
+            role: IamRoleArn,
+            runtime: Runtime
           }) =>
             Effect.gen(function* () {
 
               const currentConfiguration =
-                yield* $.configuration.$.view.get(input).pipe(
-
-                )
+                yield* $.configuration.$.view.get(input);
 
               if (!currentConfiguration) {
                 const response =
@@ -68,10 +71,11 @@ export class LambdaFunctionManageService
                     {
                       FunctionName: input.functionName,
                       Code: {
-                        ZipFile: input.code
+                        ZipFile: yield* $.factory.makeCodeZipArchive(input.code)
                       },
                       Role: input.role,
-                      ...input.configuration
+                      Runtime: input.runtime,
+                      ...input.configuration,
                     }
                   );
 
@@ -84,16 +88,15 @@ export class LambdaFunctionManageService
                   "updateFunctionCode",
                   {
                     FunctionName: input.functionName,
-                    ZipFile: input.code
+                    ZipFile: yield* $.factory.makeCodeZipArchive(input.code)
                   }
                 );
 
-              $.configuration.syncFunctionConfiguration(input);
+              yield* $.configuration.syncFunctionConfiguration(input);
 
               return updateResponse.State;
 
             });
-
 
         return {
           $, updateFunctionCode, upsertFunction
@@ -104,5 +107,6 @@ export class LambdaFunctionManageService
     dependencies: [
       LambdaClientService.Default,
       LambdaFunctionConfigurationManageService.Default,
+      LambdaFunctionFactoryService.Default
     ]
   }) { }

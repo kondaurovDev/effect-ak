@@ -1,6 +1,5 @@
 export * from "./event-source/index.js"
 export * from "./function/index.js"
 export * from "./function-configuration/index.js"
-export * from "./layer/index.js"
 export * from "./env.js"
 export * from "./client.js"

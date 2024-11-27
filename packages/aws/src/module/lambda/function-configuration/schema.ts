@@ -5,7 +5,7 @@ export class LambdaFunctionConfigurationEnvironment
     S.Struct({
       Variables: S.Record({ key: S.String, value: S.String }).pipe(S.Data)
     })
-  ) {}
+  ) {};
 
 export class LambdaFunctionConfiguration
   extends S.Class<LambdaFunctionConfiguration>("LambdaFunctionConfiguration")(

@@ -26,7 +26,7 @@ export class LambdaFunctionConfigurationManageService
             Effect.gen(function* () {
 
               if (!Schema.is(LambdaFunctionConfiguration)(input.configuration)) {
-                yield* Effect.logWarning("input configuration is not an instance of LambdaFunctionConfiguration")
+                yield* Effect.logWarning("input configuration is not an instance of LambdaFunctionConfiguration");
               }
 
               const currentConfiguration =

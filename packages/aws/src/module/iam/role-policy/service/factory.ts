@@ -15,7 +15,7 @@ export class IamRolePolicyFactoryService
             Version: "2012-10-17",
             Statement:
               Data.array([
-                S.IamRolePolicyDocument Statement.make({
+                S.IamRolePolicyDocumentStatement.make({
                   Effect: "Allow",
                   Action: "sts:AssumeRole",
                   Principal:

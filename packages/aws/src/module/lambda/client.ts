@@ -29,7 +29,7 @@ export class LambdaClientService extends
       ) =>
         pipe(
           Effect.succeed(LambdaCommandFactory[name](input)),
-          Effect.filterOrFail(_ => _ != null, () => new Cause.RuntimeException(`Command "${name}" is unknown`)),
+          Effect.filterOrDieMessage(_ => _ != null, `Command "${name}" is unknown`),
           Effect.andThen(input =>
             Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<LambdaClientApi[M]>>)
           ),
@@ -39,7 +39,8 @@ export class LambdaClientService extends
                 name: error.cause.name as LambdaExceptionName,
                 cause: error.cause,
               }) : new Cause.UnknownException(error)
-          )
+          ),
+          Effect.catchTag("UnknownException", Effect.die)
         );
 
       return { execute };
@@ -194,7 +195,7 @@ const LambdaCommandFactory = {
 } as Record<keyof LambdaClientApi, (_: unknown) => unknown>
 
 
-const lambdaExceptionNames = [
+const LambdaExceptionNames = [
   "LambdaServiceException", "InvalidParameterValueException", "PolicyLengthExceededException",
   "PreconditionFailedException", "ResourceConflictException", "ResourceNotFoundException",
   "ServiceException", "TooManyRequestsException", "CodeSigningConfigNotFoundException",
@@ -210,7 +211,7 @@ const lambdaExceptionNames = [
   "SnapStartTimeoutException", "SubnetIPAddressLimitReachedException", "UnsupportedMediaTypeException",
 ] as const;
 
-export type LambdaExceptionName = typeof lambdaExceptionNames[number];
+export type LambdaExceptionName = typeof LambdaExceptionNames[number];
 
 export class LambdaClientException extends Data.TaggedError("LambdaClientException")<
   {
@@ -220,16 +221,16 @@ export class LambdaClientException extends Data.TaggedError("LambdaClientExcepti
 > { } {
 }
 
-export function recoverFromLambdaException<A, A2>(name: LambdaExceptionName, recover: A2) {
+export function recoverFromLambdaException<A, A2, E>(name: LambdaExceptionName, recover: A2) {
 
-  return (effect: Effect.Effect<A, LambdaClientException | Cause.UnknownException>) =>
+  return (effect: Effect.Effect<A, LambdaClientException>) =>
     Effect.catchIf(
       effect,
-      (error): error is LambdaClientException => error._tag == "LambdaClientException" && error.name == name,
-      (error) =>
+      error => error._tag == "LambdaClientException" && error.name == name,
+      error =>
         pipe(
           Effect.logDebug("Recovering from error", { errorName: name, details: { message: error.cause.message, ...error.cause.$metadata } }),
-          Effect.andThen(() => recover)
+          Effect.andThen(() => Effect.succeed(recover))
         )
     )
 

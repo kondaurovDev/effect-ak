@@ -2,7 +2,6 @@ import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 
 import { ResourceGroupsTaggingApiClientService } from "../client.js";
-import { ServiceError } from "../../../internal/error.js";
 
 type TagIdWithValue = `${string}:${string}`
 
@@ -20,9 +19,9 @@ export class ResourceGroupsTagSearchService
           }) =>
             pipe(
               getResourcesByTags({ resourceTypes: [ input.resourceType ], tags: input.tags }),
-              Effect.filterOrFail(
+              Effect.filterOrDie(
                 list => list.length === 0 || list.length === 1,
-                () => new ServiceError({ description: "More than one resource has been found" })
+                () => "More than one resource has been found"
               ),
               Effect.andThen(list =>
                 pipe(

@@ -105,6 +105,9 @@ importers:
       '@effect/platform-node':
         specifier: 'catalog:'
         version: 0.64.14(@effect/platform@0.69.13(effect@3.10.8))(effect@3.10.8)
+      code-block-writer:
+        specifier: ^13.0.3
+        version: 13.0.3
       effect:
         specifier: 'catalog:'
         version: 3.10.8

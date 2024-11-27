@@ -35,13 +35,13 @@ await generateManyClients.pipe(
 
 function getClients() {
   return [
-    "apigatewayv2:api-gateway",
+    // "apigatewayv2:api-gateway",
     // "cloudwatch",
     // "dynamodb",
     // "dynamodb-streams",
     // "iam",
     // "kms",
-    // "lambda",
+    "lambda",
     // "resource-groups-tagging-api:resource-groups",
     // "s3",
     // "sqs",

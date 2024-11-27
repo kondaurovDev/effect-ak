@@ -1,10 +1,9 @@
-import { Effect, Equal, Schema } from "effect";
+import { Data, Effect, Equal, Logger, LogLevel, Schema } from "effect";
 import { describe } from "node:test";
 import { assert, it } from "vitest";
+import CodeBlockWriter from "code-block-writer";
 
-import { 
-  LambdaFunctionConfigurationFactoryService, LambdaFunctionConfiguration
-} from "../../src/module/lambda/function-configuration";
+import * as Lambda from "../../src/module/lambda";
 
 describe("lambda, function configuration", () => {
 
@@ -14,7 +13,7 @@ describe("lambda, function configuration", () => {
       await Effect.gen(function* () {
 
         const factory =
-          yield* LambdaFunctionConfigurationFactoryService;
+          yield* Lambda.LambdaFunctionConfigurationFactoryService;
 
         const input = {
           Handler: "index.js",
@@ -27,7 +26,7 @@ describe("lambda, function configuration", () => {
           }
         };
 
-        assert(Schema.is(LambdaFunctionConfiguration)(input) == false, "is must return false");
+        assert(Schema.is(Lambda.LambdaFunctionConfiguration)(input) == false, "is must return false");
 
         const a =
           yield* factory.makeConfiguration(input);
@@ -52,7 +51,7 @@ describe("lambda, function configuration", () => {
 
       }).pipe(
         Effect.provide([
-          LambdaFunctionConfigurationFactoryService.Default
+          Lambda.LambdaFunctionConfigurationFactoryService.Default
         ]),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
@@ -60,7 +59,58 @@ describe("lambda, function configuration", () => {
 
     assert(program._tag == "Success")
 
-  })
+  });
 
+  it("upsert function/invoke/delete", async () => {
+
+    const program =
+      await Effect.gen(function* () {
+
+        const manage =
+          yield* Lambda.LambdaFunctionManageService;
+
+        const writer = new CodeBlockWriter();
+
+        const response =
+          yield* manage.upsertFunction({
+            functionName: "test-fn",
+            role: "arn:aws:iam::906667703291:role/botless/ai-bot",
+            code: {
+              type: "inline",
+              code:
+                writer.writeLine("export const handler = async () => ").block(() =>
+                  writer
+                    .writeLine("console.log('Hello')")
+                    .writeLine("return 'foo'")
+                ).toString()
+            },
+            runtime: "nodejs22.x",
+            configuration:
+              Lambda.LambdaFunctionConfiguration.make({
+                MemorySize: 128,
+                Handler: "index.mjs",
+                Timeout: 10,
+                Environment:
+                  Lambda.LambdaFunctionConfigurationEnvironment.make({
+                    Variables: Data.struct({})
+                  })
+              })
+          });
+
+        return 1;
+
+      }).pipe(
+        Effect.provide([
+          Lambda.LambdaFunctionManageService.Default,
+
+        ]),
+        Logger.withMinimumLogLevel(LogLevel.Debug),
+        Effect.tapErrorCause(Effect.logError),
+        Effect.runPromiseExit
+      );
+
+    assert(program._tag == "Success")
+
+  });
 
 })
