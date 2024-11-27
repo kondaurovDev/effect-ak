@@ -1,7 +1,7 @@
 import { Effect, Exit, Array } from "effect";
 import { assert, describe, expect, it } from "vitest";
 
-import { CsvService } from "../../src/data-format"
+import { DataFormatCsvService } from "../../src/data-format"
 
 describe("Csv data service", () => {
 
@@ -10,7 +10,7 @@ describe("Csv data service", () => {
     const program = 
       Effect.gen(function* () {
 
-        const service = yield* CsvService;
+        const service = yield* DataFormatCsvService;
 
         const columns =
           Array.make(
@@ -40,7 +40,7 @@ describe("Csv data service", () => {
           encoded1, decoded1
         }
       }).pipe(
-        Effect.provide(CsvService.Default),
+        Effect.provide(DataFormatCsvService.Default),
         Effect.runSyncExit
       );
 
@@ -72,7 +72,7 @@ describe("Csv data service", () => {
     const program = 
       Effect.gen(function* () {
 
-        const service = yield* CsvService;
+        const service = yield* DataFormatCsvService;
 
         const encodedObjects =
           service.encodeObjects([
@@ -90,7 +90,7 @@ describe("Csv data service", () => {
           encodedObjects
         }
       }).pipe(
-        Effect.provide(CsvService.Default),
+        Effect.provide(DataFormatCsvService.Default),
         Effect.tapErrorCause(Effect.logError),
         Effect.runSyncExit
       );

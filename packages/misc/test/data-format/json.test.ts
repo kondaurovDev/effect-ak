@@ -1,7 +1,7 @@
 import { Effect, Exit } from "effect";
 import { assert, describe, expect, it } from "vitest";
 
-import { JsonService } from "../../src/data-format"
+import { DataFormatJsonService } from "../../src/data-format"
 
 describe("Json data service", () => {
 
@@ -10,7 +10,7 @@ describe("Json data service", () => {
     const program = 
       Effect.gen(function* () {
 
-        const service = yield* JsonService;
+        const service = yield* DataFormatJsonService;
 
         const encoded1 =
           yield* service.encode({ prop1: 1, prop2: null })
@@ -20,7 +20,7 @@ describe("Json data service", () => {
         }
 
       }).pipe(
-        Effect.provide(JsonService.Default),
+        Effect.provide(DataFormatJsonService.Default),
         Effect.runSyncExit
       );
 

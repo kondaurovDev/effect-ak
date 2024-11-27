@@ -19,7 +19,7 @@ export class TgBotSettingsService
             path: "/getMe",
             responseSchema: User,
             payload: empty
-          })
+          });
 
         const setBotName =
           (payload: typeof SetBotNameCommand.Type) =>
@@ -27,7 +27,7 @@ export class TgBotSettingsService
               path: "/sendMyName",
               responseSchema: S.Boolean,
               payload,
-            })
+            });
 
         const setBotCommands =
           (payload: typeof SetBotCommandsCommand.Type) =>
@@ -35,7 +35,7 @@ export class TgBotSettingsService
               path: "/setMyCommands",
               responseSchema: S.Boolean,
               payload
-            })
+            });
 
         const getBotCommands =
           (payload: typeof GetBotCommandsCommand.Type) =>
@@ -43,7 +43,7 @@ export class TgBotSettingsService
               path: "/getMyCommands",
               responseSchema: S.Array(BotCommand),
               payload
-            })
+            });
 
         return {
           getMe, setBotName, setBotCommands, getBotCommands

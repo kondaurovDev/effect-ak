@@ -1,10 +1,10 @@
 import * as S from "effect/Schema"
 
-export type DecodedFromJson = typeof DecodedFromJson.Type;
-export const DecodedFromJson = S.Unknown.pipe(S.brand("DecodedFromJson"));
+export type UnknownDecoded = typeof UnknownDecoded.Type;
+export const UnknownDecoded = S.Unknown.pipe(S.brand("UnknownDecoded"));
 
-export type EncodedToJson = typeof EncodedToJson.Type;
-export const EncodedToJson = S.NonEmptyString.pipe(S.brand("EncodedToJson"));
+export type JsonString = typeof JsonString.Type;
+export const JsonString = S.NonEmptyString.pipe(S.brand("JsonString"));
 
 export const PrimitiveType =
   S.Union(S.String, S.Number, S.Boolean, S.UndefinedOr(S.Null));

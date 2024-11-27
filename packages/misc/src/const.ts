@@ -1,2 +1,2 @@
-export const packageName = "@effect-ak/shared"
+export const miscPackageName = "@effect-ak/misc"
 export const miscModuleName = "effect-ak-misc";

@@ -4,3 +4,4 @@ node_modules
 .tsbuildinfo
 *.tgz
 token.txt
+*.zip
