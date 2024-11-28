@@ -30,6 +30,7 @@ export class LambdaClientService extends
         pipe(
           Effect.succeed(LambdaCommandFactory[name](input)),
           Effect.filterOrDieMessage(_ => _ != null, `Command "${name}" is unknown`),
+          Effect.tap(Effect.logDebug(`executing '${name}'`, input)),
           Effect.andThen(input =>
             Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<LambdaClientApi[M]>>)
           ),

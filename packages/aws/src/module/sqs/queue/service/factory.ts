@@ -1,14 +1,14 @@
 import * as Effect from "effect/Effect";
 
-import { AllQueueAttributes, OneOfQueue } from "../types/queue.js";
-import { QueueMetadata, QueueName } from "../types/common.js";
+import { QueueAttributes, QueueType, SdkQueueAttributes } from "../types/queue-attributes.js";
+import { makeQueueUrlFrom, QueueMetadata, QueueName } from "../types/common.js";
 import { AwsRegionConfig } from "../../../../internal/configuration.js";
 import { StsService } from "../../../sts/service.js";
 
 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html#API_SetQueueAttributes_RequestParameters
 
-export class SqsQueueAttributesService
-  extends Effect.Service<SqsQueueAttributesService>()("SqsQueueAttributesService", {
+export class SqsQueueFactoryService
+  extends Effect.Service<SqsQueueFactoryService>()("SqsQueueFactoryService", {
     effect:
       Effect.gen(function* () {
 
@@ -16,50 +16,48 @@ export class SqsQueueAttributesService
         const { accountId } = yield* StsService;
 
         const makeQueueArn =
-          (input: {
-            queueName: QueueName
-          }): typeof QueueMetadata.fields.arn.Type =>
-            `arn:aws:sqs:${region}:${accountId}:${input.queueName}`;
+          (queueName: QueueName): typeof QueueMetadata.fields.arn.Type =>
+            `arn:aws:sqs:${region}:${accountId}:${queueName}`;
 
         const makeQueueUrl =
-          (input: {
-            queueName: QueueName
-          }): typeof QueueMetadata.fields.url.Type =>
-            `https://sqs.${region}.amazonaws.com/${accountId}/${input.queueName}`;
+          (queueName: QueueName): typeof QueueMetadata.fields.url.Type =>
+            makeQueueUrlFrom({
+              region, accountId, queueName
+            });
 
         const makeQueue =
-          (queue: OneOfQueue["queue"]) => {
-            const queueName =
-              queue.queueType === "fifo" ?
-                `${queue.queueName}.fifo` :
-                `${queue.queueName}`;
+          ({ queueName, queueType }: QueueInput) => {
+            const name =
+              queueType === "fifo" ?
+                `${queueName}.fifo` :
+                `${queueName}`;
 
             return QueueMetadata.make({
               name: queueName,
-              arn: makeQueueArn({ queueName }),
-              url: makeQueueUrl({ queueName })
+              arn: makeQueueArn(name),
+              url: makeQueueUrl(name)
             })
           }
 
         const makeDeadLetterQueue =
-          (queue: OneOfQueue["queue"]) => {
-            const queueName =
-              queue.queueType === "fifo" ?
-                `${queue.queueName}-dl.fifo` :
-                `${queue.queueName}-dl`;
+          ({ queueName, queueType }: QueueInput) => {
+            const name =
+              queueType === "fifo" ?
+                `${queueName}-dl.fifo` :
+                `${queueName}-dl`;
 
             return QueueMetadata.make({
               name: queueName,
-              arn: makeQueueArn({ queueName }),
-              url: makeQueueUrl({ queueName })
+              arn: makeQueueArn(name),
+              url: makeQueueUrl(name)
             })
           }
 
-        const makeQueueSdkAttributes =
-          (queue: OneOfQueue["queue"]) => {
+        const makeSdkQueueAttributes =
+          (queue: QueueAttributes) => {
             switch (queue.queueType) {
               case "fifo":
-                return new AllQueueAttributes({
+                return new SdkQueueAttributes({
                   FifoQueue: "true",
                   ...(
                     queue.throughputLimit ? {
@@ -79,8 +77,8 @@ export class SqsQueueAttributesService
           }
 
         const commonToSdkAttributes =
-          (queue: OneOfQueue["queue"]) => {
-            return new AllQueueAttributes({
+          (queue: QueueAttributes) => {
+            return new SdkQueueAttributes({
               VisibilityTimeout: queue.visibilityTimeout?.toString() ?? "60",
               DelaySeconds: queue.deliveryDelay?.toString() ?? "0",
               ...(queue.maximumMessageSize ? {
@@ -102,7 +100,7 @@ export class SqsQueueAttributesService
           }
 
         return {
-          makeQueueSdkAttributes, makeQueue, makeDeadLetterQueue
+          makeSdkQueueAttributes, makeQueue, makeDeadLetterQueue, makeQueueUrl, makeQueueArn
         }
 
       }),
@@ -111,3 +109,8 @@ export class SqsQueueAttributesService
       StsService.Default
     ]
   }) { }
+
+type QueueInput = {
+  queueName: QueueName,
+  queueType: QueueType
+}

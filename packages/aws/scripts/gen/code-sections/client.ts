@@ -42,6 +42,7 @@ export const generateClientSection =
                 pipe(
                   Effect.succeed(${names.commandsFactoryName}[name](input)),
                   Effect.filterOrDieMessage(_ => _ != null, \`Command "$\{name\}" is unknown\`),
+                  Effect.tap(Effect.logDebug(\`executing '$\{name\}'\`, input)),
                   Effect.andThen(input =>
                     Effect.tryPromise(() => client.send(input as any) as Promise<ReturnType<${names.clientApiInterfaceName}[M]>>)
                   ),

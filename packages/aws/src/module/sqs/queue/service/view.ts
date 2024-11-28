@@ -5,7 +5,8 @@ import * as Option from "effect/Option";
 
 import { recoverFromSqsException, SqsClientService } from "../../client.js";
 import { QueueName } from "../types/common.js";
-import { AllQueueAttributes } from "../types/queue.js";
+import { SdkQueueAttributeName, SdkQueueAttributes } from "../types/queue-attributes.js";
+import * as C from "../../const.js";
 
 // https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-eventsource
 
@@ -61,11 +62,13 @@ export class SqsQueueViewService
 
         const getQueueAttributes =
           (input: {
-            queueName: QueueName
+            queueName: QueueName,
+            attributeNames: SdkQueueAttributeName[]
           }) =>
             Effect.gen(function* () {
 
-              const url = yield* getQueueUrl(input);
+              const url = 
+                input.queueName.startsWith(C.sqs_queue_url_beginning) ? input.queueName : yield* getQueueUrl(input);
 
               if (!url) return undefined;
 
@@ -73,7 +76,8 @@ export class SqsQueueViewService
                 yield* sqs.execute(
                   "getQueueAttributes", 
                   {
-                    QueueUrl: url
+                    QueueUrl: url,
+                    AttributeNames: input.attributeNames
                   }
                 );
 
@@ -81,7 +85,7 @@ export class SqsQueueViewService
                 return yield* Effect.die("The queue exists but 'Attributes' is undefined")
               }
 
-              return new AllQueueAttributes(response.Attributes)
+              return new SdkQueueAttributes(response.Attributes)
 
             });
 

@@ -5,6 +5,7 @@ import * as S from "effect/Schema";
 
 import { awsSdkModuleName, awsSdkPackageName } from "./const.js";
 
+export type AwsRegionSchema = typeof AwsRegionSchema.Type;
 export const AwsRegionSchema =
   S.TemplateLiteral(S.String, "-", S.String, "-", S.Number);
 

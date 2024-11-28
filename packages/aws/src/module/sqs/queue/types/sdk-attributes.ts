@@ -1,20 +1,7 @@
-import * as S from "effect/Schema";
 import { pipe } from "effect/Function"
+import * as S from "effect/Schema";
 
-import { QueueMetadata } from "./common.js";
-
-export class CommonQueueAttributes
-  extends S.Class<CommonQueueAttributes>("CommonQueueAttributes")({
-    queueName: QueueMetadata.fields.name,
-    queueType: S.Literal("standard", "fifo"),
-    visibilityTimeout: S.suspend(() => VisibilyTimeout).pipe(S.optional),
-    deliveryDelay: S.suspend(() => DeliveryDelay).pipe(S.optional),
-    maximumMessageSize: S.suspend(() => MaximumMessageSize).pipe(S.optional),
-    retentionPeriod: S.suspend(() => MessageRetentionPeriodInDays).pipe(S.optional),
-    receiveMessageWaitTime: S.suspend(() => ReceiveMessageWaitTime).pipe(S.optional),
-    redriveAllowPolicy: S.suspend(() => RedriveAllowPolicy).pipe(S.optional),
-    redriveConfig: S.suspend(() => RedriveConfig).pipe(S.optional)
-  }) {}
+import { sqs_queue_arn_beginning } from "../../const.js";
 
 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 export const VisibilyTimeout =
@@ -98,7 +85,7 @@ export const RedriveAllowPolicy =
 
 const dlTarget =
   pipe(
-    QueueMetadata.fields.arn
+    S.TemplateLiteral(sqs_queue_arn_beginning, S.String)
   ).annotations({
     jsonSchema: { string: "deadLetter" }
   })

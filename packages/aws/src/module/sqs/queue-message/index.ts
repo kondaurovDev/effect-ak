@@ -1,5 +1,5 @@
 export * from "./service/delete.js"
 export * from "./service/receive.js"
 export * from "./service/send.js"
-export * from "./types/attributes.js"
-export * from "./types/message.js"
+export * from "./types/sdk-attributes.js"
+export * from "./types/common.js"

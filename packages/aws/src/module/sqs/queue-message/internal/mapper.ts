@@ -1,4 +1,4 @@
-import { CommonQueueMessageAttributes, QueueMessage, SdkSendMessage } from "../types/message.js";
+import { CommonQueueMessageAttributes, QueueMessage, SdkSendMessage } from "../types/common.js";
 
 export const getMessageSdkAttributes = (
   message: QueueMessage

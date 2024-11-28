@@ -1,10 +1,8 @@
 import * as Effect from "effect/Effect";
 import * as Array from "effect/Array";
-import * as S from "effect/Schema";
-import { SendMessageBatchCommand, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 import { SqsClientService } from "../../client.js"
-import { QueueName, SqsQueueContextService } from "../../queue/index.js"
+import { SqsQueueFactoryService } from "../../queue/service/factory.js";
 
 type Message = {
   body: string,
@@ -17,58 +15,47 @@ export class SqsQueueMessageSendService
     effect:
       Effect.gen(function* () {
 
-        const sqs = yield* SqsClientService;
-        const context = yield* SqsQueueContextService;
+        const $ = {
+          client: yield* SqsClientService,
+          factory: yield* SqsQueueFactoryService
+        };
 
-        const getQueueUrl =
-          (queueName: string) =>
-            S.validate(QueueName)(queueName).pipe(
-              Effect.andThen(context.getQueueUrlByName)
-            )
+        const sendMessage =
+          (queueName: string, message: Message) => {
+            const queueUrl =
+              $.factory.makeQueueUrl(queueName);
 
-        const sendMessage = (
-          queueName: string,
-          message: Message
-        ) =>
-          Effect.gen(function* () {
+            const response =
+              $.client.execute(
+                "sendMessage",
+                {
+                  QueueUrl: queueUrl,
+                  MessageBody: message.body,
+                  ...(message.groupId ? {
+                    MessageGroupId: message.groupId
+                  } : undefined),
+                  ...(message.deduplicationId ? {
+                    MessageDeduplicationId: message.deduplicationId
+                  } : undefined)
+                }
+              );
 
-            const queueUrl = yield* getQueueUrl(queueName);
+            return response;
+          };
 
-            yield* Effect.log("sending message", { queueUrl })
+        const sendManyMessages =
+          (queueName: string, ...messages: Message[]) => {
 
-            return (
-              yield* sqs.execute(
-                `send message to SQS queue`, _ =>
-                _.send(
-                  new SendMessageCommand({
-                    QueueUrl: queueUrl,
-                    MessageBody: message.body,
-                    ...(message.groupId ? {
-                      MessageGroupId: message.groupId
-                    } : undefined),
-                    ...(message.deduplicationId ? {
-                      MessageDeduplicationId: message.deduplicationId
-                    } : undefined)
-                  })
-                )
-              )
-            )
-          })
+            const queueUrl =
+              $.factory.makeQueueUrl(queueName);
 
-        const sendManyMessages = (
-          queueName: string,
-          messages: Message[]
-        ) =>
-          Effect.gen(function* () {
-
-            const queueUrl = yield* getQueueUrl(queueName);
-
-            return (
-              yield* Effect.forEach(Array.split(10)(messages), chunk =>
-                sqs.execute(
-                  "sending many messages to queue", _ =>
-                  _.send(
-                    new SendMessageBatchCommand({
+            const forResult =
+              Effect.forEach(
+                Array.split(10)(messages),
+                chunk =>
+                  $.client.execute(
+                    "sendMessageBatch",
+                    {
                       QueueUrl: queueUrl,
                       Entries:
                         chunk.map(message => ({
@@ -81,12 +68,14 @@ export class SqsQueueMessageSendService
                             MessageDeduplicationId: message.deduplicationId
                           } : undefined)
                         }))
-                    })
+                    }
                   )
-                )
-              )
-            )
-          })
+              );
+
+            return forResult;
+
+          };
+
 
         return {
           sendMessage, sendManyMessages
@@ -96,6 +85,6 @@ export class SqsQueueMessageSendService
 
     dependencies: [
       SqsClientService.Default,
-      SqsQueueContextService.Default
+      SqsQueueFactoryService.Default
     ]
   }) { }

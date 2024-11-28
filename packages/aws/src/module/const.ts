@@ -1,5 +1,7 @@
 export type ApiGatewayType = typeof apiGatewayTypes[number];
 
+export const amazon_com = "amazonaws.com";
+
 export const apiGatewayTypes = [
   "https", "wss"
 ] as const;

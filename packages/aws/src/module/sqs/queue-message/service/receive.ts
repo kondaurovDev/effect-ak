@@ -2,32 +2,33 @@ import * as Effect from "effect/Effect";
 import * as S from "effect/Schema";
 
 import { SqsClientService } from "../../client.js"
-import { QueueName, SqsQueueContextService } from "../../queue/index.js"
-import { ValidQueueMessage } from "../types/message.js";
+import { ValidQueueMessage } from "../types/common.js";
+import { SqsQueueFactoryService } from "../../queue/service/factory.js";
 
 export class SqsQueueMessageReceiveService
   extends Effect.Service<SqsQueueMessageReceiveService>()("SqsQueueMessageReceiveService", {
     effect:
       Effect.gen(function* () {
 
-        const sqs = yield* SqsClientService;
-        const context = yield* SqsQueueContextService;
+        const $ = {
+          client: yield* SqsClientService,
+          factory: yield* SqsQueueFactoryService
+        };
 
         const receiveMessages =
           (queueName: string) =>
             Effect.gen(function* () {
 
-              const name = yield* S.validate(QueueName)(queueName);
-
-              const queueUrl = context.getQueueUrlByName(name);
+              const queueUrl =
+                $.factory.makeQueueUrl(queueName);
 
               const messages =
-                yield* sqs.execute(
-                  "receive batch of messages", _ =>
-                  _.receiveMessage({
+                yield* $.client.execute(
+                  "receiveMessage",
+                  {
                     QueueUrl: queueUrl,
                     MaxNumberOfMessages: 10
-                  })
+                  }
                 ).pipe(
                   Effect.andThen(_ => _.Messages ?? [])
                 );
@@ -61,7 +62,6 @@ export class SqsQueueMessageReceiveService
       }),
       dependencies: [
         SqsClientService.Default,
-        SqsQueueContextService.Default
+        SqsQueueFactoryService.Default
       ]
   }) { }
-

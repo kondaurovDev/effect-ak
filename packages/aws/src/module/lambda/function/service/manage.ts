@@ -92,6 +92,8 @@ export class LambdaFunctionManageService
                   }
                 );
 
+              yield* Effect.sleep("15 seconds")
+
               yield* $.configuration.syncFunctionConfiguration(input);
 
               return updateResponse.State;

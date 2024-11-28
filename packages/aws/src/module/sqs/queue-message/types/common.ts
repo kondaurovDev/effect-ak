@@ -2,9 +2,6 @@ import * as S from "effect/Schema";
 import * as Brand from "effect/Brand";
 import type * as Sdk from "@aws-sdk/client-sqs"
 
-import { MessageAttibutes, MessageBody, MessageDeduplicationId, MessageGroupId } from "./attributes.js";
-import { DeliveryDelay } from "../../queue/types/attributes.js";
-
 export type SdkMessage = Brand.Branded<Sdk.Message, "SdkMessage">;
 export const SdkMessage = Brand.nominal<SdkMessage>();
 
@@ -21,34 +18,6 @@ export const SQSBatchEvent =
   S.Struct({
     Records: S.Array(S.suspend(() => ValidQueueMessage))
   });
-
-export class CommonQueueMessageAttributes extends
-  S.Class<CommonQueueMessageAttributes>("CommonQueueMessageAttributes")({
-    attributes: MessageAttibutes,
-    body: MessageBody
-  }) { }
-
-export class MessageToFifoQueue extends
-  CommonQueueMessageAttributes.extend<MessageToFifoQueue>("MessageToFifoQueue")({
-    queueType: S.Literal("fifo"),
-    deduplicationId: MessageDeduplicationId,
-    groupId: MessageGroupId,
-  }) { }
-
-export class MessageToStandardQueue extends
-  CommonQueueMessageAttributes.extend<MessageToStandardQueue>("MessageToStandardQueue")({
-    queueType: S.Literal("standard"),
-    deliveryDelay: DeliveryDelay.pipe(S.optional)
-  }) { }
-
-export type QueueMessage = typeof QueueMessage.Type
-export const QueueMessage =
-  S.Union(
-    MessageToFifoQueue,
-    MessageToStandardQueue
-  ).annotations({
-    identifier: "QueueMessage"
-  })
 
 export class ValidQueueMessage
   extends S.Class<ValidQueueMessage>("ValidQueueMessage")({

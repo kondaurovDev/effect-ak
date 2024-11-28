@@ -1,4 +1,6 @@
-import { Effect, pipe } from "effect";
+import { pipe } from "effect/Function";
+import * as Effect from "effect/Effect";
+import * as S from "effect/Schema";
 
 import { StsClientService } from "./client.js";
 
@@ -15,8 +17,7 @@ export class StsService
               "getCallerIdentity",
               {}
             ),
-            Effect.andThen(_ => _.Account),
-            Effect.filterOrDieMessage(_ => _ != null, "AccountId is undefined"),
+            Effect.andThen(_ => S.decodeUnknown(S.NumberFromString)(_.Account))
           );
 
         return {

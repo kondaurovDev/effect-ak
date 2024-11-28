@@ -101,8 +101,7 @@ describe("lambda, function configuration", () => {
 
       }).pipe(
         Effect.provide([
-          Lambda.LambdaFunctionManageService.Default,
-
+          Lambda.LambdaFunctionManageService.Default
         ]),
         Logger.withMinimumLogLevel(LogLevel.Debug),
         Effect.tapErrorCause(Effect.logError),

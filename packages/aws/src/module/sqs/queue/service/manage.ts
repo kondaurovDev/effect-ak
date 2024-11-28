@@ -1,10 +1,12 @@
 import * as Effect from "effect/Effect"
+import * as Equal from "effect/Equal"
 
 import { SqsClientService } from "../../client.js"
 import { SqsQueueViewService } from "./view.js"
-import { OneOfQueue } from "../types/queue.js"
+import { QueueAttributes } from "../types/queue-attributes.js"
 import { AwsProjectIdConfig } from "../../../../internal/configuration.js";
-import { SqsQueueAttributesService } from "./attributes.js";
+import { SqsQueueFactoryService } from "./factory.js";
+import { QueueName } from "../types/common.js"
 
 export class SqsQueueManageService
   extends Effect.Service<SqsQueueManageService>()("SqsQueueManageService", {
@@ -14,33 +16,49 @@ export class SqsQueueManageService
         const $ = {
           client: yield* SqsClientService,
           view: yield* SqsQueueViewService,
-          attributes: yield* SqsQueueAttributesService,
+          factory: yield* SqsQueueFactoryService,
           awsConfig: yield* AwsProjectIdConfig,
         }
 
         const upsertQueue =
-          (input: OneOfQueue) =>
+          (input: {
+            queueName: QueueName,
+            attributes: QueueAttributes
+          }) =>
             Effect.gen(function* () {
 
-              const queueUrl = yield* $.view.getQueueUrl(input.queue);
+              const queueUrl = yield* $.view.getQueueUrl(input);
 
-              const attributes = $.attributes.makeQueueSdkAttributes(input.queue);
- 
+              const attributes = $.factory.makeSdkQueueAttributes(input.attributes);
+
               if (queueUrl) {
+                const currentAttributes = yield* $.view.getQueueAttributes({ 
+                  queueName: queueUrl, attributeNames: Object.keys(attributes) as any
+                });
+
+                if (!currentAttributes)
+                  return yield* Effect.die("Current queue's attributes are undefined");
+
+                if (Equal.equals(attributes, currentAttributes)) {
+                  yield* Effect.logDebug("Queue's attributes are the same");
+                  return true;
+                }
+
                 yield* $.client.execute(
                   "setQueueAttributes",
                   {
                     QueueUrl: queueUrl,
                     Attributes: attributes
                   }
-                )
-                return true;
+                );
+
+                yield* Effect.logDebug("Queue's attributes have been updated");
               }
 
               yield* $.client.execute(
                 "createQueue",
                 {
-                  QueueName: input.queue.queueName,
+                  QueueName: input.queueName,
                   Attributes: attributes,
                   tags: $.awsConfig.resourceTagsMap
                 }
@@ -49,25 +67,33 @@ export class SqsQueueManageService
             });
 
         const upsertQueueAndDeadLetterQueue =
-          (input: OneOfQueue) =>
+          (input: {
+            queueName: QueueName,
+            attributes: QueueAttributes
+          }) =>
             Effect.gen(function* () {
 
-              const dl_queue = $.attributes.makeDeadLetterQueue(input.queue);
-              const queue = $.attributes.makeQueue(input.queue);
+              const dl_queue = $.factory.makeDeadLetterQueue({ 
+                queueName: input.queueName, queueType: input.attributes.queueType 
+              });
+
+              const queue = $.factory.makeQueue({
+                queueName: input.queueName, queueType: input.attributes.queueType
+              });
 
               // dead letter queue
               yield* upsertQueue({
-                queue: {
-                  ...input.queue,
-                  queueName: dl_queue.name,
-                  redriveAllowPolicy: { redrivePermission: "byQueue", sourceQueueArns: [ queue.arn ] },
+                queueName: dl_queue.name,
+                attributes: {
+                  ...input.attributes,
+                  redriveAllowPolicy: { redrivePermission: "byQueue", sourceQueueArns: [ queue.arn ] }
                 }
               });
 
               yield* upsertQueue({
-                queue: {
-                  ...input.queue,
-                  queueName: queue.name,
+                queueName: queue.name,
+                attributes: {
+                  ...input.attributes,
                   redriveAllowPolicy: { redrivePermission: "denyAll" },
                   redriveConfig: { maxReceiveCount: 1, deadLetterTargetArn: dl_queue.arn }
                 }
@@ -83,6 +109,6 @@ export class SqsQueueManageService
     dependencies: [
       SqsClientService.Default,
       SqsQueueViewService.Default,
-      SqsQueueAttributesService.Default
+      SqsQueueFactoryService.Default
     ]
   }) { }

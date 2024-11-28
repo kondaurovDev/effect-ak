@@ -1,5 +1,5 @@
-import * as S from "effect/Schema";
 import { pipe } from "effect";
+import * as S from "effect/Schema";
 
 export type MessageAttibutes =
   typeof MessageAttibutes.Type;

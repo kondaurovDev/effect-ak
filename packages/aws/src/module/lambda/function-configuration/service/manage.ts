@@ -27,6 +27,7 @@ export class LambdaFunctionConfigurationManageService
 
               if (!Schema.is(LambdaFunctionConfiguration)(input.configuration)) {
                 yield* Effect.logWarning("input configuration is not an instance of LambdaFunctionConfiguration");
+                return false;
               }
 
               const currentConfiguration =
