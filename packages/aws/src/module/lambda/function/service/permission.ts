@@ -4,7 +4,7 @@ import * as Effect from "effect/Effect";
 import { LambdaClientService, LambdaMethodInput, recoverFromLambdaException } from "../../client.js";
 import { LambdaFunctionName } from "../schema.js";
 import { makeExecuteApiArnFrom } from "../../../api-gateway/http/const.js";
-import { AwsRegionConfig } from "packages/aws/src/internal/configuration.js";
+import { AwsRegionConfig } from "../../../../internal/configuration.js";
 import { StsService } from "../../../sts/service.js";
 
 export class LambdaFunctionPermissionService

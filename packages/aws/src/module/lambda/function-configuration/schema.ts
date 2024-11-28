@@ -12,7 +12,8 @@ export class LambdaFunctionConfiguration
     S.Struct({
       Timeout: S.Number,
       MemorySize: S.Number,
-      Environment: LambdaFunctionConfigurationEnvironment,
-      Handler: S.String
+      Environment: LambdaFunctionConfigurationEnvironment.pipe(S.optional),
+      Handler: S.String,
+      CodeSize: S.Number.pipe(S.optional)
     })
   ) {}

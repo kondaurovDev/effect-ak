@@ -52,7 +52,7 @@ export class LambdaFunctionFactoryService
                 yield* zip.createZipArchive([
                   {
                     type: "file",
-                    name: "index.js",
+                    name: "index.mjs",
                     content: code
                   }
                 ]);

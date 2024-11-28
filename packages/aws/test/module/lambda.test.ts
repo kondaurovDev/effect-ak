@@ -1,6 +1,7 @@
 import { Data, Effect, Equal, Logger, LogLevel, Schema } from "effect";
 import { describe } from "node:test";
 import { assert, it } from "vitest";
+
 import CodeBlockWriter from "code-block-writer";
 
 import * as Lambda from "../../src/module/lambda";
@@ -81,18 +82,18 @@ describe("lambda, function configuration", () => {
                 writer.writeLine("export const handler = async () => ").block(() =>
                   writer
                     .writeLine("console.log('Hello')")
-                    .writeLine("return 'foo'")
+                    .writeLine("return 'foo :)'")
                 ).toString()
             },
             runtime: "nodejs22.x",
             configuration:
               Lambda.LambdaFunctionConfiguration.make({
                 MemorySize: 128,
-                Handler: "index.mjs",
+                Handler: "index.handler",
                 Timeout: 10,
                 Environment:
                   Lambda.LambdaFunctionConfigurationEnvironment.make({
-                    Variables: Data.struct({})
+                    Variables: Data.struct({ aaa2: "1"})
                   })
               })
           });

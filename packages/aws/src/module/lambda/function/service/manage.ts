@@ -30,7 +30,7 @@ export class LambdaFunctionManageService
               const response =
                 yield* pipe(
                   $.client.execute(
-                    "updateFunctionCode", 
+                    "updateFunctionCode",
                     {
                       FunctionName: input.functionName,
                       ZipFile: yield* $.factory.makeCodeZipArchive(input.code)
@@ -64,6 +64,8 @@ export class LambdaFunctionManageService
               const currentConfiguration =
                 yield* $.configuration.$.view.get(input);
 
+              const code = yield* $.factory.makeCodeZipArchive(input.code);
+
               if (!currentConfiguration) {
                 const response =
                   yield* $.client.execute(
@@ -71,7 +73,7 @@ export class LambdaFunctionManageService
                     {
                       FunctionName: input.functionName,
                       Code: {
-                        ZipFile: yield* $.factory.makeCodeZipArchive(input.code)
+                        ZipFile: code
                       },
                       Role: input.role,
                       Runtime: input.runtime,
@@ -83,20 +85,20 @@ export class LambdaFunctionManageService
                 return true;
               }
 
-              const updateResponse =
+              if (currentConfiguration.CodeSize != code.byteLength) {
                 yield* $.client.execute(
                   "updateFunctionCode",
                   {
                     FunctionName: input.functionName,
-                    ZipFile: yield* $.factory.makeCodeZipArchive(input.code)
+                    ZipFile: code
                   }
                 );
-
-              yield* Effect.sleep("15 seconds")
+                yield* Effect.sleep("10 seconds");
+              }
 
               yield* $.configuration.syncFunctionConfiguration(input);
 
-              return updateResponse.State;
+              return true;
 
             });
 

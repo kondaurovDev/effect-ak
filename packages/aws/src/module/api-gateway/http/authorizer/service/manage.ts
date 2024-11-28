@@ -1,9 +1,8 @@
 import { pipe } from "effect/Function";
 import * as Match from "effect/Match";
 import * as Effect from "effect/Effect";
-import { CreateAuthorizerCommand, UpdateAuthorizerCommand } from "@aws-sdk/client-apigatewayv2";
 
-import { LambdaFunctionViewService } from "../../../../lambda/function/service/view.js";
+import { LambdaFunctionViewService, LambdaFunctionPermissionService } from "../../../../lambda/function/index.js";
 import { CreateOrUpdateAuthorizer, LambdaAuthorizer } from "../types.js";
 import { Apigatewayv2ClientService } from "../../../client.js";
 
@@ -15,14 +14,13 @@ export class ApiGatewayHttpAuthorizerManageService
         const $ = {
           client: yield* Apigatewayv2ClientService,
           lambdaView: yield* LambdaFunctionViewService,
+          lambdaPermission: yield* LambdaFunctionPermissionService,
         }
 
         // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html
 
-        const upsertLambdaAuthorizer = (
-          apiId: ApiId,
-          authorizer: LambdaAuthorizer
-        ) =>
+        const upsertLambdaAuthorizer = 
+          (input: LambdaAuthorizer) =>
           Effect.gen(function* () {
 
             const lambda =
@@ -37,7 +35,7 @@ export class ApiGatewayHttpAuthorizerManageService
               CreateOrUpdateAuthorizer({
                 Name: authorizer.id,
                 AuthorizerType: "REQUEST",
-                IdentitySource: [...authorizer.identitySources],
+                IdentitySource: [ ...authorizer.identitySources ],
                 ApiId: apiId,
                 AuthorizerPayloadFormatVersion: "2.0",
                 EnableSimpleResponses: true,
@@ -55,23 +53,20 @@ export class ApiGatewayHttpAuthorizerManageService
               yield* pipe(
                 Match.value(current),
                 Match.when(({ AuthorizerId: Match.defined }), ({ AuthorizerId }) =>
-                  gatewayClient.executeMethod(
-                    "update lambda authorizer", _ =>
-                    _.send(
-                      new UpdateAuthorizerCommand({
-                        AuthorizerId,
-                        ...params
-                      }))
+                  $.client.execute(
+                    "updateAuthorizer",
+                    {
+                      AuthorizerId,
+                      ...params
+                    }
                   )
                 ),
                 Match.orElse(() =>
-                  gatewayClient.executeMethod(
-                    "create lambda authorizer", _ =>
-                    _.send(
-                      new CreateAuthorizerCommand({
-                        ...params
-                      })
-                    )
+                  $.client.execute(
+                    "createAuthorizer",
+                    {
+                      ...params
+                    }
                   )
                 ),
               );
@@ -89,12 +84,10 @@ export class ApiGatewayHttpAuthorizerManageService
       }),
 
     dependencies: [
-      ApiGatewayClient.Default,
-      ApiGatewayClient.Default,
+      Apigatewayv2ClientService.Default,
       GatewayAuthorizerViewService.Default,
       LambdaFunctionViewService.Default,
-      LambdaFunctionSettingsService.Default,
-      BootstrapConfigProvider.Default
+      LambdaFunctionPermissionService.Default,
     ]
   }) { }
 
