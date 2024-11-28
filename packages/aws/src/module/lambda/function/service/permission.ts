@@ -3,6 +3,9 @@ import * as Effect from "effect/Effect";
 
 import { LambdaClientService, LambdaMethodInput, recoverFromLambdaException } from "../../client.js";
 import { LambdaFunctionName } from "../schema.js";
+import { makeExecuteApiArnFrom } from "../../../api-gateway/http/const.js";
+import { AwsRegionConfig } from "packages/aws/src/internal/configuration.js";
+import { StsService } from "../../../sts/service.js";
 
 export class LambdaFunctionPermissionService
   extends Effect.Service<LambdaFunctionPermissionService>()("LambdaFunctionPermissionService", {
@@ -10,6 +13,8 @@ export class LambdaFunctionPermissionService
       Effect.gen(function* () {
 
         const lambda = yield* LambdaClientService;
+        const region = yield* AwsRegionConfig;
+        const { accountId } = yield* StsService;
 
         const addPermission =
           (input: LambdaMethodInput<"addPermission">) =>
@@ -34,15 +39,18 @@ export class LambdaFunctionPermissionService
         const addInvokeFunctionByGatewayPermission =
           (input: {
             functionName: LambdaFunctionName,
-            apiId: unknown
+            apiId: string
           }) =>
             addPermission({
               FunctionName: input.functionName,
               StatementId: `apigateway-invoke-permissions-${input.apiId}`,
               Action: "lambda:InvokeFunction",
               Principal: "apigateway.amazonaws.com",
-              SourceArn: deps.gwInfo.getExecuteApiArn(apiId)
-            });
+              SourceArn:
+                makeExecuteApiArnFrom({
+                  apiId: input.apiId, region, accountId
+                })
+            })
 
         return {
           addPermission, addPermissionToBeInvokedByUrl, addInvokeFunctionByGatewayPermission
@@ -54,4 +62,3 @@ export class LambdaFunctionPermissionService
       LambdaClientService.Default
     ]
   }) { }
-

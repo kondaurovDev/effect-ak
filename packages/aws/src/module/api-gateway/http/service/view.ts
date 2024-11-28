@@ -1,67 +1,62 @@
-import { NotFoundException } from "@aws-sdk/client-apigatewayv2";
 import * as Effect from "effect/Effect";
-import { pipe } from "effect/Function";
+import * as Schema from "effect/Schema";
 
-import { ApiGatewayClientService } from "../../client.js";
 import { ResourceGroupsTagSearchService } from "../../../resource-groups/index.js";
+import { Apigatewayv2ClientService, recoverFromApigatewayv2Exception } from "../../client.js";
+import { ApiGatewayHttpFactoryService } from "./factory.js";
+import { ApiGatewayArn } from "../_schema/common.js";
 
-export class ApiGatewayViewService
-  extends Effect.Service<ApiGatewayViewService>()("ApiGatewayViewService", {
+export class ApiGatewayHttpViewService
+  extends Effect.Service<ApiGatewayHttpViewService>()("ApiGatewayHttpViewService", {
     effect:
       Effect.gen(function* () {
 
-        const tagSearch = yield* ResourceGroupsTagSearchService;
-        const apiGateway = yield* ApiGatewayClientService;
-        const ctx = yield* ApiGatewayContextService;
+        const $ = {
+          client: yield* Apigatewayv2ClientService,
+          tags: yield* ResourceGroupsTagSearchService,
+          factory: yield* ApiGatewayHttpFactoryService
+        }
 
-        const getProjectApiId = 
-          (input: {
-            gatewayType: ApiGatewayType
-          }) =>
-          pipe(
-            tagSearch.getOneResourceArnByTags({
-              resourceType: "apigateway",
-              tags: ctx.resourceTags(input)
-            }),
-            Effect.andThen(arn =>
-              arn == null ?
-                Effect.succeed(undefined) :
-                pipe(
-                  Effect.fromNullable(arn.split("/apis/").at(1)),
-                  Effect.catchTag(
-                    "NoSuchElementException",
-                    () => new ServiceError({ description: "Api is found but apiId is not defined" })
-                  )
-                )
-            )
-          );
+        const getProjectApiGateway =
+          Effect.gen(function* () {
 
-        const getApi =
+            const response =
+              yield* $.tags.getOneResourceArnByTags({
+                resourceType: "apigateway",
+                tags: $.factory.makeResourceTags()
+              });
+
+            if (!response) return undefined;
+
+            const validated = yield* Schema.validate(ApiGatewayArn)(response).pipe(Effect.orDie);
+
+            return {
+              arn: validated,
+              apiId: validated.split("/").at(-1)
+            };
+            
+          });
+
+        const get =
           (input: {
             apiId: string
           }) =>
-            pipe(
-              apiGateway.execute(
-                `get api`, _ =>
-                _.getApi({
-                  ApiId: input.apiId
-                })
-              ),
-              Effect.catchTag("AwsServiceError", error =>
-                error.cause instanceof NotFoundException ?
-                  Effect.succeed(undefined) :
-                  Effect.fail(error)
-              )
+            $.client.execute(
+              "getApi", {
+                ApiId: input.apiId
+              }
+            ).pipe(
+              recoverFromApigatewayv2Exception("NotFoundException", undefined),
             );
 
         return {
-          getProjectApiId, getApi
+          $, getProjectApiGateway, get
         } as const;
 
       }),
     dependencies: [
-      ApiGatewayClientService.Default,
+      Apigatewayv2ClientService.Default,
       ResourceGroupsTagSearchService.Default,
-      ApiGatewayContextService.Default
+      ApiGatewayHttpFactoryService.Default
     ]
   }) { }

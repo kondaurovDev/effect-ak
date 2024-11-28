@@ -1,87 +1,60 @@
-import { pipe } from "effect/Function";
-import * as Match from "effect/Match";
 import * as Effect from "effect/Effect";
 
-import { ApiGatewayClientService } from "../../client.js";
-import { ApiGatewayViewService } from "./view.js";
+import { AwsProjectIdConfig } from "../../../../internal/configuration.js";
+import { ApiGatewayHttpViewService } from "./view.js";
+import { Apigatewayv2ClientService } from "../../client.js";
+import { ApiGatewayHttpFactoryService } from "./factory.js";
 
 export class ApiGatewayHttpManageService
   extends Effect.Service<ApiGatewayHttpManageService>()("ApiGatewayHttpManageService", {
     effect:
       Effect.gen(function* () {
 
-        const gw = yield* ApiGatewayClientService;
-        const view = yield* ApiGatewayViewService;
+        const $ = {
+          client: yield* Apigatewayv2ClientService,
+          view: yield* ApiGatewayHttpViewService,
+          factory: yield* ApiGatewayHttpFactoryService
+        }
+
+        const config = yield* AwsProjectIdConfig;
 
         const upsertDefault = 
           Effect.gen(function* () {
 
-            const name = `${ctx.ctx.projectId}-default`;
+            const name = `${config.projectId}-default`;
 
             const defaultApiId =
-              yield* view.getProjectApiId({
-                gatewayType: "https"
-              });
+              yield* $.view.getProjectApiGateway;
 
-            if (defaultApiId == null) {
+            if (defaultApiId?.apiId == null) {
               const create = 
-                yield* gw.execute(
-                  "creating http api", _ =>
-                  _.createApi({
+                yield* $.client.execute(
+                  "createApi",
+                  {
                     Name: name,
                     ProtocolType: "HTTP",
-                    Tags: 
-                      ctx.resourceTags({
-                        gatewayType: "https"
-                      }),
+                    Tags: $.factory.makeResourceTagsMap(),
                     CorsConfiguration: {
                       AllowOrigins: [
                         "*"
                       ]
                     }
-                  })
-                )
-                
-            }
-            
-            const update =
-              gw.execute(
-                "updating http api", _ =>
-                _.updateApi({
-                  ApiId: apiId,
-                  Name: gateway.name,
-                  Description: description,
-                  CorsConfiguration: {
-                    AllowOrigins: [
-                      "*"
-                    ]
                   }
-                })
-              );
-  
-            return pipe(
-              Match.value(apiId),
-              Match.when(Match.undefined, () => create),
-              Match.when(Match.defined, () => update),
-              Match.exhaustive,
-              Effect.andThen(result => result.ApiId),
-              Effect.filterOrFail(_ => _ != null),
-              Effect.andThen(ApiId)
-            );
+                );
 
+              return yield* Effect.logInfo("http api gateway has been created");
+            }
 
           })
-
-
-
-        };
     
         return {
-          upsertHttpApi
+          upsertDefault
         } as const;
 
       }),
       dependencies: [
-        ApiGatewayClientService.Default,
+        Apigatewayv2ClientService.Default,
+        ApiGatewayHttpViewService.Default,
+        ApiGatewayHttpFactoryService.Default
       ]
   }) {}

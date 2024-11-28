@@ -1,27 +1,25 @@
 import { pipe } from "effect";
 import * as Effect from "effect/Effect";
-import { GetAuthorizersCommand } from "@aws-sdk/client-apigatewayv2";
 
-import type { ApiId } from "../../main/types.js";
-import { ApiGatewayClient } from "../../../client.js";
+import { Apigatewayv2ClientService } from "../../../client.js";
 
-export class GatewayAuthorizerViewService
-  extends Effect.Service<GatewayAuthorizerViewService>()("GatewayAuthorizerViewService", {
+export class ApiGatewayHttpAuthorizerViewService
+  extends Effect.Service<ApiGatewayHttpAuthorizerViewService>()("ApiGatewayHttpAuthorizerViewService", {
     effect:
       Effect.gen(function* () {
 
-        const gatewayClient = yield* ApiGatewayClient;
+        const client = yield* Apigatewayv2ClientService;
 
         const getApiAuthorizers =
-          (apiId: ApiId) =>
+          (input: {
+            apiId: string
+          }) =>
             pipe(
-              gatewayClient.executeMethod(
-                `getting api authorizers of ${apiId}`, _ =>
-                _.send(
-                  new GetAuthorizersCommand({
-                    ApiId: apiId,
-                    MaxResults: "20"
-                  }))
+              client.execute(
+                "getAuthorizers",
+                {
+                  ApiId: input.apiId
+                }
               ),
               Effect.andThen(_ => _.Items ?? [])
             );
@@ -32,6 +30,6 @@ export class GatewayAuthorizerViewService
 
       }),
     dependencies: [
-      ApiGatewayClient.Default
+      Apigatewayv2ClientService.Default
     ]
   }) { }

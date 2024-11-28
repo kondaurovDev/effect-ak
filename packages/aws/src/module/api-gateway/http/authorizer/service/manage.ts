@@ -3,24 +3,19 @@ import * as Match from "effect/Match";
 import * as Effect from "effect/Effect";
 import { CreateAuthorizerCommand, UpdateAuthorizerCommand } from "@aws-sdk/client-apigatewayv2";
 
-import type { ApiId } from "../../main/types.js";
 import { LambdaFunctionViewService } from "../../../../lambda/function/service/view.js";
-import { BootstrapConfigProvider } from "../../../../provider/bootstrap-config.js";
 import { CreateOrUpdateAuthorizer, LambdaAuthorizer } from "../types.js";
-import { ApiGatewayClient } from "../../../client.js";
-import { LambdaFunctionSettingsService } from "../../../../lambda/function/service/permission.js";
-import { GatewayAuthorizerViewService } from "./view.js"
+import { Apigatewayv2ClientService } from "../../../client.js";
 
-export class GatewayAuthorizerEditService
-  extends Effect.Service<GatewayAuthorizerEditService>()("GatewayAuthorizerEditService", {
+export class ApiGatewayHttpAuthorizerManageService
+  extends Effect.Service<ApiGatewayHttpAuthorizerManageService>()("ApiGatewayHttpAuthorizerManageService", {
     effect:
       Effect.gen(function* () {
 
-        const gatewayClient = yield* ApiGatewayClient;
-        const gatewayView = yield* GatewayAuthorizerViewService;
-        const fnView = yield* LambdaFunctionViewService;
-        const fnSettings = yield* LambdaFunctionSettingsService;
-        const bootstrap = yield* BootstrapConfigProvider;
+        const $ = {
+          client: yield* Apigatewayv2ClientService,
+          lambdaView: yield* LambdaFunctionViewService,
+        }
 
         // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html
 
@@ -37,12 +32,6 @@ export class GatewayAuthorizerEditService
                 ),
                 Effect.filterOrFail(_ => _ != null)
               )
-
-            const authorizerUri =
-              [
-                `arn:aws:apigateway:${bootstrap.contextConfig[2]}:lambda:`,
-                `path/2015-03-31/functions/${lambda.FunctionArn}/invocations`
-              ].join();
 
             const params =
               CreateOrUpdateAuthorizer({
