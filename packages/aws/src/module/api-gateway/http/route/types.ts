@@ -3,7 +3,7 @@ import * as Brand from "effect/Brand";
 import * as S from "effect/Schema";
 import type * as Sdk from "@aws-sdk/client-apigatewayv2";
 
-import { IntegrationDescription } from "../integration/types.js";
+import { IntegrationDescription } from "../integration/schema/types.js";
 import { AuthorizerName } from "../authorizer/types.js";
 
 export type SdkHttpRoute = Sdk.Route & Brand.Brand<"HttpRoute">;

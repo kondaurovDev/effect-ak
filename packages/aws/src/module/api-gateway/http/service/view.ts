@@ -1,8 +1,8 @@
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 
-import { ResourceGroupsTagSearchService } from "../../../resource-groups/index.js";
-import { Apigatewayv2ClientService, recoverFromApigatewayv2Exception } from "../../client.js";
+import { ResourceGroupsTagSearchService } from "#module/resource-groups/index.js";
+import { Apigatewayv2ClientService, recoverFromApigatewayv2Exception } from "#clients/apigatewayv2.js";
 import { ApiGatewayHttpFactoryService } from "./factory.js";
 import { ApiGatewayArn } from "../_schema/common.js";
 
@@ -28,11 +28,12 @@ export class ApiGatewayHttpViewService
 
             if (!response) return undefined;
 
-            const validated = yield* Schema.validate(ApiGatewayArn)(response).pipe(Effect.orDie);
+            const validated = 
+              yield* Schema.validate(ApiGatewayArn)(response).pipe(Effect.orDie);
 
             return {
               arn: validated,
-              apiId: validated.split("/").at(-1)
+              apiId: validated.split("/").at(-1)!
             };
             
           });

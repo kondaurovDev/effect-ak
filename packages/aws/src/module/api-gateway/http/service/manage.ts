@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 
-import { AwsProjectIdConfig } from "../../../../internal/configuration.js";
+import { AwsProjectIdConfig } from "../../../../core/service/configuration-provider.js";
 import { ApiGatewayHttpViewService } from "./view.js";
 import { Apigatewayv2ClientService } from "../../client.js";
 import { ApiGatewayHttpFactoryService } from "./factory.js";

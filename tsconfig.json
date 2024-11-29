@@ -2,9 +2,10 @@
   "extends": "./tsconfig.base.json",
   "include": [],
   "references": [
-    { "path": "packages/misc" },
     { "path": "packages/ai" },
-    { "path": "packages/tg-bot" },
+    { "path": "packages/aws" },
     { "path": "packages/google-api" },
+    { "path": "packages/misc" },
+    { "path": "packages/tg-bot" },
   ]
 }

@@ -1,81 +1,90 @@
-import { pipe } from "effect/Function";
-import * as Match from "effect/Match";
 import * as Effect from "effect/Effect";
 
-import { LambdaFunctionViewService, LambdaFunctionPermissionService } from "../../../../lambda/function/index.js";
+import { LambdaFunctionViewService, LambdaFunctionPermissionService } from "#module/lambda/function/index.js";
+import { AwsRegionConfig } from "#core/index.js";
+import { Apigatewayv2ClientService } from "#clients/apigatewayv2.js";
 import { CreateOrUpdateAuthorizer, LambdaAuthorizer } from "../types.js";
-import { Apigatewayv2ClientService } from "../../../client.js";
+import { ApiGatewayHttpAuthorizerViewService } from "./view.js";
+import { ApiGatewayHttpViewService } from "../../service/view.js";
+import { makeLambdaFunctionAuthorizerArnFrom } from "../const.js";
 
 export class ApiGatewayHttpAuthorizerManageService
   extends Effect.Service<ApiGatewayHttpAuthorizerManageService>()("ApiGatewayHttpAuthorizerManageService", {
     effect:
       Effect.gen(function* () {
 
-        const $ = {
-          client: yield* Apigatewayv2ClientService,
-          lambdaView: yield* LambdaFunctionViewService,
-          lambdaPermission: yield* LambdaFunctionPermissionService,
-        }
+        const region = yield* AwsRegionConfig;
+
+        const client = yield* Apigatewayv2ClientService;
+        const view = yield* ApiGatewayHttpAuthorizerViewService;
+        const gw_view = yield* ApiGatewayHttpViewService;
+        const lambda_permission = yield* LambdaFunctionPermissionService;
 
         // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html
 
-        const upsertLambdaAuthorizer = 
+        const upsertLambdaAuthorizer =
           (input: LambdaAuthorizer) =>
-          Effect.gen(function* () {
+            Effect.gen(function* () {
 
-            const lambda =
-              yield* pipe(
-                fnView.getFunctionByName(
-                  bootstrap.getFunctionName(authorizer.functionName)
-                ),
-                Effect.filterOrFail(_ => _ != null)
-              )
+              const projectApi = yield* gw_view.getProjectApiGateway;
 
-            const params =
-              CreateOrUpdateAuthorizer({
-                Name: authorizer.id,
-                AuthorizerType: "REQUEST",
-                IdentitySource: [ ...authorizer.identitySources ],
-                ApiId: apiId,
-                AuthorizerPayloadFormatVersion: "2.0",
-                EnableSimpleResponses: true,
-                AuthorizerResultTtlInSeconds: authorizer.cacheTtlSec,
-                AuthorizerUri: authorizerUri
+              if (!projectApi) {
+                return yield* Effect.die("Default http api gateway does not exist")
+              }
+
+              const authUri =
+                makeLambdaFunctionAuthorizerArnFrom({
+                  region, functionArn: input.functionArn
+                })
+
+              const params =
+                CreateOrUpdateAuthorizer({
+                  Name: input.name,
+                  AuthorizerType: "REQUEST",
+                  IdentitySource: [...input.identitySources],
+                  ApiId: projectApi.apiId,
+                  AuthorizerPayloadFormatVersion: "2.0",
+                  EnableSimpleResponses: true,
+                  AuthorizerResultTtlInSeconds: input.cacheTtl,
+                  AuthorizerUri: authUri
+                });
+
+              const current =
+                yield* view.getOne({
+                  name: input.name,
+                  apiId: projectApi.apiId
+                });
+
+              if (!current) {
+                yield* client.execute(
+                  "createAuthorizer",
+                  {
+                    ...params
+                  }
+                )
+                return;
+              }
+
+              yield* client.execute(
+                "updateAuthorizer",
+                {
+                  AuthorizerId: current.AuthorizerId,
+                  ...params
+                }
+              );
+
+              const fnName = input.functionArn.split(":").at(-1);
+
+              if (!fnName) {
+                return yield* Effect.die("Function name is undefined");
+              }
+
+              yield* lambda_permission.addInvokeFunctionByGatewayPermission({
+                apiId: projectApi.apiId,
+                functionName: fnName
               });
 
-            const current =
-              yield* pipe(
-                gatewayView.getApiAuthorizers(apiId),
-                Effect.andThen(result => result.find(_ => _.Name == authorizer.id))
-              );
-
-            const result =
-              yield* pipe(
-                Match.value(current),
-                Match.when(({ AuthorizerId: Match.defined }), ({ AuthorizerId }) =>
-                  $.client.execute(
-                    "updateAuthorizer",
-                    {
-                      AuthorizerId,
-                      ...params
-                    }
-                  )
-                ),
-                Match.orElse(() =>
-                  $.client.execute(
-                    "createAuthorizer",
-                    {
-                      ...params
-                    }
-                  )
-                ),
-              );
-
-            yield* fnSettings.addInvokeFunctionByGatewayPermission(lambda.FunctionArn, apiId);
-
-            return result;
-
-          });
+            });
 
         return {
           upsertLambdaAuthorizer
@@ -85,9 +94,8 @@ export class ApiGatewayHttpAuthorizerManageService
 
     dependencies: [
       Apigatewayv2ClientService.Default,
-      GatewayAuthorizerViewService.Default,
+      ApiGatewayHttpAuthorizerViewService.Default,
       LambdaFunctionViewService.Default,
       LambdaFunctionPermissionService.Default,
     ]
   }) { }
-

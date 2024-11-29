@@ -2,7 +2,7 @@ import * as Effect from "effect/Effect";
 import * as S from "effect/Schema";
 
 import { SqsClientService } from "../../client.js"
-import { ValidQueueMessage } from "../types/common.js";
+import { ValidQueueMessage } from "../schema/common.js";
 import { SqsQueueFactoryService } from "../../queue/service/factory.js";
 
 export class SqsQueueMessageReceiveService
@@ -10,20 +10,18 @@ export class SqsQueueMessageReceiveService
     effect:
       Effect.gen(function* () {
 
-        const $ = {
-          client: yield* SqsClientService,
-          factory: yield* SqsQueueFactoryService
-        };
+        const client = yield* SqsClientService;
+        const queue_factory = yield* SqsQueueFactoryService
 
         const receiveMessages =
           (queueName: string) =>
             Effect.gen(function* () {
 
               const queueUrl =
-                $.factory.makeQueueUrl(queueName);
+                queue_factory.makeQueueUrl(queueName);
 
               const messages =
-                yield* $.client.execute(
+                yield* client.execute(
                   "receiveMessage",
                   {
                     QueueUrl: queueUrl,

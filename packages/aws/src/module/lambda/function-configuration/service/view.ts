@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 
-import { LambdaClientService, recoverFromLambdaException } from "../../client.js";
+import { LambdaClientService, recoverFromLambdaException } from "#clients/lambda.js";
 import { LambdaFunctionConfiguration } from "../schema.js";
 
 export class LambdaFunctionConfigurationViewService

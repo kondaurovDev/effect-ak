@@ -2,22 +2,22 @@ import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 import type * as Sdk from "@aws-sdk/client-dynamodb";
 
-import { DynamoDbClient } from "../../client.js";
+import { DynamodbClientService } from "#clients/dynamodb.js";
 
 export class DynamoDbManageService
   extends Effect.Service<DynamoDbManageService>()("DynamoDbManageService", {
     effect:
       Effect.gen(function* () {
 
-        const ddb = yield* DynamoDbClient;
+        const client = yield* DynamodbClientService;
 
         const createTable = (
           commandInput: Sdk.CreateTableCommandInput
         ) =>
           pipe(
-            ddb.execute(
-              "create table", _ =>
-              _.createTable(commandInput)
+            client.execute(
+              "createTable",
+              commandInput
             )
           )
 
@@ -25,9 +25,9 @@ export class DynamoDbManageService
           commandInput: Sdk.UpdateTableCommandInput
         ) =>
           pipe(
-            ddb.execute(
-              "update table", _ =>
-              _.updateTable(commandInput)
+            client.execute(
+              "updateTable",
+              commandInput
             )
           )
 
@@ -37,6 +37,6 @@ export class DynamoDbManageService
 
       }),
       dependencies: [
-        DynamoDbClient.Default
+        DynamodbClientService.Default
       ]
   }) { }

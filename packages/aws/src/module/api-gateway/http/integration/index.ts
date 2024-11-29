@@ -1,2 +1,2 @@
 export * from "./service/lambda.js"
-export * from "./service/search.js"
+export * from "./service/view.js"

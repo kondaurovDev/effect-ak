@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 import * as S from "effect/Schema";
-import { AwsProjectIdConfig } from "../../../internal/configuration.js";
+import { AwsProjectIdConfig } from "#core/index.js";
 
 export type IamRoleArn = typeof IamRoleArn.Type
 export const IamRoleArn = 
@@ -28,7 +28,7 @@ export const makeIamRoleNamePrefixed =
     Effect.gen(function* () {
       yield* S.validate(IamRoleName)(input);
 
-      const { projectId } = yield* AwsProjectIdConfig;
+      const projectId = yield* AwsProjectIdConfig;
 
       return IamRoleNamePrefixed.make(`${projectId}-${input}`)
     });

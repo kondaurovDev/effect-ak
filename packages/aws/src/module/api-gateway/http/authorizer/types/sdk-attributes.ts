@@ -1,6 +1,13 @@
 import { pipe } from "effect";
 import * as S from "effect/Schema";
 
+export const AuthorizerName =
+  pipe(
+    S.String
+  ).annotations({
+    title: "AuthorizerName"
+  });
+
 export const AuthorizerResultTtlInSeconds =
   pipe(
     S.Number,
@@ -18,7 +25,6 @@ export const AuthorizerResultTtlInSeconds =
 export const IdentitySource =
   pipe(
     S.String.pipe(S.NonEmptyArray),
-    S.optional
   ).annotations({
     title: "IdentitySource"
   });

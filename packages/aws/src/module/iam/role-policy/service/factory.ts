@@ -2,7 +2,7 @@ import * as Effect from "effect/Effect"
 import * as Data from "effect/Data"
 
 import * as S from "../schema.js";
-import { AwsServiceName } from "../../../const.js";
+import { AwsServiceName } from "#module/const.js";
 
 export class IamRolePolicyFactoryService
   extends Effect.Service<IamRolePolicyFactoryService>()("IamRolePolicyFactoryService", {

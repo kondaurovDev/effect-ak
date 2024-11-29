@@ -1,10 +1,10 @@
-import type { AwsRegionSchema } from "../../../../internal/configuration.js";
-import type { LambdaFunctionArn } from "../../../lambda/index.js";
-import { api_gateway_arn_beginning } from "../const.js";
+import type { AwsRegion } from "#core/index.js";
+import type { LambdaFunctionArn } from "#module/lambda/index.js";
+import { api_gateway_arn_beginning } from "../brands.js";
 
 export const makeLambdaFunctionAuthorizerArnFrom =
   (input: {
-    region: AwsRegionSchema,
+    region: AwsRegion,
     functionArn: LambdaFunctionArn
   }) =>
     [

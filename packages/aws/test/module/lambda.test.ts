@@ -4,7 +4,7 @@ import { assert, it } from "vitest";
 
 import CodeBlockWriter from "code-block-writer";
 
-import * as Lambda from "../../src/module/lambda";
+import * as Lambda from "#module/lambda/index.js";
 
 describe("lambda, function configuration", () => {
 

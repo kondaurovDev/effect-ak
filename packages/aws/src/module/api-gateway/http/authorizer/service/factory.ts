@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect";
 
 import type { LambdaFunctionArn } from "../../../../lambda/index.js";
-import { AwsRegionConfig } from "../../../../../internal/configuration.js";
+import { AwsRegionConfig } from "../../../../../core/index.js";
 import { makeLambdaFunctionAuthorizerArnFrom } from "../const.js";
 
 export class ApiGatewayHttpAuthorizerFactoryService

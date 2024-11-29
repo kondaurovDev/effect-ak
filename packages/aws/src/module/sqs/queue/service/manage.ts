@@ -3,10 +3,10 @@ import * as Equal from "effect/Equal"
 
 import { SqsClientService } from "../../client.js"
 import { SqsQueueViewService } from "./view.js"
-import { QueueAttributes } from "../types/queue-attributes.js"
-import { AwsProjectIdConfig } from "../../../../internal/configuration.js";
+import { QueueAttributes } from "../schema/queue-attributes.js"
+import { AwsProjectIdConfig } from "../../../../core/service/configuration-provider.js";
 import { SqsQueueFactoryService } from "./factory.js";
-import { QueueName } from "../types/common.js"
+import { QueueName } from "../schema/common.js"
 
 export class SqsQueueManageService
   extends Effect.Service<SqsQueueManageService>()("SqsQueueManageService", {

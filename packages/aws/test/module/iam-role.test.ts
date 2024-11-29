@@ -1,14 +1,14 @@
 import { describe, it, assert } from "vitest";
 import { Effect, Equal } from "effect";
 
-import { Util } from "@effect-ak/misc"
+import { Utils } from "@effect-ak/misc"
 
-import * as Iam from "../../src/module/iam";
-import { AwsProjectIdConfig } from "../../src/internal";
+import * as Iam from "#module/iam/index.js";
+import { AwsProjectIdConfig } from "#core/index.js";
 
 describe("iam role service", () => {
 
-  const a = it("check quality of role policy document", async () => {
+  it("check quality of role policy document", async () => {
 
     const program =
       await Effect.gen(function* () {
@@ -56,7 +56,7 @@ describe("iam role service", () => {
 
         const manageRole = yield* Iam.IamRoleManageService;
 
-        const { projectId } = yield* AwsProjectIdConfig;
+        const projectId = yield* AwsProjectIdConfig;
 
         const input = {
           roleName: "lambda1"
@@ -75,7 +75,7 @@ describe("iam role service", () => {
           Iam.IamRoleManageService.Default,
         ]),
         Effect.provide([
-          Util.LogLevelConfigFromEnv,
+          Utils.LogLevelConfigFromEnv,
         ]),
         Effect.tapErrorCause(error =>
           Effect.logError("some error", error)
@@ -106,7 +106,7 @@ describe("iam role service", () => {
           Iam.IamRoleManageService.Default,
         ]),
         Effect.provide([
-          Util.LogLevelConfigFromEnv,
+          Utils.LogLevelConfigFromEnv,
         ]),
         Effect.tapErrorCause(error =>
           Effect.logError("some error", error)

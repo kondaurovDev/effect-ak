@@ -1,9 +1,9 @@
 import * as Effect from "effect/Effect";
 import type { MetricDatum } from "@aws-sdk/client-cloudwatch";
 
-import * as I from "../_schema/command.js";
-import { AwsProjectIdConfig } from "../../../../internal/configuration.js";
-import { CloudwatchClientService } from "../../client.js";
+import { AwsProjectIdConfig } from "#core/index.js";
+import { CloudwatchClientService } from "#clients/cloudwatch.js";
+import * as S from "../schema/command.js";
 
 export class CloudwatchMetricPublishService extends
   Effect.Service<CloudwatchMetricPublishService>()(`CloudwatchMetricPublishService`, {
@@ -27,9 +27,9 @@ export class CloudwatchMetricPublishService extends
             );
 
         const publishProcessorMetric =
-          (input: I.PublishProcessorMetric) =>
+          (input: S.PublishProcessorMetric) =>
             publishMetric({
-              namespace: projectId.projectId,
+              namespace: projectId,
               data: [
                 {
                   MetricName: input.metricName,

@@ -1,9 +1,8 @@
 import * as Effect from "effect/Effect";
 
-import { QueueAttributes, QueueType, SdkQueueAttributes } from "../types/queue-attributes.js";
-import { makeQueueUrlFrom, QueueMetadata, QueueName } from "../types/common.js";
-import { AwsRegionConfig } from "../../../../internal/configuration.js";
-import { StsService } from "../../../sts/service.js";
+import { CoreConfigurationProviderService } from "#core/service/configuration-provider.js";
+import { QueueAttributes, QueueType, SdkQueueAttributes } from "../schema/queue-attributes.js";
+import { makeQueueUrlFrom, QueueMetadata, QueueName } from "../schema/common.js";
 
 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html#API_SetQueueAttributes_RequestParameters
 
@@ -12,8 +11,7 @@ export class SqsQueueFactoryService
     effect:
       Effect.gen(function* () {
 
-        const region = yield* AwsRegionConfig;
-        const { accountId } = yield* StsService;
+        const { accountId } = yield* CoreConfigurationProviderService;
 
         const makeQueueArn =
           (queueName: QueueName): typeof QueueMetadata.fields.arn.Type =>

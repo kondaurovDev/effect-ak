@@ -15,18 +15,16 @@ export class SqsQueueMessageSendService
     effect:
       Effect.gen(function* () {
 
-        const $ = {
-          client: yield* SqsClientService,
-          factory: yield* SqsQueueFactoryService
-        };
+        const client = yield* SqsClientService;
+        const queue_factory = yield* SqsQueueFactoryService
 
         const sendMessage =
           (queueName: string, message: Message) => {
             const queueUrl =
-              $.factory.makeQueueUrl(queueName);
+              queue_factory.makeQueueUrl(queueName);
 
             const response =
-              $.client.execute(
+              client.execute(
                 "sendMessage",
                 {
                   QueueUrl: queueUrl,
@@ -47,13 +45,13 @@ export class SqsQueueMessageSendService
           (queueName: string, ...messages: Message[]) => {
 
             const queueUrl =
-              $.factory.makeQueueUrl(queueName);
+              queue_factory.makeQueueUrl(queueName);
 
             const forResult =
               Effect.forEach(
                 Array.split(10)(messages),
                 chunk =>
-                  $.client.execute(
+                  client.execute(
                     "sendMessageBatch",
                     {
                       QueueUrl: queueUrl,

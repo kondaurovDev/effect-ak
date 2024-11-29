@@ -2,12 +2,12 @@ import * as S from "effect/Schema"
 import * as Equal from "effect/Equal"
 import * as Effect from "effect/Effect"
 
-import { AwsProjectIdConfig, awsSdkModuleName } from "../../../../internal/index.js"
-import { IamClientService } from "../../client.js"
-import * as Policy from "../../role-policy/index.js"
-import { IamRoleViewService } from "./view.js";
+import { awsSdkModuleName, CoreConfigurationProviderService } from "#core/index.js"
+import { IamClientService } from "#clients/iam.js"
+import * as Policy from "#module/iam/role-policy/index.js"
+import { AwsServiceName } from "#module/const.js";
 import { IamRoleArn, IamRoleName } from "../schema.js";
-import { AwsServiceName } from "../../../const.js";
+import { IamRoleViewService } from "./view.js";
 
 export class IamRoleManageService
   extends Effect.Service<IamRoleManageService>()("IamRoleManageService", {
@@ -16,12 +16,12 @@ export class IamRoleManageService
 
         const iam = yield* IamClientService;
         const roleView = yield* IamRoleViewService;
-        const pId = yield* AwsProjectIdConfig;
+        const configProvider = yield* CoreConfigurationProviderService;
         const policyFactory = yield* Policy.IamRolePolicyFactoryService;
 
         yield* Effect.logDebug("IamRoleManageService is ready");
 
-        const makeRoleName = (input: string) => `${pId.projectId}-${input}`
+        const makeRoleName = (input: string) => `${configProvider.projectId}-${input}`
 
         const upsertRole =
           (input: {
@@ -79,12 +79,7 @@ export class IamRoleManageService
                         RoleName: makeRoleName(input.roleName),
                         Path: `/${awsSdkModuleName}/`,
                         AssumeRolePolicyDocument: jsonDocument,
-                        Tags: [
-                          {
-                            Key: pId.projectIdKeyName,
-                            Value: pId.projectId
-                          }
-                        ]
+                        Tags: configProvider.resourceTagsKeyValue
                       }
                     )
 
@@ -141,6 +136,7 @@ export class IamRoleManageService
     dependencies: [
       IamRoleViewService.Default,
       IamClientService.Default,
-      Policy.IamRolePolicyFactoryService.Default
+      Policy.IamRolePolicyFactoryService.Default,
+      CoreConfigurationProviderService.Default
     ]
   }) { }

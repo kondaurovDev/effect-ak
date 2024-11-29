@@ -4,15 +4,10 @@ import * as S from "effect/Schema";
 import * as Match from "effect/Match";
 import { CreateIntegrationCommand, UpdateIntegrationCommand } from "@aws-sdk/client-apigatewayv2";
 
-import { LambdaFunctionInfoService, FunctionName, LambdaFunctionSettingsService } from "../../../lambda/function/index.js";
-import { ApiId } from "../../main/types.js";
-import { IntegrationDescription, IntegrationId } from "../types.js";
-import { ApiGatewayClient } from "../../client.js";
-
-import { GatewayIntegrationViewService } from "./search.js";
+import { HttpApiGatewayIntegrationViewService } from "./view.js";
 
 export class ApiGatewayHttpIntegrationLambdaService
-  extends Effect.Service<GatewayIntegrationLambdaService>()("GatewayIntegrationLambdaService", {
+  extends Effect.Service<ApiGatewayHttpIntegrationLambdaService>()("ApiGatewayHttpIntegrationLambdaService", {
     effect:
       Effect.gen(function* () {
 

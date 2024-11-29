@@ -21,8 +21,15 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "gen": "tsx scripts/main.ts",
     "compile": "tsc -b tsconfig.src.json",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
+  },
+  "imports": {
+    "#*": {
+      "effect-ak-dev": "./src/*",
+      "default": "./dist/*"
+    }
   },
   "dependencies": {
     "@aws-sdk/client-apigatewayv2": "^3.699.0",
@@ -46,6 +53,7 @@
     "@effect/platform-node": "catalog:",
     "code-block-writer": "^13.0.3",
     "effect": "catalog:",
+    "type-fest": "^4.29.0",
     "ts-morph": "^24.0.0"
   },
   "peerDependencies": {

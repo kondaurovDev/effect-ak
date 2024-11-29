@@ -1,6 +1,7 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
-import { SsmClientService } from "../../client.js";
+
+import { SsmClientService } from "#clients/ssm.js";
 
 export class SsmParameterHierarchyService
   extends Effect.Service<SsmParameterHierarchyService>()("SsmParameterHierarchyService", {
@@ -15,12 +16,12 @@ export class SsmParameterHierarchyService
           }) =>
             pipe(
               ssm.execute(
-                `getting parameters from parameter store, ${input.start}`,
-                _ => _.getParametersByPath({
+                `getParametersByPath`,
+                {
                   Path: input.start,
                   Recursive: true,
                   WithDecryption: true
-                })
+                }
               ),
               Effect.andThen(_ => _.Parameters),
               Effect.andThen(parameters => {

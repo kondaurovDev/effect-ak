@@ -1,11 +1,10 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 
-import { LambdaClientService, LambdaMethodInput, recoverFromLambdaException } from "../../client.js";
+import { LambdaClientService, LambdaMethodInput, recoverFromLambdaException } from "#clients/lambda.js";
 import { LambdaFunctionName } from "../schema.js";
-import { makeExecuteApiArnFrom } from "../../../api-gateway/http/const.js";
-import { AwsRegionConfig } from "../../../../internal/configuration.js";
-import { StsService } from "../../../sts/service.js";
+import { makeExecuteApiArnFrom } from "#module/api-gateway/http/index.js";
+import { CoreConfigurationProviderService } from "#core/index.js";
 
 export class LambdaFunctionPermissionService
   extends Effect.Service<LambdaFunctionPermissionService>()("LambdaFunctionPermissionService", {
@@ -13,8 +12,7 @@ export class LambdaFunctionPermissionService
       Effect.gen(function* () {
 
         const lambda = yield* LambdaClientService;
-        const region = yield* AwsRegionConfig;
-        const { accountId } = yield* StsService;
+        const { accountId, region } = yield* CoreConfigurationProviderService;
 
         const addPermission =
           (input: LambdaMethodInput<"addPermission">) =>
@@ -48,7 +46,7 @@ export class LambdaFunctionPermissionService
               Principal: "apigateway.amazonaws.com",
               SourceArn:
                 makeExecuteApiArnFrom({
-                  apiId: input.apiId, region, accountId
+                  apiId: input.apiId, region, accountId: yield* accountId
                 })
             })
 

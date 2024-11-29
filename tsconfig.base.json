@@ -14,11 +14,13 @@
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "incremental": true,
+    "customConditions": ["effect-ak-dev"],
     "paths": {
-      "@efkit/shared": ["./packages/shared/src/index.js"],
-      "@efkit/tg-bot": ["./packages/tg-bot/src/index.js"],
-      "@efkit/ai": ["./packages/ai/src/index.js"],
-      "@efkit/google": ["./packages/google/src/index.js"],
+      "@effect-ak/ai": ["./packages/ai/src/index.js"],
+      "@effect-ak/aws": ["./packages/aws/src/index.js"],
+      "@effect-ak/google-api": ["./packages/google-api/src/index.js"],
+      "@effect-ak/misc": ["./packages/misc/src/index.js"],
+      "@effect-ak/tg-bot": ["./packages/tg-bot/src/index.js"],
     }
   },
   "exclude": [

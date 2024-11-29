@@ -4,8 +4,8 @@ import * as Match from "effect/Match";
 import * as Config from "effect/Config";
 import { NodeCodeBundlerService, NodeZipService } from "@effect-ak/misc/node";
 
-import { AwsProjectIdConfig } from "../../../../internal/configuration.js";
-import { awsSdkModuleName } from "../../../../internal/const.js";
+import { AwsProjectIdConfig } from "../../../../core/service/configuration-provider.js";
+import { awsSdkModuleName } from "../../../../core/const.js";
 import * as S from "../schema.js";
 
 export class LambdaFunctionFactoryService

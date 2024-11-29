@@ -2,7 +2,7 @@ import * as Brand from "effect/Brand";
 import type * as Sdk from "@aws-sdk/client-apigatewayv2";
 import * as S from "effect/Schema";
 
-import { LambdaFunctionName } from "../../../lambda/index.js";
+import { LambdaFunctionArn } from "#module/lambda/index.js";
 import * as A from "./types/sdk-attributes.js";
 
 export type SdkAuthorizer = Sdk.Authorizer & Brand.Brand<"Authorizer">;
@@ -31,7 +31,8 @@ export const CreateOrUpdateAuthorizer = Brand.nominal<CreateOrUpdateAuthorizer>(
 
 export class LambdaAuthorizer
   extends S.Class<LambdaAuthorizer>("LambdaAuthorizer")({
-    functionName: LambdaFunctionName,
+    name: A.AuthorizerName,
+    functionArn: LambdaFunctionArn,
     cacheTtl: A.AuthorizerResultTtlInSeconds,
     identitySources: A.IdentitySource,
   }) { }

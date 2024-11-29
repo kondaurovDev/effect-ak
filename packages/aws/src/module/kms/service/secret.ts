@@ -2,8 +2,8 @@ import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 import * as Cause from "effect/Cause";
 
-import { KmsClientService } from "../client.js";
-import { NodeTextConversionService } from "packages/misc/dist/node/index.js";
+import { KmsClientService } from "#clients/kms.js";
+import { NodeTextConversionService } from "@effect-ak/misc/node";
 
 export class KmsSecretService
   extends Effect.Service<KmsSecretService>()("KmsSecretService", {

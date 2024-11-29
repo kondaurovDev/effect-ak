@@ -2,8 +2,8 @@ import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 import type { Runtime } from "@aws-sdk/client-lambda";
 
-import type { IamRoleArn } from "../../../iam/index.js";
-import { LambdaClientService, recoverFromLambdaException } from "../../client.js";
+import type { IamRoleArn } from "#module/iam/index.js";
+import { LambdaClientService, recoverFromLambdaException } from "#clients/lambda.js";
 import { LambdaFunctionConfiguration } from "../../function-configuration/schema.js";
 import { LambdaFunctionConfigurationManageService } from "../../function-configuration/index.js";
 import { LambdaFunctionFactoryService } from "./factory.js";

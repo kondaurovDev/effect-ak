@@ -2,7 +2,7 @@ import * as Effect from "effect/Effect";
 import * as Equal from "effect/Equal";
 import * as Schema from "effect/Schema";
 
-import { LambdaClientService } from "../../client.js";
+import { LambdaClientService } from "#clients/lambda.js";
 import { LambdaFunctionConfiguration } from "../schema.js";
 import { LambdaFunctionConfigurationViewService } from "./view.js";
 import { LambdaFunctionConfigurationFactoryService } from "./factory.js";

@@ -3,7 +3,8 @@ import * as S from "effect/Schema";
 import * as Effect from "effect/Effect";
 import { DataFormatJsonService } from "@effect-ak/misc/data-format";
 
-import { SsmClientService } from "../../client.js";
+import { SsmClientService } from "#clients/ssm.js";
+import { CoreConfigurationProviderService } from "#core/service/configuration-provider.js";
 
 export class SsmParameterJsonService
   extends Effect.Service<SsmParameterJsonService>()("SsmParameterJsonService", {
@@ -12,6 +13,7 @@ export class SsmParameterJsonService
 
         const ssm = yield* SsmClientService;
         const jsonFormat = yield* DataFormatJsonService
+        const { projectId, resourceTagsKeyValue } = yield* CoreConfigurationProviderService;
 
         const get =
           (input: {
@@ -19,11 +21,11 @@ export class SsmParameterJsonService
           }) =>
             pipe(
               ssm.execute(
-                "getting json parameter",
-                _ => _.getParameter({
+                "getParameter",
+                {
                   Name: input.parameterName,
-                  WithDecryption: true
-                })
+                  WithDecryption: true,
+                }
               ),
               Effect.andThen(_ => _?.Parameter?.Value),
               Effect.andThen(value =>
@@ -40,17 +42,18 @@ export class SsmParameterJsonService
             parameterName: string,
             value: unknown,
             secured: boolean
-          }) =>
+          }) => 
             pipe(
               jsonFormat.encode(input.value),
               Effect.andThen(encoded =>
                 ssm.execute(
-                  "putting json parameter",
-                  _ => _.putParameter({
-                    Name: input.parameterName,
+                  "putParameter",
+                  {
+                    Name: `/${projectId}/${input.parameterName}`,
                     Value: encoded,
-                    Type: input.secured ? "SecureString" : "String"
-                  })
+                    Type: input.secured ? "SecureString" : "String",
+                    Tags: resourceTagsKeyValue
+                  }
                 )
               )
             );

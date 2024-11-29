@@ -1,11 +1,12 @@
 import * as S from "effect/Schema";
 
 import { EventSource } from "../event-source/types.js";
+import { lambda_function_arn_beginning } from "./const.js";
 
 export type LambdaFunctionArn = typeof LambdaFunctionArn.Type
 export const LambdaFunctionArn = 
   S.TemplateLiteral(
-    "arn:aws:lambda::", S.String, ":", S.Number, ":function:", S.String
+    lambda_function_arn_beginning, S.String, ":", S.Number, ":function:", S.String
   );
 
 export type LambdaFunctionSourceCode =

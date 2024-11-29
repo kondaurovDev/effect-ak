@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect";
 
-import { GlobalContextTag } from "../../../../internal/global-context.js";
-import { SsmClientService } from "../../client.js";
+import { SsmClientService } from "#clients/ssm.js";
+import { CoreConfigurationProviderService } from "#core/service/configuration-provider.js";
 
 export class SsmParameterPlainService
   extends Effect.Service<SsmParameterPlainService>()("SsmParameterPlainService", {
@@ -9,7 +9,7 @@ export class SsmParameterPlainService
       Effect.gen(function* () {
 
         const ssm = yield* SsmClientService;
-        const ctx = yield* GlobalContextTag;
+        const { projectId, resourceTagsKeyValue } = yield* CoreConfigurationProviderService;
 
         const put =
           (input: {
@@ -18,12 +18,13 @@ export class SsmParameterPlainService
             secured: boolean
           }) =>
             ssm.execute(
-              "put parameter",
-              _ => _.putParameter({
-                Name: `/${ctx.projectId}/${input.parameterName}`,
+              "putParameter",
+              {
+                Name: `/${projectId}/${input.parameterName}`,
                 Value: input.value,
-                Type: input.secured ? "SecureString" : "String"
-              })
+                Type: input.secured ? "SecureString" : "String",
+                Tags: resourceTagsKeyValue
+              }
             );
 
         const get =
@@ -32,11 +33,11 @@ export class SsmParameterPlainService
             decrypt: boolean
           }) =>
             ssm.execute(
-              "get parameter",
-              _ => _.getParameter({
+              "getParameter",
+              {
                 Name: input.parameterName,
                 WithDecryption: input.decrypt
-              })
+              }
             ).pipe(
               Effect.andThen(_ => _.Parameter?.Value)
             )

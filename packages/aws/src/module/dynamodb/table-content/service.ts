@@ -1,16 +1,15 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import type * as Sdk from "@aws-sdk/client-dynamodb";
 
-import { DynamoDbClient } from "../client.js";
+import { DynamodbClientService, DynamodbMethodInput } from "#clients/dynamodb.js";
 
 export class DynamoDbTableContentService
   extends Effect.Service<DynamoDbTableContentService>()("DynamoDbTableContentService", {
     effect:
       Effect.gen(function* () {
 
-        const ddb = yield* DynamoDbClient;
+        const client = yield* DynamodbClientService;
 
         const marshallUnknown = (
           input: unknown,
@@ -32,28 +31,28 @@ export class DynamoDbTableContentService
           marshallUnknown(key, false)
       
         const updateItem = (
-          command: Sdk.UpdateItemCommandInput
+          command: DynamodbMethodInput<"updateItem">
         ) =>
-          ddb.execute(
-            "put item", _ =>
-            _.updateItem(command)
+          client.execute(
+            "updateItem",
+            command
           )
       
         const putItem = (
-          command: Sdk.PutItemCommandInput
+          command: DynamodbMethodInput<"putItem">
         ) =>
-          ddb.execute(
-            "put item", _ =>
-            _.putItem(command)
+          client.execute(
+            "putItem",
+            command
           )
       
         const query = (
-          command: Sdk.QueryCommandInput
+          command: DynamodbMethodInput<"query">
         ) =>
           pipe(
-            ddb.execute(
-              "query items", _ =>
-              _.query(command)
+            client.execute(
+              "query",
+              command
             ),
             Effect.andThen(_ => _.Items ?? []),
             Effect.andThen(
@@ -64,11 +63,11 @@ export class DynamoDbTableContentService
           );
       
         const batchWrite = (
-          command: Sdk.BatchWriteItemCommandInput
+          command: DynamodbMethodInput<"batchWriteItem">
         ) =>
-          ddb.execute(
-            "batch write items", _ =>
-            _.batchWriteItem(command)
+          client.execute(
+            "batchWriteItem",
+            command
           )
       
         /**
@@ -77,12 +76,12 @@ export class DynamoDbTableContentService
          * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html
          */
         const getOne = (
-          command: Sdk.GetItemCommandInput
+          command: DynamodbMethodInput<"getItem">
         ) =>
           pipe(
-            ddb.execute(
-              "get item", _ =>
-              _.getItem(command)
+            client.execute(
+              "getItem",
+              command
             ),
             Effect.andThen(_ => _.Item),
             Effect.andThen(item =>
@@ -98,12 +97,12 @@ export class DynamoDbTableContentService
          * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html
          */
         const deleteItem = (
-          command: Sdk.DeleteItemCommandInput
+          command: DynamodbMethodInput<"deleteItem">
         ) =>
           pipe(
-            ddb.execute(
-              "delete item", _ =>
-              _.deleteItem(command)
+            client.execute(
+              "deleteItem",
+              command
             )
           )
       
@@ -115,6 +114,6 @@ export class DynamoDbTableContentService
 
       }), 
       dependencies: [
-        DynamoDbClient.Default
+        DynamodbClientService.Default
       ]
   }) {}

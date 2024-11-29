@@ -2,7 +2,7 @@ import * as S from "effect/Schema";
 import * as HttpBody from "@effect/platform/HttpBody";
 
 import { isMessageEffect, messageEffectIdCodesMap } from "./message-effect.js";
-import { FileWithContent } from "../module/chat/schema/commands.js";
+import { FileWithContent } from "#module/chat/schema/commands.js";
 
 export const makePayload = (
   body: Record<string, unknown>

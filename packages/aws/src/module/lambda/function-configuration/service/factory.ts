@@ -4,7 +4,7 @@ import * as Schema from "effect/Schema";
 import * as Config from "effect/Config";
 import { NodeCodeBundlerService } from "@effect-ak/misc/node";
 
-import { awsSdkModuleName } from "../../../../internal/const.js";
+import { awsSdkModuleName } from "../../../../core/const.js";
 import { LambdaFunctionConfiguration } from "../schema.js";
 
 export class LambdaFunctionConfigurationFactoryService

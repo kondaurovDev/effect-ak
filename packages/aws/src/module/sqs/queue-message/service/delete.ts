@@ -1,27 +1,25 @@
 import * as Effect from "effect/Effect";
 
-import { SqsClientService } from "../../client.js"
 import { SqsQueueFactoryService } from "../../queue/index.js"
-import { ReceiptHandle } from "../types/common.js";
+import { ReceiptHandle } from "../brands.js";
+import { SqsClientService } from "#clients/sqs.js";
 
 export class SqsQueueMessageDeleteService
   extends Effect.Service<SqsQueueMessageDeleteService>()("SqsQueueMessageDeleteService", {
     effect:
       Effect.gen(function* () {
 
-        const $ = {
-          client: yield* SqsClientService,
-          factory: yield* SqsQueueFactoryService
-        };
+        const client = yield* SqsClientService;
+        const queue_factory = yield* SqsQueueFactoryService
 
         const deleteBatch =
           (queueName: string, ...ids: ReceiptHandle[]) => {
 
             const queueUrl =
-              $.factory.makeQueueUrl(queueName);
+              queue_factory.makeQueueUrl(queueName);
 
             const response =
-              $.client.execute(
+              client.execute(
                 "deleteMessageBatch",
                 {
                   QueueUrl: queueUrl,

@@ -1,6 +1,6 @@
 import * as Sdk from "@aws-sdk/client-resource-groups-tagging-api";
 import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "../../internal/index.js";
+import { AwsRegionConfig } from "../../core/domain/index.js";
 
 // *****  GENERATED CODE *****
 export class ResourceGroupsTaggingApiClientService extends

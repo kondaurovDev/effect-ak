@@ -1,2 +1,2 @@
-export * from "./deploy/index.js"
+export * from "./public/index.js"
 export * from "./module/index.js"
