@@ -70,7 +70,17 @@ npx codegen-aws-sdk-clients
 
 ### Optional: Create a Configuration File
 
+The generated code will be placed under `src/clients` if not defined via configuration.
+The list of SDK clients is taken from `package.json` (dependencies, devDependencies), but you can configure it via configuration as well.
+
 Create a `codegen-aws-sdk-clients.json` file in the root of your project to customize the generator’s settings.
+
+```json
+{
+  "target_dir": ["src", "generated-clients" ],
+  "clients": ["s3", "lambda"],
+}
+```
 
 ## Example Usage
 
@@ -79,7 +89,7 @@ Here’s how you can use the generated SDK client in your project:
 ```typescript
 import { Effect, Console } from "effect";
 
-import { S3ClientService, recoverFromS3Exception } from "../../clients/s3.js"; // path to generated code
+import { S3ClientService, recoverFromS3Exception } from "../generated-clients/s3.js"; // path to generated code
 
 const displayNumberOfObjectsInBucket = Effect.gen(function* () {
   const s3 = yield* S3ClientService;
