@@ -8,12 +8,12 @@ import { generateClientSection } from "./code-sections/service.js";
 import { makeMorphProject } from "./make-project.js";
 
 export type Input = {
-  config: GenerateConfig,
   clientName: string,
+  targetDir: readonly string[],
 } & ReturnType<typeof makeMorphProject>;
 
 const generateOneClient =
-  (input: Pick<Input, "clientName" | "config">) =>
+  (input: Pick<Input, "clientName" | "targetDir">) =>
     Effect.gen(function* () {
       yield* Effect.logInfo(`Generating client (${input.clientName}) =>`);
       const project = yield* Effect.try(() => makeMorphProject(input));
@@ -31,8 +31,10 @@ export const generateAllEffect =
       return yield* Effect.logWarning("No clients to generate");
     }
 
+    const targetDir = config.target_dir ?? Array.make("src", "clients");
+
     yield* Effect.forEach(config.clients, clientName => {
-      return generateOneClient({ clientName, config });
+      return generateOneClient({ clientName, targetDir });
     })
   });
 
@@ -40,7 +42,8 @@ const readFileContent =
   (fileName: string) =>
     pipe(
       Effect.tryPromise(() => readFile(fileName)),
-      Effect.andThen(_ => _.toString("utf-8"))
+      Effect.andThen(_ => _.toString("utf-8")),
+      Effect.catchTag("UnknownException", () => Effect.succeed(undefined))
     );
 
 const PackageJson = 
@@ -61,7 +64,7 @@ export const generateAll =
         Effect.gen(function*() {
           const definedConfig = 
             yield* readFileContent("codegen-aws-sdk-clients.json").pipe(
-              Effect.andThen(S.decodeUnknown(S.parseJson(GenerateConfig)))
+              Effect.andThen(S.decodeUnknown(S.parseJson(GenerateConfig).pipe(S.UndefinedOr)))
             );
 
           const packageJson = 
@@ -89,8 +92,8 @@ export const generateAll =
           ] as const;
 
           return GenerateConfigTag.of({ 
-            target_dir: definedConfig.target_dir,
-            clients: definedConfig.clients ?? clientsInPackageJson
+            target_dir: definedConfig?.target_dir,
+            clients: definedConfig?.clients ?? clientsInPackageJson
            });
         })
       ),

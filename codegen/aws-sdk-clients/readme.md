@@ -46,12 +46,6 @@ If I'm not mistaken, there are currently around 400 SDK clients. Different proje
 - **Client Interface**: Defines an interface describing all possible methods supported by the SDK client and their return types.
 - **Client Wrapper**: Generates a wrapper that initializes the SDK client and invokes its methods. This wrapper functions as an [Effect](https://effect.website/) service, ensuring that the SDK client is properly closed when the program terminates. The generated code requires `effect: ^3.10.0`.
 
-### Features
-
-- Simplified client interface with method name as the first argument and parameters as the second.
-- Easier error handling by relying on error names instead of error classes.
-- Automatic code generation tailored to your project’s specific SDK client needs.
-
 ## How to Use It in Your Project
 
 ### Install the Code Generator as a Development Dependency
@@ -61,7 +55,7 @@ Add the code generator to your project’s dev dependencies:
 ```json
 {
   "devDependencies": {
-    "@effect-ak/codegen-aws-sdk-clients": "^1.0.0"
+    "@effect-ak/codegen-aws-sdk-clients": "^0.0.1"
   }
 }
 ```
@@ -85,7 +79,7 @@ Here’s how you can use the generated SDK client in your project:
 ```typescript
 import { Effect, Console } from "effect";
 
-import { S3ClientService, recoverFromS3Exception } from "../../clients/s3.js";
+import { S3ClientService, recoverFromS3Exception } from "../../clients/s3.js"; // path to generated code
 
 const displayNumberOfObjectsInBucket = Effect.gen(function* () {
   const s3 = yield* S3ClientService;

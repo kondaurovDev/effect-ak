@@ -6,7 +6,7 @@ export class GenerateConfigTag
 export class GenerateConfig
   extends S.Class<GenerateConfig>("GenerateConfig")(
     S.Struct({
-      target_dir: S.NonEmptyString.pipe(S.NonEmptyArray),
+      target_dir: S.NonEmptyString.pipe(S.NonEmptyArray, S.optional),
       clients: S.NonEmptyString.pipe(S.Array, S.optional),
     })
   ) { }

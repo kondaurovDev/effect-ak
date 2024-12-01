@@ -4,12 +4,10 @@ import assert from "assert";
 
 import * as Path from "path"
 
-import { GenerateConfig } from "./config.js";
-
-type I = { clientName: string, config: GenerateConfig };
+type I = { clientName: string, targetDir: readonly string[] };
 
 export const makeMorphProject =
-  ({ clientName, config }: I) => {
+  ({ clientName, targetDir }: I) => {
 
     const project =
       new Morph.Project({
@@ -23,9 +21,9 @@ export const makeMorphProject =
     const allClasses = project.getSourceFiles().flatMap(_ => _.getClasses());
     const allInterfaces = project.getSourceFiles().flatMap(_ => _.getInterfaces());
 
-    console.info("classes " + allClasses.length)
+    console.info("classes " + allClasses.length);
 
-    const out = Path.join(".", config.target_dir.join(Path.sep), `${clientName}.ts`);
+    const out = Path.join(".", targetDir.join(Path.sep), `${clientName}.ts`);
     const outputFile = project.createSourceFile(out, "", { overwrite: true });
 
     outputFile.addStatements(_ => _.writeLine("// *****  GENERATED CODE *****"));
