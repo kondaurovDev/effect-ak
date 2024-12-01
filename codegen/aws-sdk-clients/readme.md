@@ -1,4 +1,4 @@
-# AWS SDK Clients Code Generator
+# AWS SDK Clients Code Generator ![NPM Version](https://img.shields.io/npm/v/@effect-ak/codegen-aws-sdk-clients)<br>
 
 ## Why This Package? Motivation Behind Its Creation
 
