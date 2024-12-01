@@ -1,7 +1,6 @@
 import { Effect, pipe, Array, Option } from "effect";
-import assert from "node:assert";
 
-import type { Input } from "../main";
+import type { Input } from "../main.js";
 
 export const generateExceptionsSection =
   ({ outputFile, allClasses, names }: Input) =>
@@ -31,7 +30,9 @@ export const generateExceptionsSection =
 
       const serviceExceptionClass = all.find(_ => _.className.endsWith("ServiceException"));
 
-      assert(serviceExceptionClass, "Can not find service exception class");
+      if (!serviceExceptionClass) {
+        return yield* Effect.fail("Can not find service exception class")
+      }
 
       outputFile.addStatements(writer => {
         writer.blankLine();

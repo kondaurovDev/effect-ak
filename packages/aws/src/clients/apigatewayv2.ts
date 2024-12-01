@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-apigatewayv2";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class Apigatewayv2ClientServiceConfig extends Context.Tag("Apigatewayv2ClientServiceConfig")<Apigatewayv2ClientServiceConfig, Sdk.ApiGatewayV2ClientConfig>() {
+}
+
 export class Apigatewayv2ClientService extends
   Effect.Service<Apigatewayv2ClientService>()("Apigatewayv2ClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "Apigatewayv2" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(Apigatewayv2ClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "Apigatewayv2",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.ApiGatewayV2Client({ region });
+      const client = new Sdk.ApiGatewayV2Client(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

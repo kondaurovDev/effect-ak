@@ -1,28 +1,31 @@
-import { pipe } from "effect/Function";
-import * as String from "effect/String";
+import { pipe, String } from "effect";
 import * as Morph from "ts-morph";
-
 import assert from "assert";
 
-type I = { moduleName: string };
+import * as Path from "path"
 
-export const makeMorphProject = 
-  ({ moduleName }: I)  => {
+import { GenerateConfig } from "./config.js";
+
+type I = { clientName: string, config: GenerateConfig };
+
+export const makeMorphProject =
+  ({ clientName, config }: I) => {
 
     const project =
       new Morph.Project({
         manipulationSettings: {
           indentationText: Morph.IndentationText.TwoSpaces
         }
-      });
+      })
 
-    project.addSourceFilesAtPaths(`./node_modules/@aws-sdk/client-${moduleName}/**/*{.d.ts,.ts}`);
+    project.addSourceFilesAtPaths(`./node_modules/@aws-sdk/client-${clientName}/**/*{.d.ts,.ts}`);
 
     const allClasses = project.getSourceFiles().flatMap(_ => _.getClasses());
+    const allInterfaces = project.getSourceFiles().flatMap(_ => _.getInterfaces());
 
     console.info("classes " + allClasses.length)
 
-    const out = `./src/clients/${moduleName}.ts`;
+    const out = Path.join(".", config.target_dir.join(Path.sep), `${clientName}.ts`);
     const outputFile = project.createSourceFile(out, "", { overwrite: true });
 
     outputFile.addStatements(_ => _.writeLine("// *****  GENERATED CODE *****"));
@@ -30,21 +33,17 @@ export const makeMorphProject =
     outputFile.addImportDeclarations([
       {
         namespaceImport: "Sdk",
-        moduleSpecifier: `@aws-sdk/client-${moduleName}`,
+        moduleSpecifier: `@aws-sdk/client-${clientName}`,
       },
       {
-        namedImports: ["Effect", "Data", "pipe", "Cause"],
+        namedImports: ["Effect", "Data", "pipe", "Cause", "Context", "Option"],
         moduleSpecifier: "effect"
-      },
-      {
-        namedImports: ["AwsRegionConfig"],
-        moduleSpecifier: "#core/index.js"
       }
     ]);
 
-    const capitalizedModuleName = 
+    const capitalizedModuleName =
       pipe(
-        String.capitalize(moduleName),
+        String.capitalize(clientName),
         String.kebabToSnake,
         String.snakeToCamel
       );
@@ -67,7 +66,6 @@ export const makeMorphProject =
     }
 
     return {
-      allClasses, outputFile, names, classes
+      allClasses, allInterfaces, outputFile, names, classes 
     }
   }
-  

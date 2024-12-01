@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-sts";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class StsClientServiceConfig extends Context.Tag("StsClientServiceConfig")<StsClientServiceConfig, Sdk.STSClientConfig>() {
+}
+
 export class StsClientService extends
   Effect.Service<StsClientService>()("StsClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "Sts" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(StsClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "Sts",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.STSClient({ region });
+      const client = new Sdk.STSClient(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

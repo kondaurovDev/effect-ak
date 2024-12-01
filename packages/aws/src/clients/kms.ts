@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-kms";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class KmsClientServiceConfig extends Context.Tag("KmsClientServiceConfig")<KmsClientServiceConfig, Sdk.KMSClientConfig>() {
+}
+
 export class KmsClientService extends
   Effect.Service<KmsClientService>()("KmsClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "Kms" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(KmsClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "Kms",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.KMSClient({ region });
+      const client = new Sdk.KMSClient(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

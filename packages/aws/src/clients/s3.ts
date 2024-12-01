@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-s3";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class S3ClientServiceConfig extends Context.Tag("S3ClientServiceConfig")<S3ClientServiceConfig, Sdk.S3ClientConfig>() {
+}
+
 export class S3ClientService extends
   Effect.Service<S3ClientService>()("S3ClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "S3" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(S3ClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "S3",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.S3Client({ region });
+      const client = new Sdk.S3Client(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

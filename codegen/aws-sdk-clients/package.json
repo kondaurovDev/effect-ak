@@ -1,0 +1,38 @@
+{
+  "name": "@effect-ak/codegen-aws-sdk-clients",
+  "version": "0.0.1",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "description": "Effect-Powered AWS SDK Client Generator",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "url": "https://github.com/kondaurovDev/effect-ak",
+    "directory": "codegen/aws-sdk-clients"
+  },
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "codegen-aws-sdk-clients": "./dist/cjs/run.js"
+  },
+  "scripts": {
+    "build": "pnpm build-esm && pnpm build-cjs",
+    "build-esm": "tsc -b tsconfig.src.json",
+    "build-cjs": "babel dist/esm --plugins @babel/transform-export-namespace-from --plugins @babel/transform-modules-commonjs --out-dir dist/cjs --source-maps",
+    "pack-tar": "pnpm pack --pack-destination ../../dist"
+  },
+  "dependencies": {
+    "ts-morph": "^24.0.0"
+  },
+  "peerDependencies": {
+    "effect": "catalog:"
+  }
+}

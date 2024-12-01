@@ -2,10 +2,10 @@ import { HttpApiBuilder, HttpMiddleware, HttpServer } from "@effect/platform"
 import { NodeHttpServer, NodeRuntime } from "@effect/platform-node"
 import { ConfigProvider, Layer } from "effect"
 import { setConfigProvider } from "effect/Layer"
-import { LogLevelConfigFromEnv } from "@effect-ak/misc"
+import { LogLevelConfigFromEnv } from "@effect-ak/misc/utils"
 import { createServer } from "node:http"
 
-import integrationConfig from "../../packages/ai/integration-config.json"
+import integrationConfig from "../../packages/ai/integration-config.json" assert { type: "json" };
 import { httpApiLive } from "./api/layer.js"
 
 const nodeHttpServer = (

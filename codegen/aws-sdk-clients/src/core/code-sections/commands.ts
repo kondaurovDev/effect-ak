@@ -1,7 +1,7 @@
 import { pipe, Effect, Array, Option, String } from "effect"
 import type { MethodSignatureStructure } from "ts-morph";
 
-import type { Input } from "../main";
+import type { Input } from "../main.js";
 
 export const generateCommandsSection =
   ({ allClasses, names, outputFile }: Input) =>

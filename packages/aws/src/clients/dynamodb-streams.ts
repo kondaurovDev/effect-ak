@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-dynamodb-streams";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class DynamodbStreamsClientServiceConfig extends Context.Tag("DynamodbStreamsClientServiceConfig")<DynamodbStreamsClientServiceConfig, Sdk.DynamoDBStreamsClientConfig>() {
+}
+
 export class DynamodbStreamsClientService extends
   Effect.Service<DynamodbStreamsClientService>()("DynamodbStreamsClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "DynamodbStreams" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(DynamodbStreamsClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "DynamodbStreams",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.DynamoDBStreamsClient({ region });
+      const client = new Sdk.DynamoDBStreamsClient(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

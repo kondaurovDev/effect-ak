@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-resource-groups-tagging-api";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class ResourceGroupsTaggingApiClientServiceConfig extends Context.Tag("ResourceGroupsTaggingApiClientServiceConfig")<ResourceGroupsTaggingApiClientServiceConfig, Sdk.ResourceGroupsTaggingAPIClientConfig>() {
+}
+
 export class ResourceGroupsTaggingApiClientService extends
   Effect.Service<ResourceGroupsTaggingApiClientService>()("ResourceGroupsTaggingApiClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "ResourceGroupsTaggingApi" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(ResourceGroupsTaggingApiClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "ResourceGroupsTaggingApi",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.ResourceGroupsTaggingAPIClient({ region });
+      const client = new Sdk.ResourceGroupsTaggingAPIClient(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

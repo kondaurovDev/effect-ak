@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-sqs";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class SqsClientServiceConfig extends Context.Tag("SqsClientServiceConfig")<SqsClientServiceConfig, Sdk.SQSClientConfig>() {
+}
+
 export class SqsClientService extends
   Effect.Service<SqsClientService>()("SqsClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "Sqs" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(SqsClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "Sqs",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.SQSClient({ region });
+      const client = new Sdk.SQSClient(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

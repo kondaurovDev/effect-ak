@@ -10,9 +10,11 @@
     "start": "pnpm --filter playground run server-dev "
   },
   "devDependencies": {
-    "@types/node": "20.14.8",
+    "@types/node": "^22.10.1",
+    "@babel/cli": "^7.25.9",
+    "@babel/plugin-transform-export-namespace-from": "^7.25.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.25.9",
     "glob": "^11.0.0",
-    "openapi-typescript": "^7.4.1",
     "tsx": "^4.19.2",
     "typescript": "^5.5.4",
     "vitest": "^2.0.5"

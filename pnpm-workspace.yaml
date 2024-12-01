@@ -1,8 +1,10 @@
 packages:
-  - 'packages/*'
-  - 'playground'
+  - codegen/*
+  - packages/*
+  - playground
 
 catalog:
   effect: ^3.10.0
+  "@effect/cli": ^0.48.0
   "@effect/platform": ^0.69.0
   "@effect/platform-node": ^0.64.0

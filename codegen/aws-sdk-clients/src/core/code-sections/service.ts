@@ -1,16 +1,30 @@
 import { Effect } from "effect"
-import type { Input } from "../main";
-import assert from "assert";
+
+import type { Input } from "../main.js";
 
 export const generateClientSection =
-  ({ outputFile, allClasses, names, classes }: Input) =>
+  ({ outputFile, allClasses, names, classes, allInterfaces }: Input) =>
     Effect.gen(function* () {
 
       const serviceName = `${names.capitalizedModuleName}ClientService`;
+      const configTagName = `${serviceName}Config`;
 
       const clientClass = allClasses.find(_ => _.getName()?.endsWith("Client"));
+      const configInterface = allInterfaces.find(_ => _.getName()?.endsWith("ClientConfig"));
 
-      assert(clientClass, "client class not found");
+      if (!clientClass) {
+        return yield* Effect.fail("Client's class not found")
+      }
+
+      if (!configInterface) {
+        return yield* Effect.fail("Client's config interface not found")
+      }
+      
+      outputFile.addClass({
+        name: configTagName,
+        isExported: true,
+        extends: `Context.Tag("${configTagName}")<${configTagName}, Sdk.${configInterface.getName()}>()`
+      });
 
       outputFile.addClass({
         name: serviceName,
@@ -18,11 +32,22 @@ export const generateClientSection =
         extends: `
           Effect.Service<${serviceName}>()("${serviceName}", {
             scoped: Effect.gen(function* () {
-              const region = yield* AwsRegionConfig;
         
-              yield* Effect.logDebug("Creating aws client", { client: "${names.capitalizedModuleName}" });
-        
-              const client = new Sdk.${clientClass.getName()}({ region });
+              const config = 
+                yield* pipe(
+                  Effect.serviceOption(${configTagName}),
+                  Effect.tap(config =>
+                    Effect.logDebug("Creating aws client", {
+                      "name": "${names.capitalizedModuleName}",
+                      "isDefaultConfig": Option.isNone(config)
+                    })
+                  ),
+                  Effect.andThen(
+                    Option.getOrUndefined
+                  )
+                );
+
+              const client = new Sdk.${clientClass.getName()}(config ?? {});
 
               yield* Effect.addFinalizer(() =>
                 pipe(

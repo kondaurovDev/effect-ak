@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-lambda";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class LambdaClientServiceConfig extends Context.Tag("LambdaClientServiceConfig")<LambdaClientServiceConfig, Sdk.LambdaClientConfig>() {
+}
+
 export class LambdaClientService extends
   Effect.Service<LambdaClientService>()("LambdaClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "Lambda" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(LambdaClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "Lambda",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.LambdaClient({ region });
+      const client = new Sdk.LambdaClient(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(

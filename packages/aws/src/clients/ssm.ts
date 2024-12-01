@@ -1,16 +1,29 @@
 import * as Sdk from "@aws-sdk/client-ssm";
-import { Effect, Data, pipe, Cause } from "effect";
-import { AwsRegionConfig } from "#core/index.js";
+import { Effect, Data, pipe, Cause, Context, Option } from "effect";
 
 // *****  GENERATED CODE *****
+export class SsmClientServiceConfig extends Context.Tag("SsmClientServiceConfig")<SsmClientServiceConfig, Sdk.SSMClientConfig>() {
+}
+
 export class SsmClientService extends
   Effect.Service<SsmClientService>()("SsmClientService", {
     scoped: Effect.gen(function*() {
-      const region = yield* AwsRegionConfig;
 
-      yield* Effect.logDebug("Creating aws client", { client: "Ssm" });
+      const config =
+        yield* pipe(
+          Effect.serviceOption(SsmClientServiceConfig),
+          Effect.tap(config =>
+            Effect.logDebug("Creating aws client", {
+              "name": "Ssm",
+              "isDefaultConfig": Option.isNone(config)
+            })
+          ),
+          Effect.andThen(
+            Option.getOrUndefined
+          )
+        );
 
-      const client = new Sdk.SSMClient({ region });
+      const client = new Sdk.SSMClient(config ?? {});
 
       yield* Effect.addFinalizer(() =>
         pipe(
