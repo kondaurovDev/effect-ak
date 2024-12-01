@@ -38,3 +38,8 @@ Contains clients for interacting with the following vendors:
 - HTTP client for interacting with the Telegram Bot API
 - Sending text messages, dice, documents, etc.
 - Service for creating bots using a polling architecture. Bots can be run locally.
+
+## Code generators
+
+### aws-sdk-clients
+![NPM Version](https://img.shields.io/npm/v/@effect-ak/codegen-aws-sdk-clients)<br>
