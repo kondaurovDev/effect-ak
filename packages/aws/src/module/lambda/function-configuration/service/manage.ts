@@ -1,11 +1,9 @@
-import * as Effect from "effect/Effect";
-import * as Equal from "effect/Equal";
-import * as Schema from "effect/Schema";
+import { Effect, Equal } from "effect";
 
 import { LambdaClientService } from "#/clients/lambda.js";
-import { LambdaFunctionConfiguration } from "../schema.js";
 import { LambdaFunctionConfigurationViewService } from "./view.js";
 import { LambdaFunctionConfigurationFactoryService } from "./factory.js";
+import * as S from "../schema/_export.js";
 
 export class LambdaFunctionConfigurationManageService
   extends Effect.Service<LambdaFunctionConfigurationManageService>()("LambdaFunctionConfigurationManageService", {
@@ -20,27 +18,24 @@ export class LambdaFunctionConfigurationManageService
 
         const syncFunctionConfiguration =
           (input: {
-            functionName: string,
-            configuration: LambdaFunctionConfiguration,
-          }) =>
+            functionName: string
+          } & S.LambdaFunctionConfigurationSyncCommand) =>
             Effect.gen(function* () {
 
-              if (!Schema.is(LambdaFunctionConfiguration)(input.configuration)) {
-                yield* Effect.logWarning("input configuration is not an instance of LambdaFunctionConfiguration");
-                return false;
-              }
-
               const currentConfiguration =
+                yield* $.factory.make(input);
+
+              const deployedConfiguration =
                 yield* $.view.get({
                   functionName: input.functionName
                 });
 
-              if (currentConfiguration == null) {
+              if (deployedConfiguration == null) {
                 yield* Effect.logWarning("Function not found");
                 return false;
               }
 
-              if (Equal.equals(currentConfiguration, input.configuration)) {
+              if (Equal.equals(deployedConfiguration, currentConfiguration)) {
                 yield* Effect.logDebug("Function configuration is up to date");
                 return false;
               }
@@ -50,7 +45,7 @@ export class LambdaFunctionConfigurationManageService
                   "updateFunctionConfiguration",
                   {
                     FunctionName: input.functionName,
-                    ...input.configuration
+                    ...currentConfiguration
                   }
                 );
 

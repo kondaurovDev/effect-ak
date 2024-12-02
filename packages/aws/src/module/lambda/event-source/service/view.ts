@@ -1,8 +1,7 @@
-import * as Effect from "effect/Effect";
-import * as Cause from "effect/Cause";
+import { Effect } from "effect";
 
 import { LambdaClientService } from "#/clients/lambda.js";
-import { LambdaFunctionName } from "../../function/schema.js";
+import { LambdaFunctionName } from "#/module/lambda/function/schema/_export.js";
 
 export class LambdaEventSourceViewService
   extends Effect.Service<LambdaEventSourceViewService>()("LambdaEventSourceViewService", {
@@ -22,7 +21,7 @@ export class LambdaEventSourceViewService
               }
             ).pipe(
               Effect.andThen(_ => _.EventSourceMappings),
-              Effect.filterOrFail(_ => _ != null, () => new Cause.RuntimeException("EventSourceMappings is undefined")),
+              Effect.filterOrDieMessage(_ => _ != null, "EventSourceMappings is undefined"),
               Effect.andThen(_ => _.length == 0 ? Effect.succeed(undefined) : Effect.fromNullable(_.at(0)?.UUID))
             )
 

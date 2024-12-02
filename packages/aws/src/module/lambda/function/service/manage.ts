@@ -1,13 +1,10 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
-import type { Runtime } from "@aws-sdk/client-lambda";
 
-import type { IamRoleArn } from "#/module/iam/index.js";
 import { LambdaClientService, recoverFromLambdaException } from "#/clients/lambda.js";
-import { LambdaFunctionConfiguration } from "../../function-configuration/schema.js";
-import { LambdaFunctionConfigurationManageService } from "../../function-configuration/index.js";
+import { LambdaFunctionConfigurationManageService } from "#/module/lambda/function-configuration/service/_export.js";
 import { LambdaFunctionFactoryService } from "./factory.js";
-import { LambdaFunctionSourceCode } from "../schema.js";
+import * as S from "../schema/_export.js";
 
 export class LambdaFunctionManageService
   extends Effect.Service<LambdaFunctionManageService>()("LambdaFunctionManageService", {
@@ -23,7 +20,7 @@ export class LambdaFunctionManageService
         const updateFunctionCode =
           (input: {
             functionName: string,
-            code: LambdaFunctionSourceCode
+            code: S.LambdaFunctionSourceCode
           }) =>
             Effect.gen(function* () {
 
@@ -52,13 +49,7 @@ export class LambdaFunctionManageService
             });
 
         const upsertFunction =
-          (input: {
-            functionName: string,
-            configuration: LambdaFunctionConfiguration,
-            code: LambdaFunctionSourceCode,
-            role: IamRoleArn,
-            runtime: Runtime
-          }) =>
+          (input: S.LambdaFunctionUpsertCommand) =>
             Effect.gen(function* () {
 
               const currentConfiguration =
@@ -75,7 +66,7 @@ export class LambdaFunctionManageService
                       Code: {
                         ZipFile: code
                       },
-                      Role: input.role,
+                      Role: input.iamRole,
                       Runtime: input.runtime,
                       ...input.configuration,
                     }

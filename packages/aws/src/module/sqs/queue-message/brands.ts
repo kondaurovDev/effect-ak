@@ -1,4 +1,4 @@
-import * as Brand from "effect/Brand";
+import { Brand } from "effect";
 import type * as Sdk from "@aws-sdk/client-sqs"
 
 export type SdkMessage = Brand.Branded<Sdk.Message, "SdkMessage">;

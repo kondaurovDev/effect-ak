@@ -41,14 +41,14 @@
     "@aws-sdk/client-ssm": "^3.699.0",
     "@aws-sdk/client-sts": "^3.699.0",
     "@aws-sdk/util-dynamodb": "^3.699.0",
-    "@effect-ak/misc": "workspace:^",
-    "@effect-ak/codegen-aws-sdk-clients": "workspace:^"
+    "@effect-ak/misc": "workspace:^"
   },
   "devDependencies": {
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
     "effect": "catalog:",
-    "type-fest": "^4.29.0"
+    "type-fest": "^4.29.0",
+    "@effect-ak/codegen-aws-sdk-clients": "workspace:^"
   },
   "peerDependencies": {
     "effect": "catalog:"

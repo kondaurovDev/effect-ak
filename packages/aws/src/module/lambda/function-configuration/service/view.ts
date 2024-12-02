@@ -1,8 +1,7 @@
-import * as Effect from "effect/Effect";
-import * as Schema from "effect/Schema";
+import { Effect, Schema } from "effect";
 
 import { LambdaClientService, recoverFromLambdaException } from "#/clients/lambda.js";
-import { LambdaFunctionConfiguration } from "../schema.js";
+import { LambdaFunctionConfigurationSdk } from "../schema/_export.js";
 
 export class LambdaFunctionConfigurationViewService
   extends Effect.Service<LambdaFunctionConfigurationViewService>()("LambdaFunctionConfigurationViewService", {
@@ -32,18 +31,15 @@ export class LambdaFunctionConfigurationViewService
 
               if (!response) return undefined;
 
-              const configuration =
-                Schema.decodeUnknown(LambdaFunctionConfiguration)(response)
+              return yield* Schema.decode(LambdaFunctionConfigurationSdk)(response)
 
-              return yield* configuration.pipe(Effect.orDie)
-
-            });
+            }).pipe(
+              Effect.orDie
+            );
 
         return {
           get
         } as const;
-
-
 
       }),
 

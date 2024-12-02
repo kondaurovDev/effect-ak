@@ -1,25 +1,25 @@
-import * as Effect from "effect/Effect";
+import { Effect } from "effect";
 
 import { LambdaClientService } from "#/clients/lambda.js";
 import { LambdaEventSourceViewService } from "./view.js";
+import * as S from "../schema/_export.js";
 
 export class LambdaEventSourceSqsService
   extends Effect.Service<LambdaEventSourceSqsService>()("LambdaEventSourceSqsService", {
     effect:
       Effect.gen(function* () {
 
-        const lambda = yield* LambdaClientService;
-        const view = yield* LambdaEventSourceViewService;
+        const $ = {
+          lambda: yield* LambdaClientService,
+          view: yield* LambdaEventSourceViewService
+        }
 
-        const upsert = (
-          functionName: FnT.FunctionArn | FnT.FunctionName,
-          queueArn: QueueT.QueueArn,
-          eventSource: T.StandardQueueEventSource | T.FifoQueueEventSource
-        ) =>
+        const upsert = 
+          (input: S.LambdaEventSourceUpsertQueueCommand) =>
           Effect.gen(function* () {
       
             const current =
-              yield* view.getByEventSourceArn(functionName, queueArn);
+              yield* $.view.getIdByFunctionName(input);
       
             const commonAttributes = {
               Enabled: eventSource.active,
@@ -41,7 +41,7 @@ export class LambdaEventSourceSqsService
             yield* Effect.logDebug("esm common attributes", commonAttributes);
 
             if (current == null) {
-              yield* lambda.execute(
+              yield* $.lambda.execute(
                 "createEventSourceMapping",
                 {
                   FunctionName: functionName,

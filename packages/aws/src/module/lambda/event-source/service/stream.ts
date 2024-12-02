@@ -5,7 +5,7 @@ import type { EventSourcePosition } from "@aws-sdk/client-lambda";
 import { LambdaClientService, LambdaMethodInput } from "#/clients/lambda.js";
 import { DynamodbStreamsClientService } from "#/clients/dynamodb-streams.js";
 import { LambdaEventSourceViewService } from "./view.js";
-import { LambdaFunctionName } from "../../function/schema.js";
+import { LambdaFunctionName } from "#/module/lambda/function/schema/_export.js";
 
 // https://docs.aws.amazon.com/lambda/latest/api/API_CreateEventSourceMapping.html
 

@@ -1,10 +1,8 @@
-import { pipe } from "effect/Function";
-import * as Effect from "effect/Effect";
-import * as Cause from "effect/Cause";
+import { pipe, Effect, Cause } from "effect";
 
-import { LambdaClientService } from "../../client.js";
+import { LambdaClientService } from "#/clients/lambda.js";
 import { LambdaFunctionPermissionService } from "./permission.js";
-import { LambdaFunctionName } from "../schema.js";
+import * as S from "../schema/_export.js";
 
 export class LambdaFunctionInvokeService
   extends Effect.Service<LambdaFunctionInvokeService>()("LambdaFunctionInvokeService", {
@@ -16,7 +14,7 @@ export class LambdaFunctionInvokeService
 
         const createFunctionUrlConfig =
           (input: {
-            functionName: LambdaFunctionName
+            functionName: S.LambdaFunctionName
           }) =>
             lambda.execute(
               "createFunctionUrlConfig",
@@ -31,7 +29,7 @@ export class LambdaFunctionInvokeService
 
         const enableFunctionUrl =
           (input: {
-            functionName: LambdaFunctionName
+            functionName: S.LambdaFunctionName
           }) =>
             pipe(
               permissions.addPermissionToBeInvokedByUrl(input),
@@ -42,7 +40,7 @@ export class LambdaFunctionInvokeService
 
         const invokeFunction =
           (input: {
-            functionName: LambdaFunctionName
+            functionName: S.LambdaFunctionName
             args: unknown,
             async: boolean
           }) =>

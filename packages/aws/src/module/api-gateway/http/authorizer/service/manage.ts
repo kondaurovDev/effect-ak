@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 
-import { LambdaFunctionViewService, LambdaFunctionPermissionService } from "#/module/lambda/function/index.js";
+import { LambdaFunctionViewService, LambdaFunctionPermissionService } from "#/module/lambda/function/service/_export.js";
 import { AwsRegionConfig } from "#/core/index.js";
 import { Apigatewayv2ClientService } from "#/clients/apigatewayv2.js";
 import { ApiGatewayHttpViewService } from "#/module/api-gateway/http/service/view.js";

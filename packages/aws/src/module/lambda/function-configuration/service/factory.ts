@@ -1,35 +1,26 @@
-import { pipe } from "effect/Function";
-import * as Effect from "effect/Effect";
-import * as Schema from "effect/Schema";
-import * as Config from "effect/Config";
-import { NodeCodeBundlerService } from "@effect-ak/misc/node";
+import { Effect, Schema } from "effect";
 
-import { awsSdkModuleName } from "../../../../core/const.js";
-import { LambdaFunctionConfiguration } from "../schema.js";
+import * as S from "../schema/_export.js";
 
 export class LambdaFunctionConfigurationFactoryService
   extends Effect.Service<LambdaFunctionConfigurationFactoryService>()("LambdaFunctionConfigurationFactoryService", {
     effect:
       Effect.gen(function* () {
 
-        const minifyCode = 
-          yield* pipe(
-            Config.boolean("minify-code"),
-            Config.nested(awsSdkModuleName),
-            Config.withDefault(true)
-          );
-
-        const makeConfiguration = 
-          (input: LambdaFunctionConfiguration) =>
-            Schema.decode(LambdaFunctionConfiguration)(input)
+        const make = 
+          (input: Omit<S.LambdaFunctionConfigurationSyncCommand, "functionName">) =>
+            Schema.decode(S.LambdaFunctionConfigurationSdk)({
+              Environment: {
+                Variables: input.environment
+              },
+              Handler: input.handler,
+              MemorySize: input.memorySize,
+              Timeout: input.timeout
+            });
 
         return {
-          makeConfiguration
+          make
         } as const;
 
-      }),
-
-      dependencies: [
-        NodeCodeBundlerService.Default
-      ]
+      })
   }) { }

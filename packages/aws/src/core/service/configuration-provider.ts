@@ -17,19 +17,21 @@ export class CoreConfigurationProviderService
 
         const getAccountId =
           pipe(
-            accountIdDeferred,
-            Deferred.complete(
-              sts.execute(
-                "getCallerIdentity",
-                {}
-              ).pipe(
-                Effect.andThen(_ => S.decodeUnknown(S.NumberFromString)(_.Account)),
-              )
-            ),
-            Effect.andThen(
-              Deferred.await(accountIdDeferred)
-            )
-          )
+            Deferred.poll(accountIdDeferred),
+            Effect.andThen(resolved => {
+              if (resolved._tag == "None") {
+                const res = pipe(
+                  sts.execute("getCallerIdentity", {}),
+                  Effect.andThen(_ => S.decodeUnknown(S.NumberFromString)(_.Account)),
+                  Effect.andThen(accountId => Deferred.succeed(accountIdDeferred, accountId)),
+                  Effect.andThen(Deferred.await(accountIdDeferred))
+                )
+                return res
+              } else {
+                return resolved.value
+              }
+            })
+          );
 
         const projectIdKeyName = `${awsSdkPackageName}/projectId`;
 

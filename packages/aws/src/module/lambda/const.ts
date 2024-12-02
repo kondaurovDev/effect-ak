@@ -1,5 +1,7 @@
 import * as Config from "effect/Config";
 
+export const lambda_function_arn_beginning = "arn:aws:lambda:";
+
 export type LambdaFunctionEnvironmentVariable = 
   typeof lambdaFunctionEnvironmentVariables[number];
 export const lambdaFunctionEnvironmentVariables = [
@@ -8,6 +10,6 @@ export const lambdaFunctionEnvironmentVariables = [
   "AWS_EXECUTION_ENV"
 ] as const;
 
-export const functionEnvironmentVariable = 
+export const functionEnvironmentVariableConfig = 
   (name: LambdaFunctionEnvironmentVariable) =>
     Config.nonEmptyString(name);

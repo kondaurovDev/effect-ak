@@ -2,7 +2,7 @@ import { describe, it, assert, expect } from "vitest";
 import { Effect } from "effect";
 import { Utils } from "@effect-ak/misc"
 
-import { CoreConfigurationProviderService } from "#core/index.js";
+import { CoreConfigurationProviderService } from "#/core/index.js";
 
 describe("configuration provider service", () => {
 
@@ -13,8 +13,8 @@ describe("configuration provider service", () => {
 
         const config = yield* CoreConfigurationProviderService;
 
-        const account1 = yield* config.accountId;
-        const account2 = yield* config.accountId;
+        const account1 = yield* config.getAccountId;
+        const account2 = yield* config.getAccountId;
 
         yield* Effect.logDebug({ account1, account2 });
 

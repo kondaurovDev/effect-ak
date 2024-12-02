@@ -1,7 +1,7 @@
 import { ConfigProvider, Effect } from "effect";
 import { assert, describe, expect, it } from "vitest";
 
-import { AwsRegionConfig } from "#core/index.js";
+import { AwsRegionConfig } from "#/core/index.js";
 
 describe("resolve configs", () => {
 

@@ -1,5 +1,4 @@
-import { pipe } from "effect/Function"
-import * as S from "effect/Schema";
+import { pipe, Schema as S } from "effect";
 
 import { sqs_queue_arn_beginning } from "#/module/sqs/const.js";
 

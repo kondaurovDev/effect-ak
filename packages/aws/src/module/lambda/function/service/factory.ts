@@ -1,12 +1,9 @@
-import { pipe } from "effect/Function";
-import * as Effect from "effect/Effect";
-import * as Match from "effect/Match";
-import * as Config from "effect/Config";
+import { pipe, Effect, Match, Config } from "effect";
 import { NodeCodeBundlerService, NodeZipService } from "@effect-ak/misc/node";
 
-import { AwsProjectIdConfig } from "../../../../core/service/configuration-provider.js";
-import { awsSdkModuleName } from "../../../../core/const.js";
-import * as S from "../schema.js";
+import { awsSdkModuleName } from "#/core/const.js";
+import { CoreConfigurationProviderService } from "#/core/index.js";
+import * as S from "../schema/_export.js";
 
 export class LambdaFunctionFactoryService
   extends Effect.Service<LambdaFunctionFactoryService>()("LambdaFunctionFactoryService", {
@@ -15,7 +12,7 @@ export class LambdaFunctionFactoryService
 
         const zip = yield* NodeZipService;
         const codeBundler = yield* NodeCodeBundlerService;
-        const { projectId } = yield* AwsProjectIdConfig;
+        const { projectId } = yield* CoreConfigurationProviderService;
 
         const minifyCode = 
           yield* pipe(

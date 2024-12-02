@@ -1,10 +1,9 @@
-import { pipe } from "effect/Function";
-import * as Effect from "effect/Effect";
+import { pipe, Effect } from "effect";
 
 import { LambdaClientService, LambdaMethodInput, recoverFromLambdaException } from "#/clients/lambda.js";
 import { makeExecuteApiArnFrom } from "#/module/api-gateway/http/brands.js";
 import { CoreConfigurationProviderService } from "#/core/index.js";
-import { LambdaFunctionName } from "../schema.js";
+import { LambdaFunctionName } from "../schema/_export.js";
 
 export class LambdaFunctionPermissionService
   extends Effect.Service<LambdaFunctionPermissionService>()("LambdaFunctionPermissionService", {
