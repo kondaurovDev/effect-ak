@@ -3,8 +3,8 @@ import { Effect, Equal } from "effect";
 
 import { Utils } from "@effect-ak/misc"
 
-import * as Iam from "#module/iam/index.js";
-import { AwsProjectIdConfig } from "#core/index.js";
+import * as Iam from "#/module/iam/index.js";
+import { AwsProjectIdConfig } from "#/core/index.js";
 
 describe("iam role service", () => {
 
@@ -59,7 +59,7 @@ describe("iam role service", () => {
         const projectId = yield* AwsProjectIdConfig;
 
         const input = {
-          roleName: "lambda1"
+          roleName: "lambda-bar"
         } as const;
 
         const roleName =
@@ -68,7 +68,7 @@ describe("iam role service", () => {
             serviceName: "lambda"
           });
 
-        assert(roleName.endsWith(`${projectId}-lambda1`))
+        assert(roleName.endsWith(`${projectId}-lambda-bar`))
 
       }).pipe(
         Effect.provide([

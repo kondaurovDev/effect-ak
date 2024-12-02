@@ -1,8 +1,8 @@
-import * as Effect from "effect/Effect";
+import { Effect } from "effect";
 
 import { CoreConfigurationProviderService } from "#/core/index.js";
 import { QueueAttributes, QueueType, SdkQueueAttributes } from "../schema/queue-attributes.js";
-import { makeQueueUrlFrom, QueueMetadata, QueueName } from "../schema/common.js";
+import * as S from "../schema/common.js";
 
 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html#API_SetQueueAttributes_RequestParameters
 
@@ -16,12 +16,12 @@ export class SqsQueueFactoryService
         const accountId = yield* getAccountId;
 
         const makeQueueArn =
-          (queueName: QueueName): typeof QueueMetadata.fields.arn.Type =>
-            `arn:aws:sqs:${region}:${accountId}:${queueName}`;
+        (queueName: S.QueueName): S.QueueArn =>
+          `arn:aws:sqs:${region}:${accountId}:${queueName}`;
 
         const makeQueueUrl =
-          (queueName: QueueName): typeof QueueMetadata.fields.url.Type =>
-            makeQueueUrlFrom({
+          (queueName: S.QueueName): S.QueueUrl =>
+            S.makeQueueUrlFrom({
               region, accountId, queueName
             });
 
@@ -32,7 +32,7 @@ export class SqsQueueFactoryService
                 `${queueName}.fifo` :
                 `${queueName}`;
 
-            return QueueMetadata.make({
+            return S.QueueMetadata.make({
               name: queueName,
               arn: makeQueueArn(name),
               url: makeQueueUrl(name)
@@ -46,7 +46,7 @@ export class SqsQueueFactoryService
                 `${queueName}-dl.fifo` :
                 `${queueName}-dl`;
 
-            return QueueMetadata.make({
+            return S.QueueMetadata.make({
               name: queueName,
               arn: makeQueueArn(name),
               url: makeQueueUrl(name)
@@ -109,6 +109,6 @@ export class SqsQueueFactoryService
   }) { }
 
 type QueueInput = {
-  queueName: QueueName,
+  queueName: S.QueueName,
   queueType: QueueType
 }

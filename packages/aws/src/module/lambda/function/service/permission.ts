@@ -13,8 +13,6 @@ export class LambdaFunctionPermissionService
         const lambda = yield* LambdaClientService;
         const { getAccountId, region } = yield* CoreConfigurationProviderService;
 
-        const accountId = yield* getAccountId;
-
         const addPermission =
           (input: LambdaMethodInput<"addPermission">) =>
             pipe(
@@ -40,16 +38,22 @@ export class LambdaFunctionPermissionService
             functionName: LambdaFunctionName,
             apiId: string
           }) =>
-            addPermission({
-              FunctionName: input.functionName,
-              StatementId: `apigateway-invoke-permissions-${input.apiId}`,
-              Action: "lambda:InvokeFunction",
-              Principal: "apigateway.amazonaws.com",
-              SourceArn:
-                makeExecuteApiArnFrom({
-                  apiId: input.apiId, region, accountId: yield* accountId
-                })
+            Effect.gen(function* () {
+              const accountId = yield* getAccountId;
+
+              return yield* addPermission({
+                FunctionName: input.functionName,
+                StatementId: `apigateway-invoke-permissions-${input.apiId}`,
+                Action: "lambda:InvokeFunction",
+                Principal: "apigateway.amazonaws.com",
+                SourceArn:
+                  makeExecuteApiArnFrom({
+                    apiId: input.apiId, region, accountId
+                  })
+              })
+
             })
+
 
         return {
           addPermission, addPermissionToBeInvokedByUrl, addInvokeFunctionByGatewayPermission

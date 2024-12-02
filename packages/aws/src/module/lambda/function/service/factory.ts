@@ -67,5 +67,6 @@ export class LambdaFunctionFactoryService
       dependencies: [
         NodeZipService.Default,
         NodeCodeBundlerService.Default,
+        CoreConfigurationProviderService.Default
       ]
   }) { }

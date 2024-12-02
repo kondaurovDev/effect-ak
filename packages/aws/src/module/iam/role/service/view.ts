@@ -1,9 +1,8 @@
-import * as Effect from "effect/Effect";
-import * as Schema from "effect/Schema";
+import { Effect, Schema } from "effect";
 
 import { IamClientService } from "#/clients/iam.js";
-import * as S from "#/module/iam/role-policy/index.js";
-import { IamRoleArn } from "../schema.js";
+import * as P from "#/module/iam/role-policy/index.js";
+import * as S from "../schema/_export.js";
 
 export class IamRoleViewService
   extends Effect.Service<IamRoleViewService>()("IamRoleViewService", {
@@ -54,8 +53,8 @@ export class IamRoleViewService
               }
 
               return yield* Effect.all({
-                roleArn: Schema.validate(IamRoleArn)(role.Arn),
-                assumePolicy: S.IamRolePolicyDocument.fromJsonString(role.AssumeRolePolicyDocument)
+                roleArn: Schema.validate(S.IamRoleMetadata.fields.arn)(role.Arn),
+                assumePolicy: P.IamRolePolicyDocument.fromJsonString(role.AssumeRolePolicyDocument)
               });
 
             });
@@ -92,7 +91,7 @@ export class IamRoleViewService
                   return yield* Effect.dieMessage("The role's policy exists but `PolicyDocument` attribute is undefined")
                 }
 
-              return yield* S.IamRolePolicyDocument.fromJsonString(response.PolicyDocument).pipe(Effect.orDie);
+              return yield* P.IamRolePolicyDocument.fromJsonString(response.PolicyDocument).pipe(Effect.orDie);
 
             });
 

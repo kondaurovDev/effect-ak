@@ -1,5 +1,5 @@
 import type { AwsRegion } from "#/core/index.js";
-import type { LambdaFunctionArn } from "#/module/lambda/index.js";
+import type { LambdaFunctionArn } from "#/module/lambda/_export.js";
 import { api_gateway_arn_beginning } from "../brands.js";
 
 export const makeLambdaFunctionAuthorizerArnFrom =

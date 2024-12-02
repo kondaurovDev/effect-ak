@@ -64,6 +64,8 @@ export class LambdaClientService extends
 }
 
 export type LambdaMethodInput<M extends keyof LambdaClientApi> = Parameters<LambdaClientApi[M]>[0];
+export type LambdaMethodOutput<M extends keyof LambdaClientApi> = ReturnType<LambdaClientApi[M]>;
+
 
 export interface LambdaClientApi {
   addLayerVersionPermission(_: Sdk.AddLayerVersionPermissionCommandInput): Sdk.AddLayerVersionPermissionCommandOutput;

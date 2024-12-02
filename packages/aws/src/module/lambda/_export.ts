@@ -1,3 +1,6 @@
 export * from "./event-source/service/_export.js"
+export * from "./event-source/schema/_export.js"
 export * from "./function/service/_export.js"
+export * from "./function/schema/_export.js"
 export * from "./function-configuration/service/_export.js"
+export * from "./function-configuration/schema/_export.js"

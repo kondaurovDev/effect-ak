@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 
-import type { LambdaFunctionArn } from "#/module/lambda/index.js";
+import type { LambdaFunctionArn } from "#/module/lambda/_export.js";
 import { AwsRegionConfig } from "#/core/index.js";
 import { makeLambdaFunctionAuthorizerArnFrom } from "../const.js";
 

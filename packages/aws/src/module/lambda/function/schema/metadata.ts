@@ -7,7 +7,9 @@ export type LambdaFunctionName = typeof LambdaFunctionMetadata.fields.name.Type;
 export type LambdaFunctionArn = typeof LambdaFunctionMetadata.fields.arn.Type;
 
 export class LambdaFunctionMetadata
-  extends S.Class<LambdaFunctionMetadata>("LambdaFunctionMetadata")({
+  extends S.Class<LambdaFunctionMetadata>(
+    "LambdaFunctionMetadata"
+  )({
     name: S.NonEmptyString.pipe(S.pattern(/^[a-zA-Z0-9-_]{3,50}$/)),
     arn:
       S.TemplateLiteral(

@@ -28,10 +28,10 @@ export const StandardQueueEventSource =
     S.extend(EventSourceAttributes)
   )
 
-export type LambdaEventSource =
-  typeof LambdaEventSource.Type
+export type LambdaFunctionEventSource =
+  typeof LambdaFunctionEventSource.Type
 
-export const LambdaEventSource =
+export const LambdaFunctionEventSource =
   S.Union(
     FifoQueueEventSource,
     StandardQueueEventSource,

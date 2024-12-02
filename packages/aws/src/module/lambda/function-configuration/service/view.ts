@@ -1,6 +1,6 @@
 import { Effect, Schema } from "effect";
 
-import { LambdaClientService, recoverFromLambdaException } from "#/clients/lambda.js";
+import { LambdaClientService, LambdaMethodOutput, recoverFromLambdaException } from "#/clients/lambda.js";
 import { LambdaFunctionConfigurationSdk } from "../schema/_export.js";
 
 export class LambdaFunctionConfigurationViewService
@@ -15,7 +15,9 @@ export class LambdaFunctionConfigurationViewService
         // https://docs.aws.amazon.com/lambda/latest/api/API_GetFunctionConfiguration.html
         const get =
           (input: {
-            functionName: string | undefined
+            functionName: string | undefined,
+            beforeDecode?: 
+              (input: LambdaMethodOutput<"getFunctionConfiguration">) => LambdaMethodOutput<"getFunctionConfiguration">
           }) =>
             Effect.gen(function* () {
 
@@ -31,7 +33,7 @@ export class LambdaFunctionConfigurationViewService
 
               if (!response) return undefined;
 
-              return yield* Schema.decode(LambdaFunctionConfigurationSdk)(response)
+              return yield* Schema.decode(LambdaFunctionConfigurationSdk)(input.beforeDecode ? input.beforeDecode(response) : response);
 
             }).pipe(
               Effect.orDie

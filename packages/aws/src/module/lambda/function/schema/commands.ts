@@ -1,10 +1,10 @@
 import { Schema as S } from "effect";
 
-import { EventSource } from "#/module/lambda/event-source/service/_export.js";
-import { LambdaFunctionConfigurationSyncCommand, LambdaFunctionConfigurationRuntimeSdk } from "#/module/lambda/function-configuration/schema/_export.js";
+import { LambdaFunctionEventSource } from "#/module/lambda/event-source/schema/event-source.js";
+import { LambdaFunctionConfigurationRuntimeSdk } from "#/module/lambda/function-configuration/schema/sdk.js";
+import { LambdaFunctionConfigurationSyncCommand } from "#/module/lambda/function-configuration/schema/commands.js";
 import { LambdaFunctionSourceCode } from "./source-code.js";
 import { LambdaFunctionMetadata } from "./metadata.js";
-import { IamRoleArn } from "#/module/iam/index.js";
 
 export class LambdaFunctionUpsertCommand
   extends S.Class<LambdaFunctionUpsertCommand>(
@@ -14,7 +14,7 @@ export class LambdaFunctionUpsertCommand
     code: LambdaFunctionSourceCode,
     description: S.NonEmptyString,
     configuration: LambdaFunctionConfigurationSyncCommand.pipe(S.omit("functionName")),
-    iamRole: IamRoleArn,
+    roleName: S.NonEmptyString,
     runtime: LambdaFunctionConfigurationRuntimeSdk,
-    eventSource: EventSource.pipe(S.optional),
+    eventSource: LambdaFunctionEventSource.pipe(S.optional),
   }) { };

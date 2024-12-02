@@ -1,12 +1,10 @@
-import * as S from "effect/Schema"
-import * as Equal from "effect/Equal"
-import * as Effect from "effect/Effect"
+import { Schema, Equal, Effect } from "effect"
 
-import { awsSdkModuleName, CoreConfigurationProviderService } from "#/core/index.js"
+import { CoreConfigurationProviderService } from "#/core/index.js"
 import { IamClientService } from "#/clients/iam.js"
 import * as Policy from "#/module/iam/role-policy/index.js"
 import { AwsServiceName } from "#/module/const.js";
-import { IamRoleArn, IamRoleName } from "../schema.js";
+import * as S from "../schema/_export.js";
 import { IamRoleViewService } from "./view.js";
 
 export class IamRoleManageService
@@ -16,16 +14,16 @@ export class IamRoleManageService
 
         const iam = yield* IamClientService;
         const roleView = yield* IamRoleViewService;
-        const configProvider = yield* CoreConfigurationProviderService;
+        const { projectId, resourceTagsKeyValue } = yield* CoreConfigurationProviderService;
         const policyFactory = yield* Policy.IamRolePolicyFactoryService;
 
         yield* Effect.logDebug("IamRoleManageService is ready");
 
-        const makeRoleName = (input: string) => `${configProvider.projectId}-${input}`
+        const makeRoleName = (input: string) => `${projectId}-${input}`
 
         const upsertRole =
           (input: {
-            roleName: IamRoleName,
+            roleName: S.IamRoleName,
             serviceName: AwsServiceName
           }) =>
             Effect.gen(function* () {
@@ -77,20 +75,20 @@ export class IamRoleManageService
                       "createRole",
                       {
                         RoleName: makeRoleName(input.roleName),
-                        Path: `/${awsSdkModuleName}/`,
+                        Path: `/${projectId}/`,
                         AssumeRolePolicyDocument: jsonDocument,
-                        Tags: configProvider.resourceTagsKeyValue
+                        Tags: resourceTagsKeyValue
                       }
                     )
 
-                  return yield* S.validate(IamRoleArn)(result.Role?.Arn);
+                  return yield* Schema.validate(S.IamRoleMetadata.fields.arn)(result.Role?.Arn);
                 })
               )
             )
 
         const upsertRoleResourcePolicy =
           (input: {
-            roleName: IamRoleName,
+            roleName: S.IamRoleName,
             resources: Policy.IamRolePolicyDocumentResource,
             actions: Policy.IamRolePolicyDocumentAction
             policyName: Policy.IamRolePolicyName,

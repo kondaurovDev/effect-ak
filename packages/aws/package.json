@@ -44,6 +44,7 @@
     "@effect-ak/misc": "workspace:^"
   },
   "devDependencies": {
+    "code-block-writer": "^13.0.3",
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
     "effect": "catalog:",

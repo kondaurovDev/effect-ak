@@ -1,6 +1,6 @@
 import { Schema as S } from "effect";
 
-import { LambdaFunctionMetadata } from "#/module/lambda/function/schema/_export.js";
+import { LambdaFunctionMetadata } from "#/module/lambda/function/schema/metadata.js";
 import { LambdaFunctionConfigurationEnvironmentSdk } from "./sdk.js";
 
 export class LambdaFunctionConfigurationSyncCommand 

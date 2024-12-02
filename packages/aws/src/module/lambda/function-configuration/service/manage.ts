@@ -17,9 +17,7 @@ export class LambdaFunctionConfigurationManageService
         };
 
         const syncFunctionConfiguration =
-          (input: {
-            functionName: string
-          } & S.LambdaFunctionConfigurationSyncCommand) =>
+          (input: S.LambdaFunctionConfigurationSyncCommand) =>
             Effect.gen(function* () {
 
               const currentConfiguration =
@@ -27,7 +25,14 @@ export class LambdaFunctionConfigurationManageService
 
               const deployedConfiguration =
                 yield* $.view.get({
-                  functionName: input.functionName
+                  functionName: input.functionName,
+                  beforeDecode: _ => ({
+                    $metadata: _.$metadata,
+                    Timeout: _.Timeout,
+                    MemorySize: _.MemorySize,
+                    Environment: _.Environment,
+                    Handler: _.Handler
+                  })
                 });
 
               if (deployedConfiguration == null) {
