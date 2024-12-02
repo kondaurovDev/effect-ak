@@ -1,10 +1,10 @@
 import * as Effect from "effect/Effect"
 import * as Equal from "effect/Equal"
 
-import { SqsClientService } from "../../client.js"
+import { SqsClientService } from "#/clients/sqs.js"
+import { CoreConfigurationProviderService } from "#/core/index.js"
 import { SqsQueueViewService } from "./view.js"
 import { QueueAttributes } from "../schema/queue-attributes.js"
-import { AwsProjectIdConfig } from "../../../../core/service/configuration-provider.js";
 import { SqsQueueFactoryService } from "./factory.js";
 import { QueueName } from "../schema/common.js"
 
@@ -13,11 +13,12 @@ export class SqsQueueManageService
     effect:
       Effect.gen(function* () {
 
+        const { resourceTagsMap } = yield* CoreConfigurationProviderService;
+
         const $ = {
           client: yield* SqsClientService,
           view: yield* SqsQueueViewService,
-          factory: yield* SqsQueueFactoryService,
-          awsConfig: yield* AwsProjectIdConfig,
+          factory: yield* SqsQueueFactoryService
         }
 
         const upsertQueue =
@@ -60,7 +61,7 @@ export class SqsQueueManageService
                 {
                   QueueName: input.queueName,
                   Attributes: attributes,
-                  tags: $.awsConfig.resourceTagsMap
+                  tags: resourceTagsMap
                 }
               );
 

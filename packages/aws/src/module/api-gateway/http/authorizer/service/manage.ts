@@ -1,11 +1,11 @@
 import * as Effect from "effect/Effect";
 
-import { LambdaFunctionViewService, LambdaFunctionPermissionService } from "#module/lambda/function/index.js";
-import { AwsRegionConfig } from "#core/index.js";
-import { Apigatewayv2ClientService } from "#clients/apigatewayv2.js";
+import { LambdaFunctionViewService, LambdaFunctionPermissionService } from "#/module/lambda/function/index.js";
+import { AwsRegionConfig } from "#/core/index.js";
+import { Apigatewayv2ClientService } from "#/clients/apigatewayv2.js";
+import { ApiGatewayHttpViewService } from "#/module/api-gateway/http/service/view.js";
 import { CreateOrUpdateAuthorizer, LambdaAuthorizer } from "../types.js";
 import { ApiGatewayHttpAuthorizerViewService } from "./view.js";
-import { ApiGatewayHttpViewService } from "../../service/view.js";
 import { makeLambdaFunctionAuthorizerArnFrom } from "../const.js";
 
 export class ApiGatewayHttpAuthorizerManageService

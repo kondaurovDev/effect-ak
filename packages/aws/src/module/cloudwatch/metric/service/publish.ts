@@ -1,8 +1,8 @@
 import * as Effect from "effect/Effect";
 import type { MetricDatum } from "@aws-sdk/client-cloudwatch";
 
-import { AwsProjectIdConfig } from "#core/index.js";
-import { CloudwatchClientService } from "#clients/cloudwatch.js";
+import { AwsProjectIdConfig } from "#/core/index.js";
+import { CloudwatchClientService } from "#/clients/cloudwatch.js";
 import * as S from "../schema/command.js";
 
 export class CloudwatchMetricPublishService extends

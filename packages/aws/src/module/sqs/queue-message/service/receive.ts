@@ -1,9 +1,9 @@
 import * as Effect from "effect/Effect";
 import * as S from "effect/Schema";
 
-import { SqsClientService } from "../../client.js"
+import { SqsClientService } from "#/clients/sqs.js"
+import { SqsQueueFactoryService } from "#/module/sqs/queue/service/factory.js";
 import { ValidQueueMessage } from "../schema/common.js";
-import { SqsQueueFactoryService } from "../../queue/service/factory.js";
 
 export class SqsQueueMessageReceiveService
   extends Effect.Service<SqsQueueMessageReceiveService>()("SqsQueueMessageReceiveService", {

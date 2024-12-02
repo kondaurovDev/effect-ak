@@ -1,8 +1,8 @@
 import * as Effect from "effect/Effect";
 import * as Array from "effect/Array";
 
-import { SqsClientService } from "../../client.js"
-import { SqsQueueFactoryService } from "../../queue/service/factory.js";
+import { SqsClientService } from "#/clients/sqs.js"
+import { SqsQueueFactoryService } from "#/module/sqs/queue/service/factory.js";
 
 type Message = {
   body: string,

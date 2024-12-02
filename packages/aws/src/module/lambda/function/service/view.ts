@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 
-import { LambdaClientService } from "#clients/lambda.js";
+import { LambdaClientService } from "#/clients/lambda.js";
 
 export class LambdaFunctionViewService
   extends Effect.Service<LambdaFunctionViewService>()("LambdaFunctionViewService", {

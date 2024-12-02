@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect";
 import { FetchHttpClient, HttpClientRequest } from "@effect/platform";
 
-import { makeHttpClient } from "../../../internal/http-client.js";
+import { makeHttpClient } from "#/internal/http-client.js";
 
 export class AnthropicHttpClient extends
   Effect.Service<AnthropicHttpClient>()("AnthropicHttpClient", {

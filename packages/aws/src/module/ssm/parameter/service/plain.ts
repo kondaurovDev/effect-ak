@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect";
 
-import { SsmClientService } from "#clients/ssm.js";
-import { CoreConfigurationProviderService } from "#core/service/configuration-provider.js";
+import { SsmClientService } from "#/clients/ssm.js";
+import { CoreConfigurationProviderService } from "#/core/service/configuration-provider.js";
 
 export class SsmParameterPlainService
   extends Effect.Service<SsmParameterPlainService>()("SsmParameterPlainService", {

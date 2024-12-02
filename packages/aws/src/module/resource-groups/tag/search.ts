@@ -1,7 +1,7 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 
-import { ResourceGroupsTaggingApiClientService } from "../client.js";
+import { ResourceGroupsTaggingApiClientService } from "#/clients/resource-groups-tagging-api.js";
 
 type TagIdWithValue = `${string}:${string}`
 

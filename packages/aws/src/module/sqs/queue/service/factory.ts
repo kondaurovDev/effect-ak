@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 
-import { CoreConfigurationProviderService } from "#core/service/configuration-provider.js";
+import { CoreConfigurationProviderService } from "#/core/index.js";
 import { QueueAttributes, QueueType, SdkQueueAttributes } from "../schema/queue-attributes.js";
 import { makeQueueUrlFrom, QueueMetadata, QueueName } from "../schema/common.js";
 
@@ -11,7 +11,9 @@ export class SqsQueueFactoryService
     effect:
       Effect.gen(function* () {
 
-        const { accountId } = yield* CoreConfigurationProviderService;
+        const { getAccountId, region } = yield* CoreConfigurationProviderService;
+
+        const accountId = yield* getAccountId;
 
         const makeQueueArn =
           (queueName: QueueName): typeof QueueMetadata.fields.arn.Type =>
@@ -98,14 +100,12 @@ export class SqsQueueFactoryService
           }
 
         return {
-          makeSdkQueueAttributes, makeQueue, makeDeadLetterQueue, makeQueueUrl, makeQueueArn
-        }
+          makeSdkQueueAttributes,
+          makeQueue, makeDeadLetterQueue,
+          makeQueueUrl, makeQueueArn
+        } as const
 
-      }),
-
-    dependencies: [
-      StsService.Default
-    ]
+      })
   }) { }
 
 type QueueInput = {

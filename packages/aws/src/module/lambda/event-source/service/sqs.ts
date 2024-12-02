@@ -1,8 +1,7 @@
 import * as Effect from "effect/Effect";
-import * as LambdaSdk from "@aws-sdk/client-lambda";
 
+import { LambdaClientService } from "#/clients/lambda.js";
 import { LambdaEventSourceViewService } from "./view.js";
-import { LambdaClientService } from "../../client.js";
 
 export class LambdaEventSourceSqsService
   extends Effect.Service<LambdaEventSourceSqsService>()("LambdaEventSourceSqsService", {
@@ -43,23 +42,19 @@ export class LambdaEventSourceSqsService
 
             if (current == null) {
               yield* lambda.execute(
-                "create event source mapping", _ =>
-                _.send(
-                  new LambdaSdk.CreateEventSourceMappingCommand({
-                    FunctionName: functionName,
-                    ...commonAttributes
-                  })
-                )
+                "createEventSourceMapping",
+                {
+                  FunctionName: functionName,
+                  ...commonAttributes
+                }
               )
             } else if (current.UUID != null) {
               yield* lambda.execute(
-                `update event source mapping`, _ =>
-                _.send(
-                  new LambdaSdk.UpdateEventSourceMappingCommand({
-                    ...commonAttributes,
-                    UUID: current.UUID
-                  })
-                )
+                "updateEventSourceMapping",
+                {
+                  ...commonAttributes,
+                  UUID: current.UUID
+                }
               )
             } else {
               yield* Effect.logWarning("No event source match");

@@ -3,10 +3,10 @@ import * as Effect from "effect/Effect";
 import * as Array from "effect/Array";
 import * as Option from "effect/Option";
 
-import { recoverFromSqsException, SqsClientService } from "../../client.js";
+import { recoverFromSqsException, SqsClientService } from "#/clients/sqs.js";
+import * as C from "#/module/sqs/const.js";
 import { QueueName } from "../schema/common.js";
 import { SdkQueueAttributeName, SdkQueueAttributes } from "../schema/queue-attributes.js";
-import * as C from "../../const.js";
 
 // https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-eventsource
 

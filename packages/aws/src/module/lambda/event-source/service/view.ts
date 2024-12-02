@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect";
 import * as Cause from "effect/Cause";
 
-import { LambdaClientService } from "../../client.js";
+import { LambdaClientService } from "#/clients/lambda.js";
 import { LambdaFunctionName } from "../../function/schema.js";
 
 export class LambdaEventSourceViewService

@@ -2,10 +2,10 @@ import * as Effect from "effect/Effect";
 import * as Cause from "effect/Cause";
 import type { EventSourcePosition } from "@aws-sdk/client-lambda";
 
+import { LambdaClientService, LambdaMethodInput } from "#/clients/lambda.js";
+import { DynamodbStreamsClientService } from "#/clients/dynamodb-streams.js";
 import { LambdaEventSourceViewService } from "./view.js";
-import { LambdaClientService, LambdaMethodInput } from "../../client.js";
 import { LambdaFunctionName } from "../../function/schema.js";
-import { DynamodbStreamsClientService } from "../../../dynamodb-streams/client.js";
 
 // https://docs.aws.amazon.com/lambda/latest/api/API_CreateEventSourceMapping.html
 

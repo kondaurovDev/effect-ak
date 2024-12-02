@@ -1,6 +1,6 @@
 import * as B from "effect/Brand";
 
-import { AwsRegionTemplate } from "../../../core/domain/index.js";
+import { AwsRegionTemplate } from "#/core/index.js";
 
 export const lambda_function_arn_beginning = "arn:aws:lambda:";
 

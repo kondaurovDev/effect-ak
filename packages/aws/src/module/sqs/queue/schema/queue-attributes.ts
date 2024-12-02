@@ -3,7 +3,7 @@ import * as Data from "effect/Data";
 import type { QueueAttributeName } from "@aws-sdk/client-sqs";
 
 import * as A from "./sdk-attributes.js";
-import { SqsMethodInput } from "../../client.js";
+import { SqsMethodInput } from "#/clients/sqs.js";
 
 export type SdkQueueAttributeName = QueueAttributeName;
 

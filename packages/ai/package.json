@@ -23,7 +23,8 @@
   "scripts": {
     "test": "vitest run",
     "pack-tar": "pnpm pack --pack-destination ../../dist",
-    "compile": "tsc -b tsconfig.src.json"
+    "compile": "tsc -b tsconfig.src.json",
+    "fix-path": "tsc-alias -p tsconfig.src.json"
   },
   "devDependencies": {
     "@effect/platform": "catalog:",

@@ -1,7 +1,7 @@
 import { pipe } from "effect/Function"
 import * as S from "effect/Schema";
 
-import { sqs_queue_arn_beginning } from "../../const.js";
+import { sqs_queue_arn_beginning } from "#/module/sqs/const.js";
 
 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 export const VisibilyTimeout =

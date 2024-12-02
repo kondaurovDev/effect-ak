@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 
-import { AwsProjectIdConfig, AwsRegionConfig } from "../../../../core/service/configuration-provider.js";
+import { AwsProjectIdConfig, AwsRegionConfig } from "#/core/service/configuration-provider.js";
 import * as C from "../brands.js";
 import { StsService } from "../../../sts/service.js";
 

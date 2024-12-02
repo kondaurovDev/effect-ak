@@ -1,8 +1,8 @@
 import * as S from "effect/Schema";
 
-import * as C from "../../const.js";
-import { amazon_com } from "../../../const.js";
-import type { AwsRegion } from "../../../../core/domain/index.js";
+import type { AwsRegion } from "#/core/index.js";
+import * as C from "#/module/sqs/const.js";
+import { amazon_com } from "#/module/const.js";
 
 export type QueueArn = typeof QueueMetadata.fields.arn.Type;
 export type QueueUrl = typeof QueueMetadata.fields.url.Type;

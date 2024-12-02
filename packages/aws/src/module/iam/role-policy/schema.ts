@@ -1,6 +1,6 @@
 import * as S from "effect/Schema";
 
-import { awsServicesList } from "#module/const.js";
+import { awsServicesList } from "#/module/const.js";
 
 export type IamRolePolicyName = typeof IamRolePolicyName.Type
 export const IamRolePolicyName =

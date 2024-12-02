@@ -2,10 +2,14 @@
   "extends": "../../tsconfig.base.json",
   "include": ["src"],
   "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "src",
+    "paths": {
+      "#/*": ["./src/*"]
+    },
     "types": ["node"],
-    "outDir": "dist",
-    "declaration": true,
-    "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
-    "rootDir": "src"
+    "outDir": "dist/esm",
+    "declarationDir": "dist/dts",
+    "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo"
   }
 }

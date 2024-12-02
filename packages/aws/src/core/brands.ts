@@ -1,7 +1,7 @@
 import { pipe } from "effect/Function";
 import * as S from "effect/Schema";
 
-import { } from "#core/const.js"
+import { } from "#/core/const.js"
 
 import { projectIdRegex, regionRegex } from "./const.js";
 

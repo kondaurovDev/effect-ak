@@ -5,10 +5,14 @@
     { "path": "../misc/tsconfig.src.json" }
   ],
   "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "src",
+    "paths": {
+      "#/*": ["./src/*"]
+    },
     "types": ["node"],
     "outDir": "dist",
     "declaration": true,
-    "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
-    "rootDir": "src"
+    "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo"
   }
 }

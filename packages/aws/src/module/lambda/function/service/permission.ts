@@ -1,10 +1,10 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 
-import { LambdaClientService, LambdaMethodInput, recoverFromLambdaException } from "#clients/lambda.js";
+import { LambdaClientService, LambdaMethodInput, recoverFromLambdaException } from "#/clients/lambda.js";
+import { makeExecuteApiArnFrom } from "#/module/api-gateway/http/brands.js";
+import { CoreConfigurationProviderService } from "#/core/index.js";
 import { LambdaFunctionName } from "../schema.js";
-import { makeExecuteApiArnFrom } from "#module/api-gateway/http/index.js";
-import { CoreConfigurationProviderService } from "#core/index.js";
 
 export class LambdaFunctionPermissionService
   extends Effect.Service<LambdaFunctionPermissionService>()("LambdaFunctionPermissionService", {
@@ -12,7 +12,9 @@ export class LambdaFunctionPermissionService
       Effect.gen(function* () {
 
         const lambda = yield* LambdaClientService;
-        const { accountId, region } = yield* CoreConfigurationProviderService;
+        const { getAccountId, region } = yield* CoreConfigurationProviderService;
+
+        const accountId = yield* getAccountId;
 
         const addPermission =
           (input: LambdaMethodInput<"addPermission">) =>

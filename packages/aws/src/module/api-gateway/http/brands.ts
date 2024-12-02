@@ -1,7 +1,7 @@
 import * as Brand from "effect/Brand"
 
-import type { AwsRegion } from "#core/index.js"
-import { amazon_com } from "#module/const.js"
+import type { AwsRegion } from "#/core/index.js"
+import { amazon_com } from "#/module/const.js"
 
 export const api_gateway_arn_beginning = "arn:aws:apigateway";
 

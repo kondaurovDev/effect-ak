@@ -1,7 +1,7 @@
 import * as S from "effect/Schema";
 
+import * as QA from "#/module/sqs/queue/schema/sdk-attributes.js";
 import * as MA from "./sdk-attributes.js";
-import * as QA from "../../queue/schema/sdk-attributes.js";
 
 export class CommonQueueMessageAttributes extends
   S.Class<CommonQueueMessageAttributes>("CommonQueueMessageAttributes")({

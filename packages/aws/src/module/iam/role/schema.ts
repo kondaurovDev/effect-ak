@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect";
 import * as S from "effect/Schema";
-import { AwsProjectIdConfig } from "#core/index.js";
+import { AwsProjectIdConfig } from "#/core/index.js";
 
 export type IamRoleArn = typeof IamRoleArn.Type
 export const IamRoleArn = 

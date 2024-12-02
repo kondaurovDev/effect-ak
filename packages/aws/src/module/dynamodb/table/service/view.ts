@@ -2,7 +2,7 @@ import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 import type * as Sdk from "@aws-sdk/client-dynamodb";
 
-import { DynamodbClientService } from "#clients/dynamodb.js";
+import { DynamodbClientService } from "#/clients/dynamodb.js";
 
 export class DynamoDbViewService
   extends Effect.Service<DynamoDbViewService>()("DynamoDbViewService", {

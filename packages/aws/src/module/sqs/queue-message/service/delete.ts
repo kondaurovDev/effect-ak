@@ -2,7 +2,7 @@ import * as Effect from "effect/Effect";
 
 import { SqsQueueFactoryService } from "../../queue/index.js"
 import { ReceiptHandle } from "../brands.js";
-import { SqsClientService } from "#clients/sqs.js";
+import { SqsClientService } from "#/clients/sqs.js";
 
 export class SqsQueueMessageDeleteService
   extends Effect.Service<SqsQueueMessageDeleteService>()("SqsQueueMessageDeleteService", {

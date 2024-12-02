@@ -1,7 +1,7 @@
 import { pipe } from "effect";
 import * as Effect from "effect/Effect";
 
-import { Apigatewayv2ClientService } from "#clients/apigatewayv2.js";
+import { Apigatewayv2ClientService } from "#/clients/apigatewayv2.js";
 
 export class ApiGatewayHttpAuthorizerViewService
   extends Effect.Service<ApiGatewayHttpAuthorizerViewService>()("ApiGatewayHttpAuthorizerViewService", {

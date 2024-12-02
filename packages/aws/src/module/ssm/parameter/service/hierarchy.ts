@@ -1,7 +1,7 @@
 import { pipe } from "effect/Function";
 import * as Effect from "effect/Effect";
 
-import { SsmClientService } from "#clients/ssm.js";
+import { SsmClientService } from "#/clients/ssm.js";
 
 export class SsmParameterHierarchyService
   extends Effect.Service<SsmParameterHierarchyService>()("SsmParameterHierarchyService", {

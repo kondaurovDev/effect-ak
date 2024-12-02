@@ -10,6 +10,7 @@
     "start": "pnpm --filter playground run server-dev "
   },
   "devDependencies": {
+    "tsc-alias": "^1.8.10",
     "@types/node": "^22.10.1",
     "@babel/cli": "^7.25.9",
     "@babel/plugin-transform-export-namespace-from": "^7.25.9",

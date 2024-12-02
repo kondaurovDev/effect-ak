@@ -3,8 +3,8 @@ import * as S from "effect/Schema";
 import * as Effect from "effect/Effect";
 import { DataFormatJsonService } from "@effect-ak/misc/data-format";
 
-import { SsmClientService } from "#clients/ssm.js";
-import { CoreConfigurationProviderService } from "#core/service/configuration-provider.js";
+import { SsmClientService } from "#/clients/ssm.js";
+import { CoreConfigurationProviderService } from "#/core/service/configuration-provider.js";
 
 export class SsmParameterJsonService
   extends Effect.Service<SsmParameterJsonService>()("SsmParameterJsonService", {

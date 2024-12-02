@@ -4,19 +4,27 @@ import * as Effect from "effect/Effect";
 import { DataFormatJsonService } from "@effect-ak/misc/data-format";
 import { NodeTextConversionService } from "@effect-ak/misc/node";
 
+import { S3ClientService, S3MethodInput } from "#/clients/s3.js";
 import { BucketName, BucketKey } from "../types.js";
-import { S3ClientService } from "../../client.js";
 
 export class S3BucketContentViewService
   extends Effect.Service<S3BucketContentViewService>()("S3BucketContentViewService", {
     effect:
       Effect.gen(function* () {
 
-        const deps = {
+        const $ = {
           s3: yield* S3ClientService,
           json: yield* DataFormatJsonService,
           text: yield* NodeTextConversionService
         }
+
+        const listObjects = (
+          commandInput: S3MethodInput<"listObjectsV2">
+        ) =>
+          $.s3.execute(
+            "listObjectsV2",
+            commandInput
+          );
 
         const getFileContent = (
           bucketName: BucketName,
@@ -25,7 +33,7 @@ export class S3BucketContentViewService
 
           const fileContent =
             pipe(
-              deps.s3.execute(
+              $.s3.execute(
                 `getObject`,
                 {
                   Bucket: bucketName,
@@ -58,13 +66,14 @@ export class S3BucketContentViewService
         ) =>
           pipe(
             getFileContent(bucketName, key).fileContent,
-            Effect.andThen(deps.text.uint8ArrayToString),
-            Effect.andThen(_ => deps.json.decode(_))
+            Effect.andThen($.text.uint8ArrayToString),
+            Effect.andThen(_ => $.json.decode(_))
           )
 
         return {
           getFileContent,
-          getJsonContent
+          getJsonContent,
+          listObjects
         } as const
 
       }),

@@ -1,8 +1,8 @@
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 
-import { IamClientService } from "#clients/iam.ts";
-import * as S from "#module/iam/role-policy/index.js";
+import { IamClientService } from "#/clients/iam.js";
+import * as S from "#/module/iam/role-policy/index.js";
 import { IamRoleArn } from "../schema.js";
 
 export class IamRoleViewService

@@ -2,10 +2,10 @@ import * as S from "effect/Schema"
 import * as Equal from "effect/Equal"
 import * as Effect from "effect/Effect"
 
-import { awsSdkModuleName, CoreConfigurationProviderService } from "#core/index.js"
-import { IamClientService } from "#clients/iam.js"
-import * as Policy from "#module/iam/role-policy/index.js"
-import { AwsServiceName } from "#module/const.js";
+import { awsSdkModuleName, CoreConfigurationProviderService } from "#/core/index.js"
+import { IamClientService } from "#/clients/iam.js"
+import * as Policy from "#/module/iam/role-policy/index.js"
+import { AwsServiceName } from "#/module/const.js";
 import { IamRoleArn, IamRoleName } from "../schema.js";
 import { IamRoleViewService } from "./view.js";
 

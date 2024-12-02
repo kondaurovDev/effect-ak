@@ -22,14 +22,10 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "gen": "pnpm codegen-aws-sdk-clients",
-    "compile": "tsc -b tsconfig.src.json",
+    "build": "pnpm build-esm && pnpm build-cjs",
+    "build-esm": "tsc -b tsconfig.src.json",
+    "build-cjs": "babel dist/esm --plugins @babel/transform-export-namespace-from --plugins @babel/transform-modules-commonjs --out-dir dist/cjs --source-maps",
     "pack-tar": "pnpm pack --pack-destination ../../dist"
-  },
-  "imports": {
-    "#*": {
-      "effect-ak-dev": "./src/*",
-      "default": "./dist/*"
-    }
   },
   "dependencies": {
     "@aws-sdk/client-apigatewayv2": "^3.699.0",
@@ -60,8 +56,8 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/public/index/index.d.ts",
-      "default": "./dist/public/index/index.js"
+      "types": "./dist/public/index.d.ts",
+      "default": "./dist/public/index.js"
     },
     "./module": {
       "types": "./dist/module/index.d.ts",

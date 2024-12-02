@@ -1,9 +1,8 @@
-import * as Effect from "effect/Effect";
-import * as S from "effect/Schema";
+import { Effect, Deferred, Schema as S, ParseResult, pipe } from "effect";
 
-import { StsClientService } from "#clients/sts.js";
-import { AwsProjectIdConfig, AwsRegionConfig } from "#core/configs.js";
-import { awsSdkPackageName } from "#core/const.js";
+import { StsClientException, StsClientService } from "#/clients/sts.js";
+import { AwsProjectIdConfig, AwsRegionConfig } from "#/core/configs.js";
+import { awsSdkPackageName } from "#/core/const.js";
 
 export class CoreConfigurationProviderService
   extends Effect.Service<CoreConfigurationProviderService>()("CoreConfigurationProviderService", {
@@ -14,13 +13,23 @@ export class CoreConfigurationProviderService
         const projectId = yield* AwsProjectIdConfig;
         const region = yield* AwsRegionConfig;
 
+        const accountIdDeferred = yield* Deferred.make<number, StsClientException | ParseResult.ParseError>();
+
         const getAccountId =
-          sts.execute(
-            "getCallerIdentity",
-            {}
-          ).pipe(
-            Effect.andThen(_ => S.decodeUnknown(S.NumberFromString)(_.Account))
-          );
+          pipe(
+            accountIdDeferred,
+            Deferred.complete(
+              sts.execute(
+                "getCallerIdentity",
+                {}
+              ).pipe(
+                Effect.andThen(_ => S.decodeUnknown(S.NumberFromString)(_.Account)),
+              )
+            ),
+            Effect.andThen(
+              Deferred.await(accountIdDeferred)
+            )
+          )
 
         const projectIdKeyName = `${awsSdkPackageName}/projectId`;
 
@@ -38,7 +47,7 @@ export class CoreConfigurationProviderService
 
         return {
           region,
-          accountId: yield* Effect.cached(getAccountId),
+          getAccountId,
           projectId,
           projectIdKeyName,
           resourceTags,
