@@ -1,0 +1,39 @@
+{
+  "name": "@effect-ak/codegen-tg-bot",
+  "version": "0.0.1",
+  "author": {
+    "name": "Aleksandr Kondaurov",
+    "email": "kondaurov.dev@gmail.com"
+  },
+  "description": "Telegram bot Specification/Client Generator",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "url": "https://github.com/kondaurovDev/effect-ak",
+    "directory": "codegen/tg-bot"
+  },
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "codegen-aws-sdk-clients": "./dist/cjs/run.js"
+  },
+  "scripts": {
+    "prep": "curl https://core.telegram.org/bots/api -o api.html",
+    "build": "pnpm build-esm && pnpm build-cjs",
+    "build-esm": "tsc -b tsconfig.src.json",
+    "build-cjs": "babel dist/esm --plugins @babel/transform-export-namespace-from --plugins @babel/transform-modules-commonjs --out-dir dist/cjs --source-maps",
+    "pack-tar": "pnpm pack --pack-destination ../../dist"
+  },
+  "devDependencies": {
+    "node-html-parser": "^6.1.13"
+  },
+  "peerDependencies": {
+    "effect": "catalog:"
+  }
+}
