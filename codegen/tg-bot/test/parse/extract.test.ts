@@ -13,8 +13,12 @@ describe("extract service", () => {
 
         const extract = yield* ExtractService;
 
-        const fullInfo = yield* extract.getTypeDescription({ typeName: "ChatFullInfo" });
-        const restrictChatMember = yield* extract.getMethodDescription({ methodName: "restrictChatMember" });
+        const fullInfo = yield* extract.getTypeMetadata({ typeName: "ChatFullInfo" });
+        const restrictChatMember = yield* extract.getMethodMetadata({ methodName: "restrictChatMember" });
+
+        const allTypes = yield* extract.getAllTypeNames;
+
+        expect(allTypes.length).toBeGreaterThan(50);
 
         expect(fullInfo.description).match(/^This object contains full.*/)
 
@@ -30,5 +34,6 @@ describe("extract service", () => {
     assert(program._tag == "Success")
 
   });
+
 
 });

@@ -1,16 +1,14 @@
-import { Effect, Either } from "effect";
-import * as html_parser from "node-html-parser"
+import { Effect, Either, pipe, Array, Option } from "effect";
+import type * as html_parser from "node-html-parser"
 import { ApiHtmlPage } from "./api-html-page";
-
-const locators = {
-  sidebarDiv: "div.dev_side_nav"
-}
+import { ParseMapperService } from "./mapper";
 
 export class ExtractService
   extends Effect.Service<ExtractService>()("ExtractService", {
     effect:
       Effect.gen(function* () {
 
+        const mapper = yield* ParseMapperService;
         const { pageContent } = yield* ApiHtmlPage;
 
         const getNode =
@@ -23,16 +21,28 @@ export class ExtractService
               () => `Node '${input.cssSelector}' does not exist`
             );
 
-        const getSidebarSectionNames =
+        const getAllTypeNames =
           Either.gen(function* () {
 
-            const sections = pageContent.querySelectorAll(`${locators.sidebarDiv} > ul`);
+            const allHeaders = pageContent.querySelectorAll("h4 > a");
 
-            if (sections.length == 0) {
-              yield* Either.left("Cannot find dev sections")
+            if (!allHeaders) {
+              return yield* Either.left("Types not found");
             }
 
-            const result = sections.map(_ => _.text);
+            const result =
+              Array.filterMap(allHeaders, _ => {
+
+                const title = _.nextSibling?.text;
+
+                if (!title || !method_type_name_regex.test(title)) {
+                  return Option.none();
+                }
+                if (title[0] == title[0].toUpperCase()) {
+                  return Option.some(title);
+                }
+                return Option.none();
+              })
 
             return result;
 
@@ -71,7 +81,7 @@ export class ExtractService
 
             });
 
-        const getMethodDescription =
+        const getMethodMetadata =
           (input: {
             methodName: string
           }) =>
@@ -107,20 +117,31 @@ export class ExtractService
                     description: Either.fromNullable(first.at(3)?.text, () => "Field field 'description' not found")
                   })
 
-                  parameters.push({
-                    ...content,
-                    required: content.required == "Yes" ? true : false
-                  })
+                parameters.push({
+                  ...content,
+                  type: mapper.getNormalType({
+                    entityName: input.methodName,
+                    description: content.description,
+                    typeName: content.type
+                  }),
+                  required: content.required == "Yes" ? true : false
+                })
               }
 
               return {
-                name, description, parameters
+                name,
+                returns:
+                  yield* mapper.getNormalReturnType({
+                    methodDescription: description,
+                    methodName: input.methodName
+                  }),
+                description,
+                parameters
               } as const;
 
             });
 
-
-        const getTypeDescription =
+        const getTypeMetadata =
           (input: {
             typeName: string
           }) =>
@@ -154,7 +175,14 @@ export class ExtractService
                     description: Either.fromNullable(first.at(2)?.text, () => "Field description not found")
                   })
 
-                fields.push(content)
+                fields.push({
+                  ...content,
+                  type: mapper.getNormalType({
+                    description: content.description,
+                    entityName: input.typeName,
+                    typeName: content.type
+                  })
+                })
               }
 
               return {
@@ -164,12 +192,15 @@ export class ExtractService
             });
 
         return {
-          getTypeDescription, getMethodDescription
+          getTypeMetadata, getMethodMetadata, getAllTypeNames
         }
 
       }),
 
     dependencies: [
-      ApiHtmlPage.Default
+      ApiHtmlPage.Default,
+      ParseMapperService.Default
     ]
   }) { }
+
+const method_type_name_regex = /^\w+$/

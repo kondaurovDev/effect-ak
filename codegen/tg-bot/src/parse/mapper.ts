@@ -1,6 +1,4 @@
-import { Effect, Match, pipe } from "effect";
-
-const array_of_type = "Array of ";
+import { Effect, Either, Match, pipe } from "effect";
 
 export class ParseMapperService
   extends Effect.Service<ParseMapperService>()("ParseMapperService", {
@@ -11,7 +9,7 @@ export class ParseMapperService
           Chat: {
             type: `"private" | "group" | "supergroup" | "channel"`
           }
-        }
+        };
 
         const mapType =
           (typeName: string) =>
@@ -22,7 +20,7 @@ export class ParseMapperService
               Match.when("Boolean", () => "boolean"),
               Match.when("True", () => "true"),
               Match.orElse(() => typeName)
-            )
+            );
 
         const getNormalType =
           (input: {
@@ -54,22 +52,48 @@ export class ParseMapperService
         const getNormalReturnType =
           (input: {
             methodName: string,
-            description: string
-          }) => {
+            methodDescription: string
+          }) =>
+            Either.gen(function* () {
 
-            if (input.description.includes("if the edited message is not an inline")) {
-              return "Message | true"
-            }
+              const sentence = yield* getSentenceOfReturnType(input);
+  
+              const isReturnedResult = [
+                ...sentence.matchAll(is_returned_regex)
+              ];
 
-            return "";
+              if (isReturnedResult.length > 0) {
+                return isReturnedResult.map(_ => mapType(_[0])).join(" | ")
+              }
 
-          }
+              const returnsResult = sentence.match(returns_regex);
+
+              if (returnsResult) {
+                return mapType(returnsResult[0]);
+              }
+  
+              return yield* Either.left("Cannot extract return type");
+  
+            })
 
         const getSentenceOfReturnType =
           (input: {
             methodDescription: string
-          }) =>
-            ""
+          }) => {
+            const parts = input.methodDescription.split(".").map(_ => _.trim());
+
+            const hasReturnType = 
+              (_: string) =>
+                _.startsWith(on_success) || 
+                _.endsWith(is_returned) ||
+                _.startsWith(returns)
+            
+            return Either.fromNullable(
+              parts.find(hasReturnType),
+              () => "Sentence with return type not found"
+            );
+
+          }
 
         return {
           getNormalType, getNormalReturnType, getSentenceOfReturnType
@@ -77,3 +101,11 @@ export class ParseMapperService
 
       })
   }) { }
+
+const array_of_type = "Array of ";
+const on_success = "On Success";
+const is_returned = "is returned";
+const returns = "Returns ";
+
+const is_returned_regex = /\w+(?= is returned)/g
+const returns_regex = /(?<=^Returns )\w+/g
