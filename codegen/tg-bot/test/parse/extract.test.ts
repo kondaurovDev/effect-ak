@@ -1,26 +1,22 @@
 import { describe, expect, it, assert } from "vitest"
 import { Effect } from "effect"
 
-import { ExtractService } from "#/parse/extract"
+import { MainExtractService } from "#/parse/service/_export"
 import { testEnv } from "test/const";
 
 describe("extract service", () => {
 
-  it("get type/method", async () => {
+  it("main, get type/method", async () => {
 
     const program =
       await Effect.gen(function* () {
 
-        const extract = yield* ExtractService;
+        const service = yield* MainExtractService; 
 
-        const fullInfo = yield* extract.getTypeMetadata({ typeName: "ChatFullInfo" });
-        const restrictChatMember = yield* extract.getMethodMetadata({ methodName: "restrictChatMember" });
+        const fullInfo = yield* service.getTypeMetadata({ typeName: "ChatFullInfo" });
+        const restrictChatMember = yield* service.getMethodMetadata({ methodName: "restrictChatMember" });
 
-        const allTypes = yield* extract.getAllTypeNames;
-
-        expect(allTypes.length).toBeGreaterThan(50);
-
-        expect(fullInfo.description).match(/^This object contains full.*/)
+        expect(fullInfo.description).match(/^This object contains full.*/);
 
         yield* Effect.logInfo("type", fullInfo);
         yield* Effect.logInfo("method", restrictChatMember);
@@ -34,6 +30,5 @@ describe("extract service", () => {
     assert(program._tag == "Success")
 
   });
-
 
 });

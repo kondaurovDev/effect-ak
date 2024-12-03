@@ -1,7 +1,7 @@
 import { describe, expect, it, assert } from "vitest"
 import { Effect } from "effect"
 
-import { ParseMapperService } from "#/parse/mapper"
+import { ParseTypeMapService } from "#/parse/service/_export"
 import { testEnv } from "test/const";
 
 describe("mapper service", () => {
@@ -11,7 +11,7 @@ describe("mapper service", () => {
     const program =
       await Effect.gen(function* () {
 
-        const mapper = yield* ParseMapperService;
+        const mapper = yield* ParseTypeMapService;
 
         const make =
           (typeName: string) => ({
@@ -42,7 +42,7 @@ describe("mapper service", () => {
     const program =
       await Effect.gen(function* () {
 
-        const mapper = yield* ParseMapperService;
+        const mapper = yield* ParseTypeMapService;
 
         const ret1 =
           yield* mapper.getSentenceOfReturnType({
@@ -93,7 +93,7 @@ describe("mapper service", () => {
             methodDescription: description,
           });
 
-        const mapper = yield* ParseMapperService;
+        const mapper = yield* ParseTypeMapService;
 
         expect(yield* mapper.getNormalReturnType(make("Foo. Returns True on success"))).toEqual("true");
         expect(yield* mapper.getNormalReturnType(make("On success, the sent Message is returned"))).toEqual("Message");

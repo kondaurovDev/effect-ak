@@ -1,14 +1,16 @@
-import { Effect, Either, pipe, Array, Option } from "effect";
+import { Effect, Either } from "effect";
 import type * as html_parser from "node-html-parser"
 import { ApiHtmlPage } from "./api-html-page";
-import { ParseMapperService } from "./mapper";
 
-export class ExtractService
-  extends Effect.Service<ExtractService>()("ExtractService", {
+import { ParseTypeMapService } from "./type-map.js";
+import { FieldTypeMetadata, MethodMetadata, TypeMetadata } from "../types.js";
+
+export class MainExtractService
+  extends Effect.Service<MainExtractService>()("MainExtractService", {
     effect:
       Effect.gen(function* () {
 
-        const mapper = yield* ParseMapperService;
+        const mapper = yield* ParseTypeMapService;
         const { pageContent } = yield* ApiHtmlPage;
 
         const getNode =
@@ -20,33 +22,6 @@ export class ExtractService
               (input.source ?? pageContent).querySelector(input.cssSelector),
               () => `Node '${input.cssSelector}' does not exist`
             );
-
-        const getAllTypeNames =
-          Either.gen(function* () {
-
-            const allHeaders = pageContent.querySelectorAll("h4 > a");
-
-            if (!allHeaders) {
-              return yield* Either.left("Types not found");
-            }
-
-            const result =
-              Array.filterMap(allHeaders, _ => {
-
-                const title = _.nextSibling?.text;
-
-                if (!title || !method_type_name_regex.test(title)) {
-                  return Option.none();
-                }
-                if (title[0] == title[0].toUpperCase()) {
-                  return Option.some(title);
-                }
-                return Option.none();
-              })
-
-            return result;
-
-          });
 
         const getTypeOrMethod =
           (typeOrMethodName: string) =>
@@ -97,12 +72,7 @@ export class ExtractService
                 yield* Either.left(`A table with 4 columns was expected, actual ${head.length}`)
               }
 
-              const parameters = [] as {
-                name: string,
-                required: boolean,
-                type: string,
-                description: string
-              }[];
+              const parameters: FieldTypeMetadata[] = [];
 
               const rows = table.querySelectorAll("tbody tr");
 
@@ -117,27 +87,29 @@ export class ExtractService
                     description: Either.fromNullable(first.at(3)?.text, () => "Field field 'description' not found")
                   })
 
-                parameters.push({
-                  ...content,
-                  type: mapper.getNormalType({
-                    entityName: input.methodName,
-                    description: content.description,
-                    typeName: content.type
-                  }),
-                  required: content.required == "Yes" ? true : false
-                })
+                parameters.push(
+                  new FieldTypeMetadata({
+                    ...content,
+                    type: mapper.getNormalType({
+                      entityName: input.methodName,
+                      description: content.description,
+                      typeName: content.type
+                    }),
+                    required: content.required == "Yes" ? true : false
+                  })
+                )
               }
 
-              return {
-                name,
-                returns:
+              return new MethodMetadata({
+                methodName: name,
+                returnType:
                   yield* mapper.getNormalReturnType({
                     methodDescription: description,
                     methodName: input.methodName
                   }),
                 description,
-                parameters
-              } as const;
+                fields: parameters
+              });
 
             });
 
@@ -157,11 +129,7 @@ export class ExtractService
                 yield* Either.left(`A table with 3 columns was expected, actual ${head.length}`)
               }
 
-              const fields = [] as {
-                name: string,
-                type: string,
-                description: string
-              }[];
+              const fields: FieldTypeMetadata[] = [];
 
               const rows = table.querySelectorAll("tbody tr");
 
@@ -175,32 +143,34 @@ export class ExtractService
                     description: Either.fromNullable(first.at(2)?.text, () => "Field description not found")
                   })
 
-                fields.push({
-                  ...content,
-                  type: mapper.getNormalType({
-                    description: content.description,
-                    entityName: input.typeName,
-                    typeName: content.type
+                fields.push(
+                  new FieldTypeMetadata({
+                    ...content,
+                    type: mapper.getNormalType({
+                      description: content.description,
+                      entityName: input.typeName,
+                      typeName: content.type
+                    }),
+                    required: content.description.startsWith("Optional") == false
                   })
-                })
+                );
+
               }
 
-              return {
-                name, description, fields
-              } as const;
+              return new TypeMetadata({
+                typeName: name, description, fields
+              });
 
             });
 
         return {
-          getTypeMetadata, getMethodMetadata, getAllTypeNames
+          getTypeMetadata, getMethodMetadata
         }
 
       }),
 
     dependencies: [
       ApiHtmlPage.Default,
-      ParseMapperService.Default
+      ParseTypeMapService.Default
     ]
   }) { }
-
-const method_type_name_regex = /^\w+$/

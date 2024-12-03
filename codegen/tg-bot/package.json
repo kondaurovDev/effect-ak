@@ -31,7 +31,8 @@
     "pack-tar": "pnpm pack --pack-destination ../../dist"
   },
   "devDependencies": {
-    "node-html-parser": "^6.1.13"
+    "node-html-parser": "^6.1.13",
+    "puppeteer": "^23.9.0"
   },
   "peerDependencies": {
     "effect": "catalog:"

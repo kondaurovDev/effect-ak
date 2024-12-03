@@ -5,3 +5,4 @@ node_modules
 *.tgz
 token.txt
 *.zip
+/*.html

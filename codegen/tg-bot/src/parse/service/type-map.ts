@@ -1,7 +1,10 @@
 import { Effect, Either, Match, pipe } from "effect";
 
-export class ParseMapperService
-  extends Effect.Service<ParseMapperService>()("ParseMapperService", {
+import * as C from "../const.js";
+import { NormalType } from "../types.js";
+
+export class ParseTypeMapService
+  extends Effect.Service<ParseTypeMapService>()("ParseTypeMapService", {
     effect:
       Effect.gen(function* () {
 
@@ -32,20 +35,20 @@ export class ParseMapperService
             const override = typeOverrides[input.entityName];
 
             if (override) {
-              return override.type;
+              return NormalType(override.type);
             }
 
             if (input.typeName.includes(" or ")) {
               const types = input.typeName.split(" or ");
 
-              return types.map(mapType).join(" | ")
+              return NormalType(types.map(mapType).join(" | "))
             }
 
-            if (input.typeName.startsWith(array_of_type)) {
-              return `${mapType(input.typeName.slice(array_of_type.length))}[]`
+            if (input.typeName.startsWith(C.array_of_type)) {
+              return NormalType(`${mapType(input.typeName.slice(C.array_of_type.length))}[]`)
             }
 
-            return mapType(input.typeName);
+            return NormalType(mapType(input.typeName));
 
           }
 
@@ -59,17 +62,17 @@ export class ParseMapperService
               const sentence = yield* getSentenceOfReturnType(input);
   
               const isReturnedResult = [
-                ...sentence.matchAll(is_returned_regex)
+                ...sentence.matchAll(C.is_returned_regex)
               ];
 
               if (isReturnedResult.length > 0) {
-                return isReturnedResult.map(_ => mapType(_[0])).join(" | ")
+                return NormalType(isReturnedResult.map(_ => mapType(_[0])).join(" | "))
               }
 
-              const returnsResult = sentence.match(returns_regex);
+              const returnsResult = sentence.match(C.returns_regex);
 
               if (returnsResult) {
-                return mapType(returnsResult[0]);
+                return NormalType(mapType(returnsResult[0]));
               }
   
               return yield* Either.left("Cannot extract return type");
@@ -84,9 +87,9 @@ export class ParseMapperService
 
             const hasReturnType = 
               (_: string) =>
-                _.startsWith(on_success) || 
-                _.endsWith(is_returned) ||
-                _.startsWith(returns)
+                _.startsWith(C.on_success) || 
+                _.endsWith(C.is_returned) ||
+                _.startsWith(C.returns)
             
             return Either.fromNullable(
               parts.find(hasReturnType),
@@ -101,11 +104,3 @@ export class ParseMapperService
 
       })
   }) { }
-
-const array_of_type = "Array of ";
-const on_success = "On Success";
-const is_returned = "is returned";
-const returns = "Returns ";
-
-const is_returned_regex = /\w+(?= is returned)/g
-const returns_regex = /(?<=^Returns )\w+/g
