@@ -1,16 +1,18 @@
 import { Data } from "effect"
 
+import { docSectionNames, namespacesMap } from "./const.js"
+
 export class ExtractedTypeOrMethodOneOfType 
   extends Data.TaggedClass("ExtractedTypeOrMethodOneOfType")<{
     typeOrMethodName: string,
-    typeOrMethodDescription: string,
+    typeOrMethodDescription: string[],
     type: NormalType
   }> {}
 
 export class ExtractedTypeOrMethodFields 
   extends Data.TaggedClass("ExtractedTypeOrMethodFields")<{
     typeOrMethodName: string,
-    typeOrMethodDescription: string,
+    typeOrMethodDescription: string[],
     fields: FieldTypeMetadata[]
   }> {}
 
@@ -18,7 +20,7 @@ export class FieldTypeMetadata
   extends Data.TaggedClass("FieldTypeMetadata")<{
     name: string,
     type: NormalType,
-    description: string,
+    description: string[],
     required: boolean
   }> { }
 
@@ -27,14 +29,14 @@ export type TypeMetadata = TypeMetadataFields | TypeMetadataOneOf
 export class TypeMetadataFields
   extends Data.TaggedClass("TypeMetadataFields")<{
     typeName: string,
-    description: string
+    description: string[]
     fields: FieldTypeMetadata[]
   }> { }
 
 export class TypeMetadataOneOf
   extends Data.TaggedClass("TypeMetadataOneOf")<{
     typeName: string,
-    description: string
+    description: string[]
     type: NormalType
   }> { }
 
@@ -42,7 +44,7 @@ export class MethodMetadata
   extends Data.TaggedClass("MethodMetadata")<{
     methodName: string,
     returnType: NormalType,
-    description: string
+    description: string[]
     fields: FieldTypeMetadata[]
   }> { }
 
@@ -60,3 +62,12 @@ export class NormalType
     }
 
   }
+
+export class NamespaceMetadata
+  extends Data.TaggedClass("NamespaceMetadata")<{
+    methods: MethodMetadata[],
+    types: TypeMetadata[]
+  }> {}
+
+export type DocSectionName = typeof docSectionNames[number];
+export type Namespace = keyof typeof namespacesMap;

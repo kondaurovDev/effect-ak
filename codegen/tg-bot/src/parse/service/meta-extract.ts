@@ -1,8 +1,9 @@
-import { Effect, Either } from "effect";
-import type * as html_parser from "node-html-parser"
+import { Effect } from "effect";
 
 import { ApiHtmlPage } from "./api-html-page.js";
-import { method_type_name_regex } from "../const.js";
+import { method_type_name_regex, namespacesMap } from "../const.js";
+import { NamespaceMetadata, type Namespace } from "../types.js";
+import { MainExtractService } from "./main-extract.js";
 
 export class MetaExtractService
   extends Effect.Service<MetaExtractService>()("MetaExtractService", {
@@ -10,64 +11,71 @@ export class MetaExtractService
       Effect.gen(function* () {
 
         const { pageContent } = yield* ApiHtmlPage;
+        const extract = yield* MainExtractService;
 
-        const getNode =
+        const getNamespaceMetadata =
           (input: {
-            cssSelector: string,
-            source?: html_parser.HTMLElement
-          }) =>
-            Either.fromNullable(
-              (input.source ?? pageContent).querySelector(input.cssSelector),
-              () => `Node '${input.cssSelector}' does not exist`
-            );
+            namespace: Namespace
+          }) => {
+            const result =
+              new NamespaceMetadata({
+                methods: [], types: []
+              });
 
-        const getAllTypeNames =
-          Either.gen(function* () {
+            for (const selector of namespacesMap[input.namespace].selectors) {
 
-            const allHeaders = pageContent.querySelectorAll("h4 > a");
+              const nodes = pageContent.querySelectorAll(selector);
 
-            if (!allHeaders) {
-              return yield* Either.left("Types not found");
-            }
+              for (const node of nodes) {
 
-            const result = {
-              methodNames: [] as string[],
-              typeNames: [] as string[]
-            }
+                const title = node.nextSibling?.text;
 
-            for (const node of allHeaders) {
+                if (!title || !method_type_name_regex.test(title)) continue;
 
-              const sectionName = node.closest("h3 > a");
+                if (title[0] == title[0].toUpperCase()) {
 
-              if (!sectionName) {
-                return yield* Either.left("Unknown section");
+                  const type = 
+                    extract.getTypeMetadata({
+                      typeName: title,
+                    });
+
+                  if (type._tag == "Left") {
+                    console.warn(type.left);
+                    continue;
+                  }
+
+                  result.types.push(type.right);
+                  continue;
+                }
+
+                const method = 
+                  extract.getMethodMetadata({
+                    methodName: title,
+                  });
+
+                if (method._tag == "Left") {
+                  console.warn(method.left);
+                  continue;
+                }
+
+                result.methods.push(method.right);
+
               }
-
-              const title = node.nextSibling?.text;
-
-              if (!title || !method_type_name_regex.test(title)) continue;
-
-              if (title[0] == title[0].toUpperCase()) {
-                result.typeNames.push(title);
-                continue;
-              }
-
-              result.methodNames.push(title);
 
             }
 
             return result;
-
-          });
+          }
 
         return {
-          getAllTypeNames
+          getNamespaceMetadata
         } as const;
 
       }),
 
-      dependencies: [
-        ApiHtmlPage.Default
-      ]
+    dependencies: [
+      ApiHtmlPage.Default,
+      MainExtractService.Default
+    ]
 
   }) { }

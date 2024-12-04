@@ -1,20 +1,37 @@
 import { describe, expect, it, assert } from "vitest"
-import { Effect, Logger } from "effect"
+import { Effect } from "effect"
 
-import { MainExtractService } from "#/parse/service/_export"
-import { testEnv } from "test/const";
+import { MainExtractService, MetaExtractService } from "#/parse/service/_export"
+import { testRuntime } from "../const.js";
 
-describe("extract service", () => {
+describe("extract services", () => {
 
-  it("main, get type/method", async () => {
+  it("main service, static functions", async () => {
+
+    const splitter = MainExtractService.descriptionSplitter()
+
+    const actual = splitter("Use this method to send a native poll. On success, the sent Message is returned.");
+
+    expect(actual).toEqual([
+      "Use this method to send a native poll",
+      "On success, the sent Message is returned"
+    ]);
+
+  })
+
+  it("main service, get type/method", async () => {
 
     const program =
       await Effect.gen(function* () {
 
-        const service = yield* MainExtractService; 
+        const service = yield* MainExtractService;
+
+        const methods = {
+          sendMessage: yield* service.getMethodMetadata({ methodName: "sendMessage" }),
+          sendVoice: yield* service.getMethodMetadata({ methodName: "sendVoice" })
+        }
 
         const fullInfo = yield* service.getTypeMetadata({ typeName: "ChatFullInfo" });
-        const restrictChatMember = yield* service.getMethodMetadata({ methodName: "restrictChatMember" });
 
         assert(fullInfo._tag == "TypeMetadataFields");
 
@@ -27,22 +44,40 @@ describe("extract service", () => {
 
         const field2 = fullInfo.fields.find(_ => _.name == "available_reactions");
         expect(field2?.type.tsType).toEqual("ReactionType[]");
-
         expect(field2?.required).toBeFalsy();
 
-        yield* Effect.logInfo(fullInfo);
-        yield* Effect.logInfo(restrictChatMember);
-
       }).pipe(
-        Effect.provide(testEnv),
+        Effect.provide(testRuntime),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );
 
     assert(program._tag == "Success")
 
+  });
+
+  it("meta service, get namespace", async () => {
+
+    const program =
+      await Effect.gen(function* () {
+
+        const service = yield* MetaExtractService;
+
+        const primary = service.getNamespaceMetadata({ namespace: "primary" });
+
+        expect(primary.methods.length).toBeGreaterThan(70);
+        expect(primary.types.length).toBeGreaterThan(100);
+
+      }).pipe(
+        Effect.provide(testRuntime),
+        Effect.tapErrorCause(Effect.logError),
+        Effect.runPromiseExit
+      );
+
+    assert(program._tag == "Success");
+
     program
 
-  });
+  })
 
 });

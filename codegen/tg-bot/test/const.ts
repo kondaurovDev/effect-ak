@@ -1,18 +1,6 @@
-import { ConfigProvider, Layer, Logger } from "effect"
+import { makeMainLayer} from "#/layer.js";
 
-import { MainExtractService, ParseTypeMapService } from "#/parse/service/_export";
-
-export const testEnv = 
-  Layer.mergeAll(
-    MainExtractService.Default,
-    ParseTypeMapService.Default,
-    Logger.pretty
-  ).pipe(
-    Layer.provide(
-      Layer.setConfigProvider(
-        ConfigProvider.fromJson({
-          "page-path": "tg-bot-api.html"
-        })
-      )
-    )
-  );
+export const testRuntime =
+  makeMainLayer({
+    pagePath: "tg-bot-api.html"
+  })
