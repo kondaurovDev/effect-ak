@@ -13,22 +13,23 @@ describe("mapper service", () => {
 
         const mapper = yield* ParseTypeMapService;
 
-        const make =
-          (typeName: string) => ({
-            entityName: "SomeUnknown",
-            description: "",
-            typeName
-          });
+        const check = 
+          (docType: string, expected: string) => {
+            const t = mapper.getNormalType({
+              entityName: "SomeUnknown",
+              description: "",
+              typeName: docType
+            }).pipe(Either.andThen(_ => _.tsType));
+            assert(t._tag == "Right");
+            expect(t, expected)
+          } 
 
-        const getNormalType = 
-          (name: string) => mapper.getNormalType(make(name)).pipe(Either.andThen(_ => _.tsType))
-
-        expect(yield* getNormalType("String or Integer")).toEqual("string | number");
-        expect(yield* getNormalType("Boolean")).toEqual("boolean");
-        expect(yield* getNormalType("True")).toEqual("true");
-        expect(yield* getNormalType("Array of String")).toEqual("string[]");
-        expect(yield* getNormalType("Array of Integer")).toEqual("number[]");
-        expect(yield* getNormalType("Array of ChatObject")).toEqual("ChatObject[]");
+        check("String or Integer", "string | number");
+        check("Boolean", "boolean");
+        check("True","true");
+        check("Array of String", "string[]");
+        check("Array of Integer", "number[]");
+        check("Array of ChatObject", "ChatObject[]");
 
       }).pipe(
         Effect.provide(testEnv),
@@ -97,16 +98,34 @@ describe("mapper service", () => {
 
         const mapper = yield* ParseTypeMapService;
 
-        const getReturn =
-          (description: string) => 
+        const check =
+          (input: {
+            description: string,
+            expected: string
+          }) => {
+            const actual = 
             mapper.getNormalReturnType(({
               methodName: "SomeUnknown",
-              methodDescription: description,
-            })).pipe(Either.andThen(_ => _.tsType))
+              methodDescription: input.description,
+            }));
+            assert(actual._tag == "Right");
+            expect(actual.right.tsType).toEqual(input.expected)
+          }
 
-        expect(yield* getReturn("Foo. Returns True on success")).toEqual("true");
-        expect(yield* getReturn("On success, the sent Message is returned")).toEqual("Message");
-        expect(yield* getReturn("A is returned or B is returned or C is returned")).toEqual("A | B | C");
+        check({
+          description: "Foo. Returns True on success",
+          expected: "true"
+        });
+
+        check({
+          description: "On success, the sent Message is returned",
+          expected: "Message"
+        });
+
+        check({
+          description: "A is returned or B is returned or C is returned",
+          expected: "A | B | C"
+        });
 
       }).pipe(
         Effect.provide(testEnv),
