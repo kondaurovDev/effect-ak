@@ -1,9 +1,9 @@
-import { Effect, Either } from "effect";
+import { Effect, Either, pipe, Array } from "effect";
 import type * as html_parser from "node-html-parser"
-import { ApiHtmlPage } from "./api-html-page";
 
+import { ApiHtmlPage } from "./api-html-page.js";
 import { ParseTypeMapService } from "./type-map.js";
-import { FieldTypeMetadata, MethodMetadata, TypeMetadata } from "../types.js";
+import * as T from "../types.js";
 
 export class MainExtractService
   extends Effect.Service<MainExtractService>()("MainExtractService", {
@@ -24,35 +24,96 @@ export class MainExtractService
             );
 
         const getTypeOrMethod =
-          (typeOrMethodName: string) =>
+          (input: {
+            typeOrMethodName: string
+          }) =>
             Either.gen(function* () {
               const a_tag =
                 yield* getNode({
-                  cssSelector: `a.anchor[name="${typeOrMethodName.toLowerCase()}"]`
+                  cssSelector: `a.anchor[name="${input.typeOrMethodName.toLowerCase()}"]`
                 });
 
-              const name =
+              const typeOrMethodName =
                 yield* Either.fromNullable(
                   a_tag.nextSibling?.text, () => "Title not found"
                 );
 
-              const description =
+              const typeOrMethodDescription =
                 yield* Either.fromNullable(
                   a_tag.parentNode.nextElementSibling?.text, () => "Description not found"
                 );
 
-              const table =
+              const detailsNode =
                 yield* Either.fromNullable(
-                  a_tag.parentNode.nextElementSibling?.nextElementSibling, () => "Table with fields not found"
+                  a_tag.parentNode.nextElementSibling?.nextElementSibling, () => "Type/Method details not found"
                 );
 
-              if (table.tagName != "TABLE") {
-                yield* Either.left(`Table node was expected, found ${table.tagName}`)
+              if (detailsNode.tagName == "TABLE") {
+
+                const fields: T.FieldTypeMetadata[] = [];
+
+                const rows = detailsNode.querySelectorAll("tbody tr");
+
+                for (const row of rows) {
+                  const all = row.querySelectorAll("td");
+
+                  const name = yield* Either.fromNullable(all.at(0)?.text, () => "Column 'name' not found");
+                  const type = yield* Either.fromNullable(all.at(1)?.text, () => "Column 'type' not found");
+                  const description = yield* Either.fromNullable(all.at(all.length - 1)?.text, () => "Column 'description' not found"); // description is the last column
+
+                  const required =
+                    yield* (
+                      all.length == 3 ?
+                        Either.right(description.startsWith("Optional") == false) :
+                        pipe(
+                          Either.fromNullable(all.at(2)?.text, () => "Column 'required' not found"),
+                          Either.filterOrLeft(_ => _ == "Optional" || _ == "Yes", (input) => `'${input}' does not describe field requirement`),
+                          Either.andThen(_ => _ != "Optional")
+                        )
+                    );
+
+                  fields.push(
+                    new T.FieldTypeMetadata({
+                      name, description, required,
+                      type:
+                        yield* mapper.getNormalType({
+                          entityName: typeOrMethodName,
+                          description,
+                          typeName: type
+                        })
+                    })
+                  )
+                };
+
+                return new T.ExtractedTypeOrMethodFields({
+                  fields, typeOrMethodName, typeOrMethodDescription
+                });
+
               }
 
-              return {
-                name, description, table
-              } as const;
+              if (detailsNode.tagName == "UL") {
+
+                const oneOf: string[] = [];
+
+                const nodes = detailsNode.querySelectorAll("li");
+
+                for (const node of nodes) {
+                  oneOf.push(node.text)
+                }
+
+                if (Array.isNonEmptyArray(oneOf)) {
+                  return new T.ExtractedTypeOrMethodOneOfType({
+                    typeOrMethodName,
+                    type: new T.NormalType({ typeNames: oneOf}),
+                    typeOrMethodDescription
+                  })
+                }
+
+                return yield* Either.left("At least one type is expected");
+
+              }
+
+              return yield* Either.left("Type definition not found");
 
             });
 
@@ -62,54 +123,25 @@ export class MainExtractService
           }) =>
             Either.gen(function* () {
 
-              const {
-                description, table, name
-              } = yield* getTypeOrMethod(input.methodName);
+              const extracted =
+                yield* getTypeOrMethod({
+                  typeOrMethodName: input.methodName
+                });
 
-              const head = table.querySelectorAll("thead tr th");
-
-              if (head.length != 4) {
-                yield* Either.left(`A table with 4 columns was expected, actual ${head.length}`)
-              }
-
-              const parameters: FieldTypeMetadata[] = [];
-
-              const rows = table.querySelectorAll("tbody tr");
-
-              for (const row of rows) {
-                const first = row.querySelectorAll("td");
-
-                const content =
-                  yield* Either.all({
-                    name: Either.fromNullable(first.at(0)?.text, () => "Parameter field 'name' not found"),
-                    type: Either.fromNullable(first.at(1)?.text, () => "Parameter field 'type' not found"),
-                    required: Either.fromNullable(first.at(2)?.text, () => "Parameter field 'required' not found"),
-                    description: Either.fromNullable(first.at(3)?.text, () => "Field field 'description' not found")
-                  })
-
-                parameters.push(
-                  new FieldTypeMetadata({
-                    ...content,
-                    type: mapper.getNormalType({
-                      entityName: input.methodName,
-                      description: content.description,
-                      typeName: content.type
+              if (extracted._tag == "ExtractedTypeOrMethodFields") {
+                return new T.MethodMetadata({
+                  methodName: extracted.typeOrMethodName,
+                  returnType:
+                    yield* mapper.getNormalReturnType({
+                      methodDescription: extracted.typeOrMethodDescription,
+                      methodName: extracted.typeOrMethodName
                     }),
-                    required: content.required == "Yes" ? true : false
-                  })
-                )
+                  description: extracted.typeOrMethodDescription,
+                  fields: extracted.fields
+                });
               }
 
-              return new MethodMetadata({
-                methodName: name,
-                returnType:
-                  yield* mapper.getNormalReturnType({
-                    methodDescription: description,
-                    methodName: input.methodName
-                  }),
-                description,
-                fields: parameters
-              });
+              return yield* Either.left(`${input.methodName} does not contain any field`);
 
             });
 
@@ -119,46 +151,23 @@ export class MainExtractService
           }) =>
             Either.gen(function* () {
 
-              const {
-                description, table, name
-              } = yield* getTypeOrMethod(input.typeName);
+              const extracted =
+                yield* getTypeOrMethod({
+                  typeOrMethodName: input.typeName
+                });
 
-              const head = table.querySelectorAll("thead tr th");
-
-              if (head.length != 3) {
-                yield* Either.left(`A table with 3 columns was expected, actual ${head.length}`)
+              if (extracted._tag == "ExtractedTypeOrMethodFields") {
+                return new T.TypeMetadataFields({
+                  typeName: extracted.typeOrMethodName,
+                  description: extracted.typeOrMethodDescription,
+                  fields: extracted.fields
+                });
               }
 
-              const fields: FieldTypeMetadata[] = [];
-
-              const rows = table.querySelectorAll("tbody tr");
-
-              for (const row of rows) {
-                const first = row.querySelectorAll("td");
-
-                const content =
-                  yield* Either.all({
-                    name: Either.fromNullable(first.at(0)?.text, () => "Field name not found"),
-                    type: Either.fromNullable(first.at(1)?.text, () => "Field type not found"),
-                    description: Either.fromNullable(first.at(2)?.text, () => "Field description not found")
-                  })
-
-                fields.push(
-                  new FieldTypeMetadata({
-                    ...content,
-                    type: mapper.getNormalType({
-                      description: content.description,
-                      entityName: input.typeName,
-                      typeName: content.type
-                    }),
-                    required: content.description.startsWith("Optional") == false
-                  })
-                );
-
-              }
-
-              return new TypeMetadata({
-                typeName: name, description, fields
+              return new T.TypeMetadataOneOf({
+                typeName: extracted.typeOrMethodName,
+                description: extracted.typeOrMethodDescription,
+                type: extracted.type
               });
 
             });

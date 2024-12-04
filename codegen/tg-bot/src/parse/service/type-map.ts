@@ -1,4 +1,4 @@
-import { Effect, Either, Match, pipe } from "effect";
+import { Effect, Either, Match, pipe, Array } from "effect";
 
 import * as C from "../const.js";
 import { NormalType } from "../types.js";
@@ -30,27 +30,46 @@ export class ParseTypeMapService
             entityName: string,
             typeName: string,
             description: string
-          }) => {
+          }) =>
+            Either.gen(function* () {
 
-            const override = typeOverrides[input.entityName];
+              const override = typeOverrides[input.entityName];
+  
+              if (override) {
+                return new NormalType({ typeNames: [ override.type ] });
+              }
 
-            if (override) {
-              return NormalType(override.type);
-            }
+              const mustBeNonEmpty = 
+                Either.left(`'${input.typeName} must be non empty string'`);
+  
+              if (input.typeName.includes(" or ")) {
+                const typeNames = input.typeName.split(" or ").map(mapType);
 
-            if (input.typeName.includes(" or ")) {
-              const types = input.typeName.split(" or ");
+                if (Array.isNonEmptyArray(typeNames) && typeNames[0].length > 0) {
+                  return new NormalType({ typeNames })
+                }
+  
+                return yield* mustBeNonEmpty;
+                
+              } else if (input.typeName.startsWith(C.array_of_type)) {
+                const typeName = mapType(input.typeName.slice(C.array_of_type.length));
 
-              return NormalType(types.map(mapType).join(" | "))
-            }
+                if (typeName.length > 0) {
+                  return new NormalType({ typeNames: [ `${typeName}[]` ] })
+                }
 
-            if (input.typeName.startsWith(C.array_of_type)) {
-              return NormalType(`${mapType(input.typeName.slice(C.array_of_type.length))}[]`)
-            }
+                return yield* mustBeNonEmpty;
+              } else {
+                const typeNames = Array.make(mapType(input.typeName));
 
-            return NormalType(mapType(input.typeName));
-
-          }
+                if (typeNames[0].length == 0) {
+                  return yield* mustBeNonEmpty;
+                }
+                
+                return new NormalType({ typeNames });
+              }
+  
+            })
 
         const getNormalReturnType =
           (input: {
@@ -65,17 +84,18 @@ export class ParseTypeMapService
                 ...sentence.matchAll(C.is_returned_regex)
               ];
 
-              if (isReturnedResult.length > 0) {
-                return NormalType(isReturnedResult.map(_ => mapType(_[0])).join(" | "))
+              if (Array.isNonEmptyArray(isReturnedResult)) {
+                const typeNames = Array.map(isReturnedResult, _ => mapType(_[0]));
+                return new NormalType({ typeNames });
               }
 
               const returnsResult = sentence.match(C.returns_regex);
 
               if (returnsResult) {
-                return NormalType(mapType(returnsResult[0]));
+                return new NormalType({ typeNames: [ mapType(returnsResult[0]) ]});
               }
   
-              return yield* Either.left("Cannot extract return type");
+              return yield* Either.left("Cannot extract return type from description");
   
             })
 

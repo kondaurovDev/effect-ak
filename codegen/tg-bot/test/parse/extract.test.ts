@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest"
-import { Effect } from "effect"
+import { Effect, Logger } from "effect"
 
 import { MainExtractService } from "#/parse/service/_export"
 import { testEnv } from "test/const";
@@ -16,10 +16,22 @@ describe("extract service", () => {
         const fullInfo = yield* service.getTypeMetadata({ typeName: "ChatFullInfo" });
         const restrictChatMember = yield* service.getMethodMetadata({ methodName: "restrictChatMember" });
 
+        assert(fullInfo._tag == "TypeMetadataFields");
+
         expect(fullInfo.description).match(/^This object contains full.*/);
 
-        yield* Effect.logInfo("type", fullInfo);
-        yield* Effect.logInfo("method", restrictChatMember);
+        const field1 = fullInfo.fields.find(_ => _.name == "accent_color_id");
+
+        expect(field1?.required).toBeTruthy();
+        expect(field1?.type.tsType).toEqual("number");
+
+        const field2 = fullInfo.fields.find(_ => _.name == "available_reactions");
+        expect(field2?.type.tsType).toEqual("ReactionType[]");
+
+        expect(field2?.required).toBeFalsy();
+
+        yield* Effect.logInfo(fullInfo);
+        yield* Effect.logInfo(restrictChatMember);
 
       }).pipe(
         Effect.provide(testEnv),
@@ -28,6 +40,8 @@ describe("extract service", () => {
       );
 
     assert(program._tag == "Success")
+
+    program
 
   });
 

@@ -4,8 +4,8 @@ import type * as html_parser from "node-html-parser"
 import { ApiHtmlPage } from "./api-html-page.js";
 import { method_type_name_regex } from "../const.js";
 
-export class NavbarExtractService
-  extends Effect.Service<NavbarExtractService>()("NavbarExtractService", {
+export class MetaExtractService
+  extends Effect.Service<MetaExtractService>()("MetaExtractService", {
     effect:
       Effect.gen(function* () {
 
