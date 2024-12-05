@@ -2,7 +2,7 @@ import { describe, it, assert } from "vitest"
 import { Effect } from "effect"
 
 import { GenerateNamespaceService } from "#/generate/service/_export";
-import { testRuntime } from "../const.js";
+import { testLayer } from "../const.js";
 
 describe("write services", () => {
 
@@ -16,7 +16,7 @@ describe("write services", () => {
         const primary = yield* service.generate({ namespace: "primary" });
 
       }).pipe(
-        Effect.provide(testRuntime),
+        Effect.provide(testLayer),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );

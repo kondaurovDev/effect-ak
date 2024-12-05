@@ -1,8 +1,8 @@
 import { describe, it, assert } from "vitest"
-import { Effect, ManagedRuntime } from "effect"
+import { Effect } from "effect"
 
 import { WriteCodeService } from "#/generate/service/_export";
-import { testRuntime } from "../const.js";
+import { testLayer } from "../const.js";
 
 describe("write services", () => {
 
@@ -20,15 +20,10 @@ describe("write services", () => {
         );
 
       }).pipe(
-        Effect.provide(testRuntime),
+        Effect.provide(testLayer),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );
-
-
-    if (ManagedRuntime.isManagedRuntime(testRuntime)) {
-      const a = await testRuntime.runtime()
-    }
 
     assert(program._tag == "Success")
 

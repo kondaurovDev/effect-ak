@@ -1,6 +1,6 @@
 import { makeMainLayer} from "#/layer.js";
 
-export const testRuntime =
+export const testLayer =
   makeMainLayer({
     pagePath: "tg-bot-api.html"
   })

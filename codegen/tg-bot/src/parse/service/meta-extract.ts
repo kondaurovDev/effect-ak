@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ApiHtmlPage } from "./api-html-page.js";
+import { DocPage } from "./doc-page.js";
 import { method_type_name_regex, namespacesMap } from "../const.js";
 import { NamespaceMetadata, type Namespace } from "../types.js";
 import { MainExtractService } from "./main-extract.js";
@@ -10,7 +10,7 @@ export class MetaExtractService
     effect:
       Effect.gen(function* () {
 
-        const { pageContent } = yield* ApiHtmlPage;
+        const { pageContent } = yield* DocPage;
         const extract = yield* MainExtractService;
 
         const getNamespaceMetadata =
@@ -74,7 +74,7 @@ export class MetaExtractService
       }),
 
     dependencies: [
-      ApiHtmlPage.Default,
+      DocPage.Default,
       MainExtractService.Default
     ]
 

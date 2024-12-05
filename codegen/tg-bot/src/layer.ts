@@ -8,6 +8,7 @@ export const makeMainLayer =
     pagePath: string
   }) =>
     Layer.mergeAll(
+      ParseService.DocPage.Default,
       ParseService.MainExtractService.Default,
       ParseService.TypeMapService.Default,
       ParseService.MetaExtractService.Default,

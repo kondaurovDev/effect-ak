@@ -1,7 +1,7 @@
 import { Effect, Either, pipe, Array } from "effect";
 import type * as html_parser from "node-html-parser"
 
-import { ApiHtmlPage } from "./api-html-page.js";
+import { DocPage } from "./doc-page.js";
 import { TypeMapService } from "./type-map.js";
 import * as T from "../types.js";
 
@@ -11,9 +11,9 @@ export class MainExtractService
       Effect.gen(function* () {
 
         const mapper = yield* TypeMapService;
-        const { pageContent } = yield* ApiHtmlPage;
+        const docPage = yield* DocPage;
 
-        const splitDescription = MainExtractService.descriptionSplitter();
+        const parseDescription = MainExtractService.descriptionParser();
 
         const getMethodMetadata =
           (input: {
@@ -70,25 +70,14 @@ export class MainExtractService
 
             });
 
-        const getNode =
-          (input: {
-            cssSelector: string,
-            source?: html_parser.HTMLElement
-          }) =>
-            Either.fromNullable(
-              (input.source ?? pageContent).querySelector(input.cssSelector),
-              () => `Node '${input.cssSelector}' does not exist`
-            );
-
         const getTypeOrMethod =
           (input: {
             typeOrMethodName: string
           }) =>
             Either.gen(function* () {
-              const a_tag =
-                yield* getNode({
-                  cssSelector: `a.anchor[name="${input.typeOrMethodName.toLowerCase()}"]`
-                });
+              const a_tag = docPage.getTypeOrMethodNode(input.typeOrMethodName);
+
+              if (!a_tag) return yield* Either.left(`'${input.typeOrMethodName}' is not a type or method`);
 
               const typeOrMethodName =
                 yield* Either.fromNullable(
@@ -98,9 +87,9 @@ export class MainExtractService
               const typeOrMethodDescription =
                 yield* pipe(
                   Either.fromNullable(
-                    a_tag.parentNode.nextElementSibling?.text, () => "Description not found"
+                    a_tag.parentNode.nextElementSibling, () => "Description not found"
                   ),
-                  Either.andThen(splitDescription)
+                  Either.andThen(parseDescription)
                 );
 
               const detailsNode =
@@ -121,8 +110,8 @@ export class MainExtractService
                   const type = yield* Either.fromNullable(all.at(1)?.text, () => "Column 'type' not found");
                   const description =
                     yield* pipe(
-                      Either.fromNullable(all.at(all.length - 1)?.text, () => "Column 'description' not found"), // description is the last column
-                      Either.andThen(splitDescription)
+                      Either.fromNullable(all.at(all.length - 1), () => "Column 'description' not found"), // description is the last column
+                      Either.andThen(parseDescription)
                     )
 
                   const required =
@@ -187,18 +176,20 @@ export class MainExtractService
       }),
 
     dependencies: [
-      ApiHtmlPage.Default,
+      DocPage.Default,
       TypeMapService.Default
     ]
   }) {
 
-  static descriptionSplitter() {
-    const description_split_regex = /(\.\s{1}|\.$)/g
-    const contains_letters_regex = /\w{1,}/
-    return (description: string) =>
-      description
+  static descriptionParser() {
+    const description_split_regex = /(\.\s{1}|\.$)/g;
+    const contains_letters_regex = /\w{1,}/;
+    return (node: html_parser.HTMLElement) => {
+      return node.innerHTML
         .split(description_split_regex)
         .filter(s => contains_letters_regex.test(s));
+    }
+
   }
 
 }

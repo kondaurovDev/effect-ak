@@ -1,19 +1,31 @@
 import { describe, expect, it, assert } from "vitest"
-import { Effect } from "effect"
+import { Effect, pipe } from "effect"
 
-import { MainExtractService, MetaExtractService } from "#/parse/service/_export"
-import { testRuntime } from "../const.js";
+import { DocPage, MainExtractService, MetaExtractService } from "#/parse/service/_export"
+import { testLayer } from "../const.js";
 
 describe("extract services", () => {
 
-  it("main service, static functions", async () => {
+  it("main service, parse description", async () => {
 
-    const splitter = MainExtractService.descriptionSplitter()
+    const parseDescription = MainExtractService.descriptionParser();
 
-    const actual = splitter("Use this method to send a native poll. On success, the sent Message is returned.");
+    const sendMessageDescriptionNode = 
+      await pipe(
+        DocPage,
+        Effect.andThen(_ => _.pageContent.querySelector("h4 > a#sendmessage")?.parentNode.nextElementSibling),
+        Effect.provide([
+          testLayer
+        ]),
+        Effect.runPromise
+      );
+
+    assert(sendMessageDescriptionNode != null);
+
+    const actual = parseDescription(sendMessageDescriptionNode);
 
     expect(actual).toEqual([
-      "Use this method to send a native poll",
+      "Use this method to send text messages",
       "On success, the sent Message is returned"
     ]);
 
@@ -47,7 +59,7 @@ describe("extract services", () => {
         expect(field2?.required).toBeFalsy();
 
       }).pipe(
-        Effect.provide(testRuntime),
+        Effect.provide(testLayer),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );
@@ -69,7 +81,7 @@ describe("extract services", () => {
         expect(primary.types.length).toBeGreaterThan(100);
 
       }).pipe(
-        Effect.provide(testRuntime),
+        Effect.provide(testLayer),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );

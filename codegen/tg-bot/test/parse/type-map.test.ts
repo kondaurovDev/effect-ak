@@ -2,7 +2,7 @@ import { describe, expect, it, assert } from "vitest"
 import { Effect, Either } from "effect"
 
 import { TypeMapService } from "#/parse/service/_export"
-import { testRuntime } from "../const.js";
+import { testLayer } from "../const.js";
 
 describe("mapper service", () => {
 
@@ -85,7 +85,7 @@ describe("mapper service", () => {
         check("Array of ChatObject", "ChatObject[]");
 
       }).pipe(
-        Effect.provide(testRuntime),
+        Effect.provide(testLayer),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );
@@ -131,7 +131,7 @@ describe("mapper service", () => {
         });
 
       }).pipe(
-        Effect.provide(testRuntime),
+        Effect.provide(testLayer),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );
