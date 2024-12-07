@@ -4,6 +4,22 @@ import { pageTest } from "../_fixtures/page";
 
 describe("extracted-entity", () => {
 
+  pageTest("getMyCommands", ({ page }) => {
+
+    const entity = page.getEntity("getMyCommands");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+
+    expect(entity.right.entityName).toEqual("getMyCommands");
+    assert(entity.right.type.type == "fields");
+
+    expect(entity.right.type.fields).toHaveLength(2);
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["BotCommand[]"]);
+
+  });
+
   pageTest("logOut", ({ page }) => {
 
     const entity = page.getEntity("logOut");
@@ -76,6 +92,13 @@ describe("extracted-entity", () => {
     const field2 = entity.right.type.fields.find(_ => _.name == "available_reactions");
     expect(field2?.type.tsType).toEqual("ReactionType[]");
     expect(field2?.required).toBeFalsy();
+
+    const lastNameField = entity.right.type.fields.find(_ => _.name == "last_name");
+    expect(lastNameField?.type.tsType).toEqual("string");
+    expect(lastNameField?.required).toBeFalsy();
+    expect(lastNameField?.description).toEqual([
+      "Last name of the other party in a private chat"
+    ]);
 
   })
 

@@ -8,7 +8,7 @@ export class WriteCodeService
     scoped:
       Effect.gen(function* () {
 
-        const outDir = [__dirname, "..", "..", "code"];
+        const outDir = [__dirname, "..", "..", "client/src/api"];
 
         const project = new TsMorph.Project();
 

@@ -1,8 +1,10 @@
 import { describe, it, assert } from "vitest"
 import { Effect } from "effect"
 
-import { GenerateNamespaceService } from "#/generate/service/_export";
-import { testLayer } from "../const.js";
+import { generateNamespace } from "#/generate/namespace";
+import { PageProvider } from "#/service/page-provider";
+import { WriteCodeService } from "#/service/write-code";
+import { withConfig } from "#/layer";
 
 describe("write services", () => {
 
@@ -11,12 +13,18 @@ describe("write services", () => {
     const program =
       await Effect.gen(function* () {
 
-        const service = yield* GenerateNamespaceService;
-
-        const primary = yield* service.generate({ namespace: "primary" });
+        yield* generateNamespace("primary");
 
       }).pipe(
-        Effect.provide(testLayer),
+        Effect.provide([
+          PageProvider.Default,
+          WriteCodeService.Default
+        ]),
+        Effect.withConfigProvider(
+          withConfig({
+            pagePath: "tg-bot-api.html"
+          })
+        ),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );

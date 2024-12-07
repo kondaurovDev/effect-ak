@@ -1,7 +1,7 @@
 import { Data, Either } from "effect"
 
 import type { HtmlElement } from "#/types"
-import type { NormalType, NormalTypeShape } from "../normal-type/_model"
+import { NormalType, NormalTypeShape } from "../normal-type/_model"
 import type { EntityField } from "../entity-field/_model"
 import { extractFromNode } from "./factory"
 

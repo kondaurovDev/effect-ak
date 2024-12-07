@@ -1,18 +1,18 @@
-import { Array, Either } from "effect";
+import { Array, Either, pipe } from "effect";
 
-import { HtmlElement } from "#/types.js";
+import type { HtmlElement } from "#/types.js";
+import type { ExtractedEntityShape } from "./_model";
 import { ExtractEntityError } from "./errors";
-import { NormalTypeShape } from "../normal-type/_model";
-import { ExtractedEntityShape } from "./_model";
 import { new_entity_tag_set } from "./const";
 import { mapType } from "../normal-type/map-type";
 
 const description_split_regex = /(\.\s{1}|\.$)/g;
 const contains_letters_regex = /\w{1,}/;
-const type_tags_regex = /\w+(?=\<\/(a|em)>)/g
-const html_tags_regex = /<\/?[^>]+>/g
+const type_tags_regex = /\w+(?=\<\/(a|em)>)/g;
+const html_tags_regex = /<\/?[^>]+>/g;
+const optional_field_label = "Optional";
 
-const hasReturnType =
+const isReturnSentence =
   (_: string) =>
     _.startsWith("On Success") ||
     _.endsWith("is returned") ||
@@ -21,13 +21,13 @@ const hasReturnType =
 const removeHtmlTags = 
   (input: string) => input.replace(html_tags_regex, "")
 
-export const extractDescription = (
+export const extractEntityDescription = (
   node: HtmlElement, entityName: string
 ): Either.Either<ExtractedEntityShape["entityDescription"], ExtractEntityError> => {
 
     const lines = [] as string[];
 
-    let returnType: NormalTypeShape | undefined;
+    let returnTypes = [] as string[];
 
     let currentNode = node.nextElementSibling;
 
@@ -38,20 +38,32 @@ export const extractDescription = (
       for (const line of currentNode.innerHTML.split(description_split_regex)) {
 
         if (!contains_letters_regex.test(line)) continue;
+
+        const plainLine = removeHtmlTags(line);
   
-        if (hasReturnType(line)) {
-          if (returnType) return ExtractEntityError.left("Description:TooManyReturns", { entityName });
-          const typeNames = [...line.matchAll(type_tags_regex)].map(_ => mapType(_[0]));
+        if (isReturnSentence(line)) {
+          const typeNames = pipe(
+            Array.fromIterable(line.matchAll(type_tags_regex)),
+            Array.map(_ => {
+              const name = mapType(_[0]);
+              const isArray = plainLine.toLowerCase().includes(`an array of ${name.toLowerCase()}`);
+              return `${name}${isArray ? "[]" : ""}`;
+            })
+          );
+
           if (Array.isNonEmptyArray(typeNames)) {
-            returnType = { typeNames }
+            returnTypes.push(...typeNames)
           } else {
-            return ExtractEntityError.left("Description:NoReturnTypes", { entityName });
+            console.warn("No return type found for ", {
+              entityName, 
+              sentenceWithReturn: line 
+            })
           }
 
           continue;
         };
 
-        lines.push(removeHtmlTags(line));
+        lines.push(plainLine);
   
       }
 
@@ -60,8 +72,30 @@ export const extractDescription = (
     }
 
     if (Array.isNonEmptyArray(lines) && lines[0].length != 0) {
-      return Either.right({ lines, returns: returnType })
+      if (Array.isNonEmptyArray(returnTypes)) {
+        return Either.right({ lines, returns: { typeNames: returnTypes } })
+      } else {
+        return Either.right({ lines, returns: undefined })
+      }
+
     };
 
     return ExtractEntityError.left("Description:Empty");
+  }
+
+export const extractFieldDescription = 
+  (input: string) => {
+
+    const lines = [] as string[];
+
+    for (const line of input.split(description_split_regex)) {
+
+      if (!contains_letters_regex.test(line)) continue;
+
+      lines.push(line);
+
+    }
+
+    return lines
+
   }

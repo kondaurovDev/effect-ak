@@ -1,8 +1,7 @@
 import { describe, it, assert } from "vitest"
 import { Effect } from "effect"
 
-import { WriteCodeService } from "#/generate/service/_export";
-import { testLayer } from "../const.js";
+import { WriteCodeService } from "#/service/write-code";
 
 describe("write services", () => {
 
@@ -20,7 +19,9 @@ describe("write services", () => {
         );
 
       }).pipe(
-        Effect.provide(testLayer),
+        Effect.provide([
+          WriteCodeService.Default,
+        ]),
         Effect.tapErrorCause(Effect.logError),
         Effect.runPromiseExit
       );

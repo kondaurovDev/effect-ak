@@ -1,18 +1,25 @@
-import { Effect } from "effect";
+import { Effect, Logger, LogLevel } from "effect";
 
-import { GenerateNamespaceService } from "./service/namespace.js";
-import { makeMainLayer } from "#/layer.js";
+import { generateNamespace } from "./namespace.js";
+import { withConfig } from "#/layer.js";
+import { PageProvider } from "#/service/page-provider.js";
+import { WriteCodeService } from "#/service/write-code.js";
 
 const run =
   Effect.gen(function* () {
-
-    const gen = yield* GenerateNamespaceService;
-
-    yield* gen.generate({ namespace: "primary" })
-
+    yield* generateNamespace("primary");
   }).pipe(
-    Effect.provide(makeMainLayer({ pagePath: "tg-bot-api.html" })),
+    Effect.provide([
+      PageProvider.Default,
+      WriteCodeService.Default
+    ]),
+    Effect.withConfigProvider(
+      withConfig({
+        pagePath: "tg-bot-api.html"
+      })
+    ),
+    Logger.withMinimumLogLevel(LogLevel.Debug),
     Effect.runPromise
-  ) 
+  );
 
 run.then(() => console.log("done generating"))
