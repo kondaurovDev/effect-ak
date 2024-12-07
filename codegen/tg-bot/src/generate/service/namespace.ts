@@ -2,8 +2,8 @@ import { Effect, Either, String } from "effect";
 import * as TsMorph from "ts-morph"
 
 import { WriteCodeService } from "./write-code.js";
-import { Namespace } from "#/parse/types.js";
-import { MetaExtractService } from "#/parse/service/meta-extract.js";
+import { Namespace } from "#/types.js";
+import { MetaExtractService } from "#/scrape/service/meta-extract.js";
 
 export class GenerateNamespaceService
   extends Effect.Service<GenerateNamespaceService>()("GenerateNamespaceService", {
