@@ -1,4 +1,4 @@
-import { Effect, Either, String } from "effect";
+import { Effect, String } from "effect";
 
 import * as TsMorph from "ts-morph"
 import { PageProvider } from "#/service/page-provider";
@@ -21,55 +21,75 @@ export const generateNamespace =
       const makeApiInterfaceName =
         (_: string) => `${String.snakeToPascal(_)}Api`;
 
-      Either.gen(function* () {
+      const ns =
+        yield* EntityNamespace.makeFromPage(page, namespaceName);
 
-        const ns =
-          yield* EntityNamespace.makeFromPage(page, namespaceName);
-
-        const src =
-          yield* writeCode.createTsFile({
-            fileName: namespaceName
-          });
-
-        const apiInterfaceName =
-          makeApiInterfaceName(namespaceName);
-
-        src.addInterface({
-          name: apiInterfaceName,
-          methods:
-            ns.methods.slice(0, limit).map(method => ({
-              name: method.methodName,
-              returnType: method.returnType.tsType,
-              docs: [method.methodDescription.join("\n")],
-              parameters: [
-                {
-                  name: "_",
-                  type: makeMethodInterfaceInputName(method.methodName)
-                }
-              ]
-            } as TsMorph.MethodSignatureStructure))
+      const src =
+        yield* writeCode.createTsFile({
+          fileName: namespaceName
         });
 
-        for (const method of ns.methods.slice(0, limit)) {
+      const apiInterfaceName =
+        makeApiInterfaceName(namespaceName);
 
-          const interfaceName = makeMethodInterfaceInputName(method.methodName)
+      src.addInterface({
+        name: apiInterfaceName,
+        methods:
+          ns.methods.slice(0, limit).map(method => ({
+            name: method.methodName,
+            returnType: method.returnType.tsType,
+            docs: [method.methodDescription.join("\n")],
+            parameters: [
+              {
+                name: "_",
+                type: makeMethodInterfaceInputName(method.methodName)
+              }
+            ]
+          } as TsMorph.MethodSignatureStructure))
+      });
 
+      // for (const method of ns.methods) {
+
+      //   const interfaceName = makeMethodInterfaceInputName(method.methodName)
+
+      //   src.addInterface({
+      //     name: interfaceName,
+      //     ...(method.parameters == null ? undefined : {
+      //       properties:
+      //         method.parameters.map(field => ({
+      //           name: field.name,
+      //           type: field.type.tsType,
+      //           hasQuestionToken: !field.required,
+      //           docs: [field.description.join("\n")]
+      //         } as TsMorph.PropertySignatureStructure))
+      //     })
+
+      //   });
+
+      // }
+
+      for (const type of ns.types) {
+
+        if (type.type.type == "fields") {
           src.addInterface({
-            name: interfaceName,
-            ...(method.parameters == null ? undefined : {
+            name: type.typeName,
+            ...(type.type.type == null ? undefined : {
               properties:
-                method.parameters.map(field => ({
+                type.type.fields.map(field => ({
                   name: field.name,
                   type: field.type.tsType,
                   hasQuestionToken: !field.required,
                   docs: [field.description.join("\n")]
                 } as TsMorph.PropertySignatureStructure))
             })
+          })
+        } else {
+          src.addTypeAlias({
+            name: type.typeName,
+            type: type.type.normalType.tsType
+          })
+        };
 
-          });
+      }
 
-        }
-
-      })
-
-    })
+    });

@@ -1,6 +1,8 @@
-export const typeOverrides: Record<string, Record<string, string>> = {
+import type { NormalTypeShape } from "./_model";
+
+export const typeOverrides: Record<string, Record<string, NormalTypeShape>> = {
   Chat: {
-    type: `"private" | "group" | "supergroup" | "channel"`
+    type: { typeNames: ["private", "group", "supergroup", "channel" ] }
   }
 };
 

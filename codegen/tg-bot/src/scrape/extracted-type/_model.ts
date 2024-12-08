@@ -14,7 +14,7 @@ export class ExtractedType
     static makeFrom(entity: ExtractedEntityShape) {
       return new ExtractedType({
         typeName: entity.entityName,
-        description: entity.entityDescription,
+        description: entity.entityDescription.lines,
         type: entity.type
       })
     }

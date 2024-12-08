@@ -1,5 +1,5 @@
-import { describe, it, assert } from "vitest"
-import { Effect } from "effect"
+import { describe, it, assert } from "vitest";
+import { Effect } from "effect";
 
 import { generateNamespace } from "#/generate/namespace";
 import { PageProvider } from "#/service/page-provider";

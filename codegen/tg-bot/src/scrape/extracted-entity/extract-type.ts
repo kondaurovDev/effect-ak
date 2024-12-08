@@ -6,6 +6,7 @@ import { NormalType } from "../normal-type/_model";
 import { ExtractEntityError } from "./errors";
 import { ExtractedEntityShape } from "./_model";
 import { extractFieldDescription } from "./extract-description";
+import { optional_field_label } from "./const";
 
 export const extractType = (
   node: HtmlElement, entityName: string
@@ -31,15 +32,16 @@ export const extractType = (
       let required = false;
 
       if (all.length == 3) {
-        required = description[0].startsWith("Optional") == false;
-        description.shift();
+        const isOptional = description[0].startsWith(optional_field_label);
+        if (isOptional) description.shift();
+        required = isOptional == false;
       } else {
         const isRequired = all.at(2)?.text;
         if (!isRequired) return ExtractEntityError.left("NoColumn", { columnName: "required", entityName });
-        if (isRequired != "Optional" && isRequired != "Yes") {
+        if (isRequired != optional_field_label && isRequired != "Yes") {
           return ExtractEntityError.left("UnexpectedValue", { columnName: "required", entityName })
         }
-        required = isRequired != "Optional";
+        required = isRequired != optional_field_label;
       };
 
       const normalType =

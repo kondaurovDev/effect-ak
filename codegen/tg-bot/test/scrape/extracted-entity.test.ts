@@ -4,6 +4,91 @@ import { pageTest } from "../_fixtures/page";
 
 describe("extracted-entity", () => {
 
+  pageTest("ReplyKeyboardMarkup", ({ page }) => {
+
+    const entity = page.getEntity("ReplyKeyboardMarkup");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("ReplyKeyboardMarkup");
+    expect(entity.right.entityDescription.returns).toBeUndefined();
+    assert(entity.right.type.type == "fields");
+
+    const field1 = entity.right.type.fields.find(_ => _.name == "keyboard");
+    
+    expect(field1?.type.tsType).toEqual("KeyboardButton[][]");
+
+  });
+
+  pageTest("User", ({ page }) => {
+
+    const entity = page.getEntity("User");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("User");
+    expect(entity.right.entityDescription.returns).toBeUndefined();
+    assert(entity.right.type.type == "fields");
+    expect(entity.right.type.fields.map(_ => _.name)).containSubset(["id", "is_bot", "username"]);
+
+  });
+
+
+  pageTest("forwardMessages", ({ page }) => {
+
+    const entity = page.getEntity("forwardMessages");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("forwardMessages");
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["MessageId[]"])
+
+  });
+
+  pageTest("Chat", ({ page }) => {
+
+    const entity = page.getEntity("Chat");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+
+    expect(entity.right.entityName).toEqual("Chat");
+    expect(entity.right.entityDescription.lines[0]).toEqual("This object represents a chat");
+
+    assert(entity.right.type.type == "fields");
+    expect(entity.right.type.fields.length).greaterThan(1);
+
+    const titleField = entity.right.type.fields.find(_ => _.name == "title");
+
+    expect(titleField?.description.at(0)).toEqual("Title, for supergroups, channels and group chats")
+    expect(titleField?.type.tsType).toEqual("string");
+    expect(titleField?.required).toEqual(false);
+
+    const typeField = entity.right.type.fields.find(_ => _.name == "type");
+    
+    expect(typeField?.description.at(0)).toEqual("Type of the chat, can be either “private”, “group”, “supergroup” or “channel”")
+
+  });
+
+  pageTest("Message", ({ page }) => {
+
+    const entity = page.getEntity("Message");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+
+    expect(entity.right.entityName).toEqual("Message");
+    assert(entity.right.type.type == "fields");
+
+    expect(entity.right.type.fields.length).greaterThan(80);
+
+  });
+
   pageTest("getMyCommands", ({ page }) => {
 
     const entity = page.getEntity("getMyCommands");
