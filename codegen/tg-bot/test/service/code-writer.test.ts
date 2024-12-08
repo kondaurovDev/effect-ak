@@ -1,7 +1,6 @@
 import { describe, assert } from "vitest";
 import { Effect } from "effect";
 import { fixture } from "../fixture";
-import { EntityNamespace } from "#/scrape/entity-namespace/_model";
 
 describe("code writer service", () => {
 

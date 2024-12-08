@@ -4,6 +4,42 @@ import { fixture } from "../fixture";
 
 describe("extracted-entity", () => {
 
+  fixture("getStarTransactions", ({ page }) => {
+
+    const entity = page.getEntity("getStarTransactions");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("getStarTransactions");
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["StarTransactions"]);
+
+  });
+
+  fixture("deleteMessage", ({ page }) => {
+
+    const entity = page.getEntity("deleteMessage");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("deleteMessage");
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["true"]);
+
+  });
+  
+  fixture("getWebhookInfo", ({ page }) => {
+
+    const entity = page.getEntity("getWebhookInfo");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("getWebhookInfo");
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["WebhookInfo"]);
+
+  });
+
   fixture("ReplyKeyboardMarkup", ({ page }) => {
 
     const entity = page.getEntity("ReplyKeyboardMarkup");

@@ -6,14 +6,14 @@ import { ExtractEntityError } from "./errors";
 import { new_entity_tag_set } from "./const";
 import { mapType } from "../normal-type/map-type";
 
-const description_split_regex = /(\.\s{1}|\.$)/g;
+const description_split_regex = /(\.\s{0,}|\.$)/g;
 const contains_letters_regex = /\w{1,}/;
 const type_tags_regex = /\w+(?=\<\/(a|em)>)/g;
 const html_tags_regex = /<\/?[^>]+>/g;
 
 const isReturnSentence =
   (_: string) =>
-    _.startsWith("On Success") ||
+    _.startsWith("On success") ||
     _.endsWith("is returned") ||
     _.startsWith("Returns ");
 
@@ -28,7 +28,7 @@ export const extractEntityDescription = (
 
     let returnTypes = [] as string[];
 
-    let currentNode = node.nextElementSibling;
+    let currentNode: HtmlElement | null  = node.nextElementSibling;
 
     while (currentNode) {
 
@@ -40,7 +40,7 @@ export const extractEntityDescription = (
 
         const plainLine = removeHtmlTags(line);
   
-        if (isReturnSentence(line)) {
+        if (isReturnSentence(plainLine)) {
           const typeNames = pipe(
             Array.fromIterable(line.matchAll(type_tags_regex)),
             Array.map(_ => {
@@ -51,15 +51,14 @@ export const extractEntityDescription = (
           );
 
           if (Array.isNonEmptyArray(typeNames)) {
-            returnTypes.push(...typeNames)
+            returnTypes.push(...typeNames);
+            continue;
           } else {
             console.warn("No return type found for ", {
               entityName, 
               sentenceWithReturn: line 
             })
           }
-
-          continue;
         };
 
         lines.push(plainLine);
@@ -79,7 +78,7 @@ export const extractEntityDescription = (
 
     };
 
-    return ExtractEntityError.left("Description:Empty");
+    return ExtractEntityError.left("Description:Empty", { entityName });
   }
 
 export const extractFieldDescription = 
