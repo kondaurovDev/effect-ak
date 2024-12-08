@@ -12,7 +12,7 @@ const makeArray =
   (input: string) => {
 
     const dimension = [...input.matchAll(array_of_regex)].length;
-    const typeName = input.replaceAll(array_of_regex, "").trim();
+    const typeName = mapType(input.replaceAll(array_of_regex, "").trim());
 
     return `${typeName}${"[]".repeat(dimension)}`;
 

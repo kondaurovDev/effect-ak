@@ -1,13 +1,13 @@
 import { describe, expect, assert } from "vitest"
 
-import { pageTest } from "../_fixtures/page";
-import { EntityNamespace } from "#/scrape/entity-namespace/_model";
+import { fixture } from "../fixture";
+import { ExtractedEntities } from "#/scrape/extracted-entities/_model";
 
-describe("entity namespace", () => {
+describe("extracted entities", () => {
 
-  pageTest("create primary namespace ", async ({ page }) => {
+  fixture("extract", async ({ page }) => {
 
-    const ns = EntityNamespace.makeFromPage(page, "primary");
+    const ns = ExtractedEntities.make(page);
 
     if (ns._tag == "Left") {
       console.log(ns.left)

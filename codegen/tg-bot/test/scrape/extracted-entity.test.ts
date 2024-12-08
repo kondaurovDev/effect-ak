@@ -1,10 +1,10 @@
 import { describe, expect, assert } from "vitest"
 
-import { pageTest } from "../_fixtures/page";
+import { fixture } from "../fixture";
 
 describe("extracted-entity", () => {
 
-  pageTest("ReplyKeyboardMarkup", ({ page }) => {
+  fixture("ReplyKeyboardMarkup", ({ page }) => {
 
     const entity = page.getEntity("ReplyKeyboardMarkup");
 
@@ -21,7 +21,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("User", ({ page }) => {
+  fixture("User", ({ page }) => {
 
     const entity = page.getEntity("User");
 
@@ -36,7 +36,7 @@ describe("extracted-entity", () => {
   });
 
 
-  pageTest("forwardMessages", ({ page }) => {
+  fixture("forwardMessages", ({ page }) => {
 
     const entity = page.getEntity("forwardMessages");
 
@@ -48,7 +48,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("Chat", ({ page }) => {
+  fixture("Chat", ({ page }) => {
 
     const entity = page.getEntity("Chat");
 
@@ -74,7 +74,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("Message", ({ page }) => {
+  fixture("Message", ({ page }) => {
 
     const entity = page.getEntity("Message");
 
@@ -89,7 +89,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("getMyCommands", ({ page }) => {
+  fixture("getMyCommands", ({ page }) => {
 
     const entity = page.getEntity("getMyCommands");
 
@@ -105,7 +105,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("logOut", ({ page }) => {
+  fixture("logOut", ({ page }) => {
 
     const entity = page.getEntity("logOut");
 
@@ -119,7 +119,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("getMe", ({ page }) => {
+  fixture("getMe", ({ page }) => {
 
     const entity = page.getEntity("getMe");
 
@@ -132,7 +132,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("sendChatAction", ({ page }) => {
+  fixture("sendChatAction", ({ page }) => {
 
     const entity = page.getEntity("sendChatAction");
 
@@ -143,7 +143,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("ForumTopicClosed", async ({ page }) => {
+  fixture("ForumTopicClosed", async ({ page }) => {
 
     const entity = page.getEntity("forumTopicClosed");
 
@@ -159,7 +159,7 @@ describe("extracted-entity", () => {
 
   });
 
-  pageTest("ChatFullInfo", ({ page }) => {
+  fixture("ChatFullInfo", ({ page }) => {
 
     const entity = page.getEntity("ChatFullInfo");
 

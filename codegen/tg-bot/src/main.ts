@@ -1,12 +1,18 @@
 import { Effect, Logger, LogLevel } from "effect";
 
-import { generateNamespace } from "./namespace.js";
-import { withConfig } from "#/layer.js";
-import { PageProvider } from "#/service/page-provider.js";
-import { WriteCodeService } from "#/service/write-code.js";
+import { withConfig } from "./config.js";
+import { PageProviderService } from "./service/index.js";
+import { namespacesMap } from "./scrape/extracted-entities/const.js";
 
 const run =
   Effect.gen(function* () {
+
+    const { page } = yield* PageProviderService;
+
+    for (const namespaceName of Objec) {
+
+    }
+
     yield* generateNamespace("primary");
   }).pipe(
     Effect.provide([
