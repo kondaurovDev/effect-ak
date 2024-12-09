@@ -31,6 +31,10 @@ export const makeTgBotClient =
           cause: httpResponse
         });
 
+      if (httpResponse.ok == false) {
+        console.warn(httpResponse)
+      }
+
       return httpResponse;
 
     }

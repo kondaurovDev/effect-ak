@@ -42,13 +42,9 @@ export const makePayload = (
     // }
 
     if (typeof value != "object") {
-      result.append(
-        key, `${value}`
-      )
+      result.append(key, `${value}`)
     } else {
-      result.append(
-        key, new Blob([ JSON.stringify(value) ], { type: "application/json" })
-      )  
+      result.append(key, JSON.stringify(value))  
     }
 
     // if () {

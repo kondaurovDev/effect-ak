@@ -1,6 +1,7 @@
 import { describe, expect, assert, vi } from "vitest";
 
 import { fixture } from "./fixture";
+import { MESSAGE_EFFECTS } from "../src/client/const";
 
 const fetchSpy = vi.spyOn(global, "fetch");
 
@@ -28,13 +29,40 @@ describe("telegram bot client", () => {
 
   fixture("send message", async ({ chat_id, client, skip }) => {
 
-    skip();
+    // skip();
 
     const response =
       await client.execute("send_message", {
         chat_id,
         text: "hey again",
-        message_effect_id: ""
+        message_effect_id: MESSAGE_EFFECTS["💩"]
+      })
+
+    expect(response.result?.chat.id).toBeDefined();
+
+  });
+
+  fixture("send message with keyboard", async ({ chat_id, client, skip }) => {
+
+    skip();
+
+    const response =
+      await client.execute("send_message", {
+        chat_id,
+        text: "hey again!",
+        message_effect_id: MESSAGE_EFFECTS["🎉"],
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "app", 
+                web_app: {
+                  url: "https://core.telegram.org/api"
+                }
+              }
+            ]
+          ]
+        }
       })
 
     expect(response.result?.chat.id).toBeDefined();
