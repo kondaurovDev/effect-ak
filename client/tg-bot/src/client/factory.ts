@@ -1,6 +1,6 @@
-import type { Api } from "../specification/api";
-import { makePayload, methodPath } from "./request";
-import { isTgBotApiResponse, TgBotApiResponse } from "./response";
+import type { Api } from "../specification/api.js";
+import { makePayload, methodPath } from "./request.js";
+import { isTgBotApiResponse, TgBotApiResponse } from "./response.js";
 
 const defaultBaseUrl = "https://api.telegram.org";
 
@@ -22,9 +22,9 @@ export const makeTgBotClient =
       const httpResponse =
         await fetch(
           `${baseUrl}/bot${options.token}/${methodPath(method)}`, {
-          body: makePayload(input),
+          body: makePayload(input) ?? null,
           method: "POST"
-        }).then(_ => _.json());
+        }).then(_ => _.json() as Promise<Record<string, unknown>>);
 
       if (!isTgBotApiResponse<ReturnType<Api[M]>>(httpResponse)) 
         throw new Error("Not valid response", { 

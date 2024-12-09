@@ -16,7 +16,7 @@
   "license": "MIT",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/dts/index.d.ts",
   "scripts": {
     "prep": "curl https://core.telegram.org/bots/api -o api.html",
     "build": "pnpm build-esm && pnpm build-cjs",

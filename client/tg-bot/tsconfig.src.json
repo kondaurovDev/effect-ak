@@ -3,8 +3,8 @@
   "include": ["src"],
   "compilerOptions": {
     "types": ["node"],
-    "outDir": "dist",
-    "declaration": true,
+    "outDir": "dist/esm",
+    "declarationDir": "dist/dts",
     "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
     "rootDir": "src"
   }

@@ -4,6 +4,21 @@ import { fixture } from "../fixture";
 
 describe("extracted-entity", () => {
 
+  fixture("InputFile", ({ page }) => {
+
+    const entity = page.getEntity("InputFile");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("InputFile");
+
+    assert(entity.right.type.type == "normalType");
+
+    expect(entity.right.type.normalType.getTsType()).toEqual("File");
+
+  });
+
   fixture("sendMediaGroup", ({ page }) => {
 
     const entity = page.getEntity("sendMediaGroup");
@@ -18,7 +33,7 @@ describe("extracted-entity", () => {
     const field1 = entity.right.type.fields.find(_ => _.name == "media");
 
     expect(field1?.type.getTsType()).toEqual(
-      "(T.InputMediaAudio | T.InputMediaDocument | T.InputMediaPhoto | InputMediaVideo)[]"
+      "(T.InputMediaAudio | T.InputMediaDocument | T.InputMediaPhoto | T.InputMediaVideo)[]"
     );
 
   });

@@ -6,3 +6,7 @@ export const optional_field_label = "Optional";
 export const returnTypeOverrides: Record<string, [string, ...string[]]> = {
   sendMediaGroup: [ "Message[]" ]
 } as const;
+
+export const typeAliasOverrides: Record<string, string> = {
+  InputFile: "{ file_content: Uint8Array, file_name: string }"
+}

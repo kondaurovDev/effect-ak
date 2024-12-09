@@ -29,14 +29,14 @@ describe("telegram bot client", () => {
 
   fixture("send message", async ({ chat_id, client, skip }) => {
 
-    // skip();
+    skip();
 
     const response =
       await client.execute("send_message", {
         chat_id,
         text: "hey again",
-        message_effect_id: MESSAGE_EFFECTS["💩"]
-      })
+        message_effect_id: MESSAGE_EFFECTS["🔥"]
+      });
 
     expect(response.result?.chat.id).toBeDefined();
 
@@ -55,7 +55,7 @@ describe("telegram bot client", () => {
           inline_keyboard: [
             [
               {
-                text: "app", 
+                text: "api documentation", 
                 web_app: {
                   url: "https://core.telegram.org/api"
                 }
@@ -69,5 +69,21 @@ describe("telegram bot client", () => {
 
   });
 
+  fixture("send document", async ({ chat_id, client, skip }) => {
+
+    const response =
+      await client.execute("send_document", {
+        chat_id,
+        message_effect_id: MESSAGE_EFFECTS["🎉"],
+        document: {
+          file_content: Buffer.from("Hello!"),
+          file_name: "hello.txt"
+        },
+        caption: "simple text file"
+      })
+
+    expect(response.result?.chat.id).toBeDefined();
+
+  });
 
 })

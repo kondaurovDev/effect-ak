@@ -7,6 +7,7 @@ import { ExtractEntityError } from "./errors";
 import { findTypeNode } from "./find-type";
 import { extractEntityDescription } from "./extract-description";
 import { extractType } from "./extract-type";
+import { typeAliasOverrides } from "./const";
 
 export const extractFromNode = (
   node: HtmlElement
@@ -24,12 +25,13 @@ export const extractFromNode = (
 
   if (Either.isLeft(detailsNode)) {
     if (detailsNode.left.error == "TypeDefinition:StopTagEncountered") {
+      const typeName = typeAliasOverrides[entityName] ?? "never";
       return Either.right({
         entityName,
         entityDescription: entityDescription.right,
         type: {
           type: "normalType",
-          normalType: new NormalType({ typeNames: [ "never" ]})
+          normalType: new NormalType({ typeNames: [ typeName ]})
         }
       })
     };

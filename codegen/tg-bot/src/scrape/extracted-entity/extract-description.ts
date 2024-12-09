@@ -17,33 +17,34 @@ const isReturnSentence =
     _.endsWith("is returned") ||
     _.startsWith("Returns ");
 
-const removeHtmlTags = 
+const removeHtmlTags =
   (input: string) => input.replace(html_tags_regex, "")
 
 export const extractEntityDescription = (
   node: HtmlElement, entityName: string
 ): Either.Either<ExtractedEntityShape["entityDescription"], ExtractEntityError> => {
 
-    const lines = [] as string[];
+  const lines = [] as string[];
 
-    let returnTypes = [] as string[];
+  let returnTypes = [] as string[];
 
-    const returnTypeOverridden = returnTypeOverrides[entityName];
+  const returnTypeOverridden = returnTypeOverrides[entityName];
 
-    let currentNode: HtmlElement | null  = node.nextElementSibling;
+  let currentNode: HtmlElement | null = node.nextElementSibling;
 
-    while (currentNode) {
+  while (currentNode) {
 
-      if (!currentNode || new_entity_tag_set.has(currentNode.tagName)) break;
+    if (!currentNode || new_entity_tag_set.has(currentNode.tagName)) break;
 
-      for (const line of currentNode.innerHTML.split(description_split_regex)) {
+    for (const line of currentNode.innerHTML.split(description_split_regex)) {
 
-        if (!contains_letters_regex.test(line)) continue;
+      if (!contains_letters_regex.test(line)) continue;
 
-        const plainLine = removeHtmlTags(line);
-  
-        if (!returnTypeOverridden && isReturnSentence(plainLine)) {
-          const typeNames = pipe(
+      const plainLine = removeHtmlTags(line);
+
+      if (!returnTypeOverridden && isReturnSentence(plainLine)) {
+        const typeNames =
+          pipe(
             Array.fromIterable(line.matchAll(type_tags_regex)),
             Array.filterMap(_ => {
               const originName = _[0];
@@ -56,46 +57,46 @@ export const extractEntityDescription = (
             })
           );
 
-          if (Array.isNonEmptyArray(typeNames)) {
-            returnTypes.push(...typeNames);
-            continue;
-          } else {
-            console.warn("No return type found for ", {
-              entityName,
-              sentenceWithReturn: line 
-            })
-          }
-        };
+        if (Array.isNonEmptyArray(typeNames)) {
+          returnTypes.push(...typeNames);
+          continue;
+        } else {
+          console.warn("No return type found for ", {
+            entityName,
+            sentenceWithReturn: line
+          })
+        }
+      };
 
-        lines.push(plainLine);
-  
-      }
-
-      currentNode = currentNode.nextElementSibling;
+      lines.push(plainLine);
 
     }
 
-    if (Array.isNonEmptyArray(lines) && lines[0].length != 0) {
-      if (returnTypeOverridden) {
-        return Either.right({ 
-          lines, 
-          returns: { typeNames: returnTypeOverridden } 
-        })
-      } else if (Array.isNonEmptyArray(returnTypes)) {
-        return Either.right({ 
-          lines, 
-          returns: { typeNames: Array.dedupe(returnTypes) } 
-        })
-      } else {
-        return Either.right({ lines, returns: undefined })
-      }
+    currentNode = currentNode.nextElementSibling;
 
-    };
-
-    return ExtractEntityError.left("Description:Empty", { entityName });
   }
 
-export const extractFieldDescription = 
+  if (Array.isNonEmptyArray(lines) && lines[0].length != 0) {
+    if (returnTypeOverridden) {
+      return Either.right({
+        lines,
+        returns: { typeNames: returnTypeOverridden }
+      })
+    } else if (Array.isNonEmptyArray(returnTypes)) {
+      return Either.right({
+        lines,
+        returns: { typeNames: Array.dedupe(returnTypes) }
+      })
+    } else {
+      return Either.right({ lines, returns: undefined })
+    }
+
+  };
+
+  return ExtractEntityError.left("Description:Empty", { entityName });
+}
+
+export const extractFieldDescription =
   (input: string) => {
 
     const lines = [] as string[];

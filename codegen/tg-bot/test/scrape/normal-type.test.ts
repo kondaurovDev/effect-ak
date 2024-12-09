@@ -11,7 +11,8 @@ describe("normal type", () => {
       (docType: string, expected: string) => {
         const t = NormalType.makeFrom({
           entityName: "SomeUnknown",
-          typeName: docType
+          fieldName: "unknown",
+          specType: docType
         }).pipe(Either.andThen(_ => _.getTsType()));
         assert(t._tag == "Right");
         expect(t.right, expected);

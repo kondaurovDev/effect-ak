@@ -10,21 +10,17 @@ export const methodPath =
         }
       }, "")
 
-type FileProps = {
-  fileContent: Uint8Array,
-  fileName?: string
-}
+type FileProps = { file_content: Uint8Array, file_name: string }
 
 const hasFileContent =
   (input: unknown): input is FileProps =>
-    typeof input == "object" &&
-    input != null &&
-    "fileContent" in input &&
-    input.fileContent instanceof Uint8Array
+    (typeof input == "object" && input != null) &&
+    ("file_content" in input && input.file_content instanceof Uint8Array) &&
+    ("file_name" in input && typeof input.file_name === "string" && input.file_name.length > 0)
 
 export const makePayload = (
   body: Record<string, unknown>
-) => {
+): FormData | undefined => {
 
   const entries = Object.entries(body);
 
@@ -35,27 +31,14 @@ export const makePayload = (
   for (const [key, value] of entries) {
     if (!value) continue;
 
-    // file
-    // if (true) {
-    //   result.append(key, new Blob([value.content]), value.fileName);
-    //   continue;
-    // }
-
     if (typeof value != "object") {
       result.append(key, `${value}`)
+    } else if (hasFileContent(value)) {
+      result.append(key, new Blob([ value.file_content ]), value.file_name);
     } else {
       result.append(key, JSON.stringify(value))  
     }
 
-    // if () {
-
-    // } else {
-    //   if (key == "message_effect_id" && isMessageEffect(value)) {
-    //     result.append(key, messageEffectIdCodesMap[value]);
-    //     continue;
-    //   }
-
-    // }
   }
 
   return result;
