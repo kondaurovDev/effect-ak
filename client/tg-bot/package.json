@@ -5,6 +5,9 @@
     "name": "Aleksandr Kondaurov",
     "email": "kondaurov.dev@gmail.com"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Telegram bot client",
   "files": [
     "dist"
