@@ -1,7 +1,8 @@
 import { defineWorkspace } from 'vitest/config'
 
 export default defineWorkspace([
-  "packages/*",
+  "client/*",
   "codegen/*",
+  "packages/*",
   "playground"
-])
+]);

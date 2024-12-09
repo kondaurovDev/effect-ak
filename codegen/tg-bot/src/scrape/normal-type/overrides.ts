@@ -6,5 +6,8 @@ export const typeOverrides: Record<string, Record<string, NormalTypeShape>> = {
   },
   sendMediaGroup: {
     media: { typeNames: [ "(T.InputMediaAudio | T.InputMediaDocument | T.InputMediaPhoto | T.InputMediaVideo)[]"] }
+  },
+  sendDice: {
+    emoji: { typeNames: [ `"🎲" | "🎯" | "🏀" | "⚽" | "🎰"` ] }
   }
 } as const;

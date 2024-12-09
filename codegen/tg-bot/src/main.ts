@@ -1,23 +1,25 @@
 import { Effect, Logger, LogLevel } from "effect";
 
 import { withConfig } from "./config.js";
-import { PageProviderService } from "./service/index.js";
-import { namespacesMap } from "./scrape/extracted-entities/const.js";
+import { ExtractedEntities } from "./scrape/extracted-entities/_model.js";
+import { CodeWriterService, PageProviderService } from "./service/index.js";
 
 const run =
   Effect.gen(function* () {
 
     const { page } = yield* PageProviderService;
+    const codeWriter = yield* CodeWriterService;
+    const entities = yield* ExtractedEntities.make(page);
 
-    for (const namespaceName of Objec) {
+    codeWriter.writeTypes(entities.types);
+    codeWriter.writeMethods(entities.methods);
 
-    }
+    yield* codeWriter.saveFiles;
 
-    yield* generateNamespace("primary");
   }).pipe(
     Effect.provide([
-      PageProvider.Default,
-      WriteCodeService.Default
+      PageProviderService.Default,
+      CodeWriterService.Default
     ]),
     Effect.withConfigProvider(
       withConfig({

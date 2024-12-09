@@ -6,5 +6,5 @@ export const withConfig =
   }) =>
     ConfigProvider.fromJson({
       "page-path": input.pagePath,
-      "client-out-dir": [__dirname, "..", "client", "src", "generated"]
+      "client-out-dir": [ __dirname, "..", "..", "..", "client", "tg-bot", "src", "specification" ]
     })
