@@ -21,14 +21,15 @@ const makeArray =
 export const makeFrom =
   (input: {
     entityName: string,
-    typeName: string
+    fieldName: string,
+    specType: string
   }): Either.Either<NormalTypeShape, NormalTypeError> => {
-    const override = typeOverrides[input.entityName]?.[input.typeName];
+    const override = typeOverrides[input.entityName]?.[input.fieldName];
 
-    if (override) Either.right(override);
+    if (override) return Either.right({ ...override, isOverridden: true });
 
-    if (input.typeName.includes(" or ")) {
-      const typeNames = input.typeName.split(" or ").map(mapType);
+    if (input.specType.includes(" or ")) {
+      const typeNames = input.specType.split(" or ").map(mapType);
 
       if (Array.isNonEmptyArray(typeNames) && typeNames[0].length > 0) {
         return Either.right({ typeNames })
@@ -36,8 +37,8 @@ export const makeFrom =
 
       return NormalTypeError.left("EmptyType", input);
 
-    } else if (input.typeName.startsWith(array_of_label)) {
-      const typeName = mapType(makeArray(input.typeName));
+    } else if (input.specType.startsWith(array_of_label)) {
+      const typeName = mapType(makeArray(input.specType));
 
       if (typeName.length > 0) {
         return Either.right({ typeNames: [ typeName ] });
@@ -45,7 +46,7 @@ export const makeFrom =
 
       return NormalTypeError.left("EmptyType", input);
     } else {
-      const typeNames = Array.make(mapType(input.typeName));
+      const typeNames = Array.make(mapType(input.specType));
 
       if (typeNames[0].length == 0) {
         return NormalTypeError.left("EmptyType", input);

@@ -6,8 +6,10 @@ export const mapType =
       Match.value(typeName),
       Match.when("String", () => "string"),
       Match.when("Integer", () => "number"),
+      Match.when("Int", () => "number"),
       Match.when("Float", () => "number"),
       Match.when("Boolean", () => "boolean"),
-      Match.when("True", () => "true"),
+      Match.when("True", () => "boolean"),
+      Match.when("False", () => "boolean"),
       Match.orElse(() => typeName)
     );

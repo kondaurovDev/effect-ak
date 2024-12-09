@@ -12,14 +12,14 @@ describe("normal type", () => {
         const t = NormalType.makeFrom({
           entityName: "SomeUnknown",
           typeName: docType
-        }).pipe(Either.andThen(_ => _.tsType));
+        }).pipe(Either.andThen(_ => _.getTsType()));
         assert(t._tag == "Right");
         expect(t.right, expected);
       }
 
     check("String or Integer", "string | number");
     check("Boolean", "boolean");
-    check("True", "true");
+    check("True", "boolean");
     check("Array of String", "string[]");
     check("Array of Integer", "number[]");
     check("Array of ChatObject", "ChatObject[]");

@@ -4,6 +4,37 @@ import { fixture } from "../fixture";
 
 describe("extracted-entity", () => {
 
+  fixture("sendMediaGroup", ({ page }) => {
+
+    const entity = page.getEntity("sendMediaGroup");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("sendMediaGroup");
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["Message[]"]);
+
+    assert(entity.right.type.type == "fields");
+    const field1 = entity.right.type.fields.find(_ => _.name == "media");
+
+    expect(field1?.type.getTsType()).toEqual(
+      "(T.InputMediaAudio | T.InputMediaDocument | T.InputMediaPhoto | InputMediaVideo)[]"
+    );
+
+  });
+
+  fixture("setGameScore", ({ page }) => {
+
+    const entity = page.getEntity("setGameScore");
+
+    if (entity._tag == "Left") console.log(entity.left);
+
+    assert(entity._tag == "Right");
+    expect(entity.right.entityName).toEqual("setGameScore");
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["Message", "boolean"]);
+
+  });
+
   fixture("getStarTransactions", ({ page }) => {
 
     const entity = page.getEntity("getStarTransactions");
@@ -24,7 +55,7 @@ describe("extracted-entity", () => {
 
     assert(entity._tag == "Right");
     expect(entity.right.entityName).toEqual("deleteMessage");
-    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["true"]);
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["boolean"]);
 
   });
   
@@ -53,7 +84,7 @@ describe("extracted-entity", () => {
 
     const field1 = entity.right.type.fields.find(_ => _.name == "keyboard");
     
-    expect(field1?.type.tsType).toEqual("KeyboardButton[][]");
+    expect(field1?.type.getTsType()).toEqual("KeyboardButton[][]");
 
   });
 
@@ -101,7 +132,7 @@ describe("extracted-entity", () => {
     const titleField = entity.right.type.fields.find(_ => _.name == "title");
 
     expect(titleField?.description.at(0)).toEqual("Title, for supergroups, channels and group chats")
-    expect(titleField?.type.tsType).toEqual("string");
+    expect(titleField?.type.getTsType()).toEqual("string");
     expect(titleField?.required).toEqual(false);
 
     const typeField = entity.right.type.fields.find(_ => _.name == "type");
@@ -150,8 +181,8 @@ describe("extracted-entity", () => {
     expect(entity.right.entityName).toEqual("logOut");
     assert(entity.right.type.type == "normalType");
 
-    expect(entity.right.type.normalType.tsType).toEqual("never");
-    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["true"]);
+    expect(entity.right.type.normalType.getTsType()).toEqual("never");
+    expect(entity.right.entityDescription.returns?.typeNames).toEqual(["boolean"]);
 
   });
 
@@ -164,7 +195,7 @@ describe("extracted-entity", () => {
     expect(entity.right.entityName).toEqual("getMe");
     assert(entity.right.type.type == "normalType");
 
-    expect(entity.right.type.normalType.tsType).toEqual("never")
+    expect(entity.right.type.normalType.getTsType()).toEqual("never")
 
   });
 
@@ -187,7 +218,7 @@ describe("extracted-entity", () => {
 
     assert(entity.right.type.type == "normalType");
 
-    expect(entity.right.type.normalType.tsType).toEqual("never");
+    expect(entity.right.type.normalType.getTsType()).toEqual("never");
 
     // expect(entity.right.entityName).toEqual("forumTopicClosed");
     // expect(entity.right.type.type).toEqual("fields");
@@ -208,14 +239,14 @@ describe("extracted-entity", () => {
     const field1 = entity.right.type.fields.find(_ => _.name == "accent_color_id");
 
     expect(field1?.required).toBeTruthy();
-    expect(field1?.type.tsType).toEqual("number");
+    expect(field1?.type.getTsType()).toEqual("number");
 
     const field2 = entity.right.type.fields.find(_ => _.name == "available_reactions");
-    expect(field2?.type.tsType).toEqual("ReactionType[]");
+    expect(field2?.type.getTsType()).toEqual("ReactionType[]");
     expect(field2?.required).toBeFalsy();
 
     const lastNameField = entity.right.type.fields.find(_ => _.name == "last_name");
-    expect(lastNameField?.type.tsType).toEqual("string");
+    expect(lastNameField?.type.getTsType()).toEqual("string");
     expect(lastNameField?.required).toBeFalsy();
     expect(lastNameField?.description).toEqual([
       "Last name of the other party in a private chat"

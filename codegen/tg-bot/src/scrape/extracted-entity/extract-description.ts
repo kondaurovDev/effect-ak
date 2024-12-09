@@ -1,9 +1,9 @@
-import { Array, Either, pipe } from "effect";
+import { Array, Either, pipe, Option } from "effect";
 
 import type { HtmlElement } from "#/types.js";
 import type { ExtractedEntityShape } from "./_model";
 import { ExtractEntityError } from "./errors";
-import { new_entity_tag_set } from "./const";
+import { new_entity_tag_set, returnTypeOverrides } from "./const";
 import { mapType } from "../normal-type/map-type";
 
 const description_split_regex = /(\.\s{0,}|\.$)/g;
@@ -28,6 +28,8 @@ export const extractEntityDescription = (
 
     let returnTypes = [] as string[];
 
+    const returnTypeOverridden = returnTypeOverrides[entityName];
+
     let currentNode: HtmlElement | null  = node.nextElementSibling;
 
     while (currentNode) {
@@ -40,13 +42,17 @@ export const extractEntityDescription = (
 
         const plainLine = removeHtmlTags(line);
   
-        if (isReturnSentence(plainLine)) {
+        if (!returnTypeOverridden && isReturnSentence(plainLine)) {
           const typeNames = pipe(
             Array.fromIterable(line.matchAll(type_tags_regex)),
-            Array.map(_ => {
-              const name = mapType(_[0]);
+            Array.filterMap(_ => {
+              const originName = _[0];
+              if (originName.at(0)?.toUpperCase() != originName.at(0)) {
+                return Option.none();
+              }
+              const name = mapType(originName);
               const isArray = plainLine.toLowerCase().includes(`an array of ${name.toLowerCase()}`);
-              return `${name}${isArray ? "[]" : ""}`;
+              return Option.some(`${name}${isArray ? "[]" : ""}`);
             })
           );
 
@@ -55,7 +61,7 @@ export const extractEntityDescription = (
             continue;
           } else {
             console.warn("No return type found for ", {
-              entityName, 
+              entityName,
               sentenceWithReturn: line 
             })
           }
@@ -70,8 +76,16 @@ export const extractEntityDescription = (
     }
 
     if (Array.isNonEmptyArray(lines) && lines[0].length != 0) {
-      if (Array.isNonEmptyArray(returnTypes)) {
-        return Either.right({ lines, returns: { typeNames: returnTypes } })
+      if (returnTypeOverridden) {
+        return Either.right({ 
+          lines, 
+          returns: { typeNames: returnTypeOverridden } 
+        })
+      } else if (Array.isNonEmptyArray(returnTypes)) {
+        return Either.right({ 
+          lines, 
+          returns: { typeNames: Array.dedupe(returnTypes) } 
+        })
       } else {
         return Either.right({ lines, returns: undefined })
       }

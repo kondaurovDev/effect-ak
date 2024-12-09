@@ -20,10 +20,10 @@ export const extractType = (
     for (const row of rows) {
       const all = row.querySelectorAll("td");
 
-      const name = all.at(0)?.text;
-      if (!name) return ExtractEntityError.left("NoColumn", { columnName: "name", entityName });
-      const typeName = all.at(1)?.text;
-      if (!typeName) return ExtractEntityError.left("NoColumn", { columnName: "type", entityName });
+      const fieldName = all.at(0)?.text;
+      if (!fieldName) return ExtractEntityError.left("NoColumn", { columnName: "name", entityName });
+      const specType = all.at(1)?.text;
+      if (!specType) return ExtractEntityError.left("NoColumn", { columnName: "type", entityName });
       const descriptionNode = all.at(all.length - 1); // description is the last column
       if (!descriptionNode) return ExtractEntityError.left("NoColumn", { columnName: "description", entityName });
 
@@ -45,7 +45,7 @@ export const extractType = (
       };
 
       const normalType =
-        NormalType.makeFrom({ entityName, typeName });
+        NormalType.makeFrom({ entityName, fieldName, specType });
 
       if (Either.isLeft(normalType)) {
         console.warn(normalType.left)
@@ -54,7 +54,7 @@ export const extractType = (
 
       fields.push(
         new EntityField({
-          name, description, required,
+          name: fieldName, description, required,
           type: normalType.right
         })
       )

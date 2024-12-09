@@ -10,11 +10,12 @@ export const writeTypes =
         if (type.type.type == "fields") {
           src.addInterface({
             name: type.typeName,
+            isExported: true,
             ...(type.type.type == null ? undefined : {
               properties:
                 type.type.fields.map(field => ({
                   name: field.name,
-                  type: field.type.tsType,
+                  type: field.type.getTsType(),
                   hasQuestionToken: !field.required,
                   docs: [field.description.join("\n")]
                 } as PropertySignatureStructure))
@@ -23,7 +24,8 @@ export const writeTypes =
         } else {
           src.addTypeAlias({
             name: type.typeName,
-            type: type.type.normalType.tsType
+            isExported: true,
+            type: type.type.normalType.getTsType()
           })
         };
       }

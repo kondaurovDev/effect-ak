@@ -10,13 +10,21 @@ export const writeMethods =
       const makeMethodInterfaceInputName =
         (_: string) => `${String.snakeToPascal(_)}Input`;
 
+      const typeNamespace = "T";
+
+      src.addImportDeclaration({
+        moduleSpecifier: "./types",
+        namespaceImport: typeNamespace
+      })
+
       src.addInterface({
-        name: "TgBotApi",
+        name: "Api",
+        isExported: true,
         methods:
           methods.map(method => ({
-            name: method.methodName,
-            returnType: method.returnType.tsType,
-            docs: [method.methodDescription.join("\n")],
+            name: String.camelToSnake(method.methodName),
+            returnType: method.returnType.getTsType(typeNamespace),
+            docs: [ method.methodDescription.join("\n") ],
             parameters: [
               {
                 name: "_",
@@ -36,7 +44,7 @@ export const writeMethods =
             properties:
               method.parameters.map(field => ({
                 name: field.name,
-                type: field.type.tsType,
+                type: field.type.getTsType(typeNamespace),
                 hasQuestionToken: !field.required,
                 docs: [field.description.join("\n")]
               } as PropertySignatureStructure))
