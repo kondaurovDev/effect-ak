@@ -2,7 +2,7 @@ import { Effect, Logger, LogLevel } from "effect";
 import { describe } from "node:test";
 import { assert, it } from "vitest";
 
-import * as SQS from "../../src/module/sqs";
+import * as SQS from "#/module/sqs/index.js";
 
 describe("sqs", () => {
 
@@ -17,8 +17,8 @@ describe("sqs", () => {
           queueName: "test",
           attributes: {
             queueType: "standard",
-            deliveryDelay: 1,
-            retentionPeriod: 1
+            deliveryDelay: 2,
+            retentionPeriod: 3
           }
         });
 

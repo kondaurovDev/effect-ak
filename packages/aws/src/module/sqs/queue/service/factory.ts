@@ -105,7 +105,11 @@ export class SqsQueueFactoryService
           makeQueueUrl, makeQueueArn
         } as const
 
-      })
+      }),
+
+      dependencies: [
+        CoreConfigurationProviderService.Default
+      ]
   }) { }
 
 type QueueInput = {

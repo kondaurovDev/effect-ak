@@ -38,7 +38,7 @@ export class SqsQueueManageService
                 });
 
                 if (!currentAttributes)
-                  return yield* Effect.die("Current queue's attributes are undefined");
+                  yield* Effect.die("Current queue's attributes are undefined");
 
                 if (Equal.equals(attributes, currentAttributes)) {
                   yield* Effect.logDebug("Queue's attributes are the same");
@@ -100,7 +100,7 @@ export class SqsQueueManageService
                 }
               });
 
-            })
+            });
 
         return {
           $, upsertQueue, upsertQueueAndDeadLetterQueue
@@ -110,6 +110,7 @@ export class SqsQueueManageService
     dependencies: [
       SqsClientService.Default,
       SqsQueueViewService.Default,
-      SqsQueueFactoryService.Default
+      SqsQueueFactoryService.Default,
+      CoreConfigurationProviderService.Default
     ]
   }) { }
