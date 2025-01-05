@@ -32,8 +32,3 @@ Contains clients for interacting with the following vendors:
 - Google Calendar
 - Google Tasks
 - Google Drive
-
-## Code generators
-
-### aws-sdk-clients
-![NPM Version](https://img.shields.io/npm/v/@effect-ak/codegen-aws-sdk-clients)<br>
