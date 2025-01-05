@@ -15,13 +15,10 @@
     "noFallthroughCasesInSwitch": true,
     "incremental": true,
     "paths": {
-      "@effect-ak/client-tg-bot": ["./client/tg-bot/src/index.js"],
-      "@effect-ak/codegen-aws-sdk-clients": ["./codegen/aws-sdk-clients/src/index.js"],
       "@effect-ak/ai": ["./packages/ai/src/index.js"],
       "@effect-ak/aws": ["./packages/aws/src/index.js"],
       "@effect-ak/google-api": ["./packages/google-api/src/index.js"],
       "@effect-ak/misc": ["./packages/misc/src/index.js"],
-      "@effect-ak/tg-bot": ["./packages/tg-bot/src/index.js"],
     }
   },
   "exclude": [
