@@ -33,12 +33,6 @@ Contains clients for interacting with the following vendors:
 - Google Tasks
 - Google Drive
 
-### TG-Bot
-![NPM Version](https://img.shields.io/npm/v/@effect-ak/tg-bot)<br>
-- HTTP client for interacting with the Telegram Bot API
-- Sending text messages, dice, documents, etc.
-- Service for creating bots using a polling architecture. Bots can be run locally.
-
 ## Code generators
 
 ### aws-sdk-clients

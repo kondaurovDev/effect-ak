@@ -199,6 +199,10 @@ importers:
         version: 3.10.19
 
   packages/tg-bot:
+    dependencies:
+      '@effect-ak/tg-bot-client':
+        specifier: ^0.0.6
+        version: 0.0.6
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
@@ -570,6 +574,9 @@ packages:
   '@babel/types@7.26.0':
     resolution: {integrity: sha512-Z/yiTPj+lDVnF7lWeKCIJzaIkI0vYO87dMpZ4bg4TDrFe4XXLFWL1TbXU27gBP3QccxV9mZICCrnjnYlJjXHOA==, tarball: https://registry.npmjs.org/@babel/types/-/types-7.26.0.tgz}
     engines: {node: '>=6.9.0'}
+
+  '@effect-ak/tg-bot-client@0.0.6':
+    resolution: {integrity: sha512-1Ibq1fpqP57gPEunxIwKT1trlCNMZN6sA24j97z9zFavvaFYQ2goqhWe+/2bepIaTouzLSo03JbZH9S73PGdGg==, tarball: https://registry.npmjs.org/@effect-ak/tg-bot-client/-/tg-bot-client-0.0.6.tgz}
 
   '@effect/platform-node-shared@0.19.30':
     resolution: {integrity: sha512-7jHhnggIfWTBP1gW4iPc2L7YnYtwzzjTfBMjnlUcUuk1+3Vj4j3LzOpWVsCNR2G84p0OWtqt764Ee4OxMY5nFg==, tarball: https://registry.npmjs.org/@effect/platform-node-shared/-/platform-node-shared-0.19.30.tgz}
@@ -3756,6 +3763,8 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
+
+  '@effect-ak/tg-bot-client@0.0.6': {}
 
   '@effect/platform-node-shared@0.19.30(@effect/platform@0.69.29(effect@3.10.19))(effect@3.10.19)':
     dependencies:
