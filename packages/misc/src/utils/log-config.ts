@@ -9,4 +9,4 @@ export const LogLevelConfigFromEnv =
     ),
     Effect.map(Logger.minimumLogLevel),
     Layer.unwrapEffect
-  )
+  );
